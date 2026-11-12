@@ -90,13 +90,14 @@ body { width: 340px; }
 .spam { display: flex; flex-direction: column; gap: 12px; padding: 14px; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--line); transition: opacity 0.15s; }
 .spam.off { opacity: 0.5; }
 .spam-count { display: flex; align-items: center; gap: 12px; }
-.spam-number { font-family: var(--heading); font-size: 36px; font-weight: 800; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; }
+.spam-number { font-size: 34px; font-weight: 700; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; }
 .spam-label { font-weight: 600; }
 .small { font-size: 13px; }
 .top-rules { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
 .top-rules li { display: flex; justify-content: space-between; }
 .tag-only-note { font-size: 13px; padding: 8px 10px; border-radius: var(--radius-sm); background: var(--accent-soft); }
-.link-button { align-self: flex-start; border: 0; background: none; padding: 0; color: var(--accent); font-weight: 600; font-size: 13px; }
+.link-button { align-self: flex-start; border: 0; background: none; padding: 0; color: var(--muted); font-weight: 600; font-size: 13px; }
+.link-button:hover { color: var(--ink); }
 .features { display: flex; flex-direction: column; gap: 10px; }
 .features h2 { font-size: 13px; font-weight: 600; color: var(--muted); }
 .features .toggle-label { font-weight: 500; }

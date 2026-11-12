@@ -675,7 +675,7 @@
     "message": "Account info"
   },
   "feature_account_info_description": {
-    "message": "Shows details about each author next to the name: where the account is based, how long it has been on Threads, and its follower and post counts. Looks up one account every 1.5 to 2 seconds."
+    "message": "Shows a small line of details under each author name: where the account is based, how long it has been on Threads, and its follower and post counts. Looks up one account every 1.5 to 2 seconds."
   },
   "feature_account_info_option_age": {
     "message": "How long on Threads"

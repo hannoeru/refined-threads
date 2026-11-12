@@ -38,6 +38,6 @@ const featuresUrl = browser.runtime.getURL('/options.html#features')
 .welcome h1 { font-size: clamp(30px, 5vw, 44px); font-weight: 800; letter-spacing: -0.01em; }
 .welcome-lead { font-size: 18px; max-width: 56ch; }
 .welcome-more { padding: 12px 14px; border-radius: var(--radius-lg); background: var(--accent-soft); }
-.welcome-more a { color: var(--accent); font-weight: 600; }
+.welcome-more a { color: var(--link); font-weight: 600; text-decoration: none; }
 .welcome-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 </style>

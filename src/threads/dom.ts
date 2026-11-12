@@ -30,6 +30,13 @@ export function nameSlotOf(container: Element, username: string): Element | null
   return link
 }
 
+export function authorHeaderOf(container: Element, username: string): Element | null {
+  const slot = nameSlotOf(container, username)
+  const header = slot?.parentElement?.parentElement
+  if (!slot || !header || slot.parentElement === container || header === container || !container.contains(header)) return null
+  return header.ownerDocument.defaultView?.getComputedStyle(header).display === 'grid' ? header : null
+}
+
 export const THREADS_THEME = {
   text: 'var(--barcelona-primary-text, currentColor)',
   secondary: 'var(--barcelona-secondary-icon, rgb(119, 119, 119))',

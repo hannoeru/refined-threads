@@ -46,9 +46,12 @@ export function postContainer(code: string, username = 'amy', datetime = '2026-0
   return `
   <div data-pressable-container="true" id="c-${code}">
     <a href="/@${username}"><img alt=""></a>
-    <div class="row">
-      <div class="name"><span><a href="/@${username}"><span>${username}</span></a></span></div>
-      <span><a href="/@${username}/post/${code}"><time datetime="${datetime}">1h</time></a></span>
+    <div class="header" style="display: grid">
+      <div class="row">
+        <div class="name"><span><a href="/@${username}"><span>${username}</span></a></span></div>
+        <span><a href="/@${username}/post/${code}"><time datetime="${datetime}">1h</time></a></span>
+      </div>
+      <div class="menu" role="button">⋯</div>
     </div>
     <p>body</p>
   </div>`

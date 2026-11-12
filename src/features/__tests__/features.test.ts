@@ -96,10 +96,11 @@ describe('account-info', () => {
     return { lookups, runtime, badge, items, wanted }
   }
 
-  it('places one badge in the author row between the name and the time, and fills it when data arrives', () => {
+  it('places one line under the username, after the menu, and fills it when data arrives', () => {
     const { lookups, runtime, badge, items } = setup({ followers: true, posts: true })
-    expect(badge()?.previousElementSibling?.className).toBe('name')
-    expect(badge()?.nextElementSibling?.querySelector('time')).not.toBeNull()
+    expect(badge()?.parentElement?.className).toBe('header')
+    expect(badge()?.previousElementSibling?.className).toBe('menu')
+    expect(badge()?.classList.contains('rt-ai-line')).toBe(true)
     expect(badge()?.hidden).toBe(true)
     lookups.resolve('p1', { country: 'JP', ageMonths: 30, followers: 1200, posts: 4515 })
     expect(items()).toEqual([
@@ -111,6 +112,15 @@ describe('account-info', () => {
     expect(badge()?.getAttribute('aria-label')).toBe('Based in Japan, On Threads for 2y, 1.2K followers, 4.5K posts')
     runtime.stopAll()
     expect(badge()).toBeNull()
+  })
+
+  it('falls back to a small inline badge after the name when the header layout is unknown', () => {
+    document.body.innerHTML = postContainer('I2').replace('style="display: grid"', '')
+    const posts = catalogWith([makePost({ code: 'I2', author: { pk: 'p2', username: 'amy' } })])
+    run('account-info', { 'account-info': { enabled: true } }, posts, fakeLookups())
+    const badge = document.querySelector('.rt-account-info')!
+    expect(badge.classList.contains('rt-ai-inline')).toBe(true)
+    expect(badge.previousElementSibling?.className).toBe('name')
   })
 
   it('shows each detail only when its switch is on', () => {

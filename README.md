@@ -11,15 +11,17 @@ The name follows [Refined GitHub](https://github.com/refined-github/refined-gith
 | Spam filter (`spam-filter`) | Yes | Hides or tags spam and bot posts. Levels (Light, Balanced, Strict), blocked words and sites, hidden and allowed accounts, account checks (country, age, followers, posts), user-defined scoring rules, and shareable settings files with presets. |
 | Real dates (`absolute-timestamps`) | No | Shows the date and time of each post instead of "5h". |
 | Keyboard navigation (`keyboard-navigation`) | No | `j` and `k` move between posts, `o` opens the selected post. |
-| Account info (`account-info`) | No | Shows small details between each author's name and the post time. Each one has its own switch: country flag, country name (🏴 when the account hides its location), how long the account has been on Threads, follower count, and post count. Location and age need a logged-in Threads session. |
+| Account info (`account-info`) | No | Shows a small line of details under each author's name. Each detail has its own switch: country flag, country name (🏴 when the account hides its location), how long the account has been on Threads, follower count, and post count. Location and age need a logged-in Threads session. |
 
 The settings page lists every feature with a switch, a search box, and a settings page per feature. The popup has a switch for every feature, plus the spam filter's daily count and level. Changes apply to open Threads tabs at once.
+
+The settings page, popup, and welcome page use Threads' design: monochrome surfaces, Threads' outline grays, black or white primary buttons and switches, and the system font, in light and dark mode.
 
 On the page, everything follows the Threads theme (light or dark, set in Threads) through Threads' own `--barcelona-*` CSS variables:
 
 - A hidden post folds into one bar with a short reason, such as "Hidden · affiliate link", and a Show button.
 - A tagged post gets a small chip after the author name, with × for "Not spam".
-- Account details sit as small gray pills in the same row. They shrink before the post time does.
+- Account details sit on a small gray line under the author name, inside Threads' own header grid, so the post menu does not move.
 
 ## How it works
 

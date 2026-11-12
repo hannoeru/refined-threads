@@ -1,14 +1,17 @@
 import type { ProfileData } from '../../profile/lookups'
-import { nameSlotOf, POST_CONTAINER, postCodeOf, THREADS_THEME } from '../../threads/dom'
+import { authorHeaderOf, nameSlotOf, POST_CONTAINER, postCodeOf, THREADS_THEME } from '../../threads/dom'
 import { defineFeature } from '../api'
 
 const BADGE = 'rt-account-info'
 
 const STYLE = `
-.${BADGE} { display: inline-flex; flex: 0 1 auto; align-items: center; gap: 4px; min-width: 0; overflow: hidden; font-size: 13px; line-height: 18px; font-weight: 400; color: ${THREADS_THEME.secondary}; white-space: nowrap; }
+.${BADGE} { display: flex; align-items: center; min-width: 0; overflow: hidden; font-size: 11px; line-height: 14px; font-weight: 400;
+  color: ${THREADS_THEME.secondary}; white-space: nowrap; }
 .${BADGE}[hidden] { display: none; }
-.${BADGE} > span { flex: none; display: inline-flex; align-items: center; gap: 3px; padding: 0 6px; border-radius: 999px; background: ${THREADS_THEME.pill}; }
-.${BADGE} > .rt-ai-flag { padding: 0 4px; font-size: 14px; background: none; }
+.${BADGE}.rt-ai-line { grid-column: 1 / -1; margin: -1px 0 3px; }
+.${BADGE}.rt-ai-inline { display: inline-flex; flex: 0 1 auto; margin-inline-start: 6px; }
+.${BADGE} > span { flex: none; }
+.${BADGE} > span + span::before { content: "·"; margin: 0 4px; }
 .${BADGE} > .rt-ai-hidden { font-style: italic; }
 `
 
@@ -92,12 +95,15 @@ export default defineFeature({
       const code = postCodeOf(container)
       const post = code ? ctx.posts.get(code) : undefined
       if (!post) return
-      const slot = nameSlotOf(container, post.author.username)
-      if (!slot || slot.nextElementSibling?.classList.contains(BADGE)) return
+      if (container.querySelector(`.${BADGE}`)) return
+      const header = authorHeaderOf(container, post.author.username)
+      const slot = header ? null : nameSlotOf(container, post.author.username)
+      if (!header && !slot) return
       const badge = ctx.document.createElement('span')
-      badge.className = BADGE
+      badge.className = `${BADGE} ${header ? 'rt-ai-line' : 'rt-ai-inline'}`
       badge.setAttribute('role', 'note')
-      slot.after(badge)
+      if (header) header.append(badge)
+      else slot!.after(badge)
       const set = badges.get(post.author.pk) ?? new Set()
       set.add(badge)
       badges.set(post.author.pk, set)

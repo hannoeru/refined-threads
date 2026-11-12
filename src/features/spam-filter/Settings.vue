@@ -39,8 +39,8 @@ const { settings, update } = useSettings()
 </template>
 
 <style>
-.subtabs { display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
-.subtab { border: 0; background: transparent; padding: 6px 12px; border-radius: 999px; color: var(--muted); }
+.subtabs { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--hairline); padding-bottom: 8px; }
+.subtab { flex: none; border: 0; background: transparent; padding: 6px 10px; border-radius: var(--radius-sm); color: var(--muted); font-size: 14px; font-weight: 600; white-space: nowrap; }
 .subtab:hover { background: var(--accent-soft); color: var(--ink); }
 .subtab[aria-selected='true'] { background: var(--accent-soft); color: var(--ink); font-weight: 700; }
 </style>

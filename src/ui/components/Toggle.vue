@@ -18,11 +18,11 @@ defineProps<{ label: string; description?: string }>()
 .toggle { display: flex; align-items: center; gap: 12px; cursor: pointer; }
 .toggle-text { flex: 1; display: flex; flex-direction: column; }
 .toggle-label { font-weight: 600; }
-.toggle-description { font-size: 13px; }
+.toggle-description { font-size: 13px; line-height: 18px; margin-top: 2px; }
 .toggle-input { position: absolute; opacity: 0; width: 1px; height: 1px; }
 .toggle-track { flex: none; width: 40px; height: 24px; border-radius: 999px; background: var(--line); position: relative; transition: background 0.15s; }
-.toggle-thumb { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--surface); transition: transform 0.15s; }
-.toggle-input:checked + .toggle-track { background: var(--accent); }
+.toggle-thumb { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--surface); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); transition: transform 0.15s; }
+.toggle-input:checked + .toggle-track { background: var(--ink); }
 .toggle-input:checked + .toggle-track .toggle-thumb { transform: translateX(16px); }
-.toggle-input:focus-visible + .toggle-track { outline: 2px solid var(--accent); outline-offset: 2px; }
+.toggle-input:focus-visible + .toggle-track { outline: 2px solid var(--link); outline-offset: 2px; }
 </style>

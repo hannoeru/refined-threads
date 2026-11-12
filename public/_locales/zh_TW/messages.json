@@ -675,7 +675,7 @@
     "message": "帳號資訊"
   },
   "feature_account_info_description": {
-    "message": "在名稱旁顯示作者的資訊：帳號所在地、加入 Threads 多久，以及粉絲數和貼文數。每 1.5 到 2 秒查詢一個帳號。"
+    "message": "在每個作者名稱下方顯示一行小字：帳號所在地、加入 Threads 多久，以及粉絲數和貼文數。每 1.5 到 2 秒查詢一個帳號。"
   },
   "feature_account_info_option_age": {
     "message": "加入 Threads 多久"
