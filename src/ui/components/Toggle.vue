@@ -22,7 +22,7 @@ defineProps<{ label: string; description?: string }>()
 .toggle-input { position: absolute; opacity: 0; width: 1px; height: 1px; }
 .toggle-track { flex: none; width: 40px; height: 24px; border-radius: 999px; background: var(--line); position: relative; transition: background 0.15s; }
 .toggle-thumb { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--surface); transition: transform 0.15s; }
-.toggle-input:checked + .toggle-track { background: var(--roller); }
+.toggle-input:checked + .toggle-track { background: var(--accent); }
 .toggle-input:checked + .toggle-track .toggle-thumb { transform: translateX(16px); }
-.toggle-input:focus-visible + .toggle-track { outline: 2px solid var(--roller); outline-offset: 2px; }
+.toggle-input:focus-visible + .toggle-track { outline: 2px solid var(--accent); outline-offset: 2px; }
 </style>

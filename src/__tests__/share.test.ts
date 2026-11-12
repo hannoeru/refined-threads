@@ -24,14 +24,14 @@ describe('sharing settings', () => {
 
   it('reports plain errors for files that are not settings', () => {
     expect(readSharedFile('{nope')).toEqual({ ok: false, errors: ['not-json'] })
-    const wrong = readSharedFile(JSON.stringify({ format: 'lint-roller-settings', settings: { level: 'extreme' } }))
+    const wrong = readSharedFile(JSON.stringify({ format: 'refined-threads-settings', settings: { level: 'extreme' } }))
     expect(wrong.ok).toBe(false)
     if (!wrong.ok) expect(wrong.errors[0]).toMatch(/^settings\.level: /)
   })
 
   it('merges rules by id and keeps the rest of my rules', () => {
     const mine = { ...defaultSettings(), ruleFile: addAccount(defaultSettings().ruleFile, 'hidden-accounts', 'spammer') }
-    const shared = { format: 'lint-roller-settings' as const, name: '', description: '', settings: { ruleFile: { version: 1 as const, scoring: mine.ruleFile.scoring, rules: [
+    const shared = { format: 'refined-threads-settings' as const, name: '', description: '', settings: { ruleFile: { version: 1 as const, scoring: mine.ruleFile.scoring, rules: [
       { id: 'countries', name: '', enabled: true, target: 'all' as const, effect: 'tag' as const, score: 1, when: { field: 'author.country' as const, in: ['JP'] } },
       { id: 'mine-new', name: 'New one', enabled: true, target: 'replies' as const, effect: 'hide' as const, score: 1, when: { field: 'text' as const, contains_any: ['x'] } },
     ] } } }

@@ -77,7 +77,7 @@ function remove(item: string): void {
 .chips { display: flex; flex-direction: column; gap: 8px; }
 .chips-label { font-weight: 600; }
 .chips-list { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 0; padding: 0; }
-.chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 4px 2px 10px; border-radius: 999px; background: var(--roller-soft); }
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 4px 2px 10px; border-radius: 999px; background: var(--accent-soft); }
 .chip-remove { border: 0; background: transparent; width: 24px; height: 24px; border-radius: 50%; font-size: 16px; line-height: 1; }
 .chip-remove:hover { background: var(--line); }
 .chips-add { display: flex; gap: 8px; }

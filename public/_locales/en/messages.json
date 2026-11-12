@@ -1,6 +1,6 @@
 {
   "extName": {
-    "message": "Lint Roller for Threads"
+    "message": "Refined Threads"
   },
   "extDescription": {
     "message": "Hides spam and bot posts on Threads. Works on install. Your settings stay in your browser."
@@ -14,7 +14,7 @@
     }
   },
   "bar_tagged": {
-    "message": "Lint Roller: $VALUE$",
+    "message": "Refined Threads: $VALUE$",
     "placeholders": {
       "value": {
         "content": "$1"
@@ -377,7 +377,7 @@
     "message": "You are protected on Threads."
   },
   "welcome_lead": {
-    "message": "Lint Roller already hides spam and bot posts. Pick how strict it should be. You can change this at any time."
+    "message": "Refined Threads already hides spam and bot posts. Pick how strict it should be. You can change this at any time."
   },
   "welcome_privacy": {
     "message": "Your settings stay in your browser. There is no account and no tracking."

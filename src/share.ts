@@ -1,7 +1,7 @@
 import * as v from 'valibot'
 import { BAIT_PHRASES, type Rule, RuleFileSchema, type Settings, SettingsSchema } from './model'
 
-export const SHARE_FORMAT = 'lint-roller-settings'
+export const SHARE_FORMAT = 'refined-threads-settings'
 
 export const SharedFileSchema = v.strictObject({
   format: v.literal(SHARE_FORMAT),

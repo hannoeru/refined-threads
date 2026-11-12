@@ -48,7 +48,7 @@ function setup(settings: Settings = defaultSettings(), profile: Partial<ProfileD
 }
 
 const container = (code: string) => document.getElementById(`c-${code}`)!
-const bar = (code: string) => container(code).querySelector(':scope > .lr-bar')
+const bar = (code: string) => container(code).querySelector(':scope > .rt-bar')
 const click = (code: string, label: string) =>
   [...container(code).querySelectorAll('button')].find((button) => button.textContent === label)!.click()
 
@@ -71,7 +71,7 @@ describe('PageController', () => {
     const { controller } = setup()
     controller.addPosts([affiliate('A1')])
     controller.scan()
-    expect(container('A1').classList.contains('lr-collapse')).toBe(true)
+    expect(container('A1').classList.contains('rt-collapse')).toBe(true)
     expect(bar('A1')?.textContent).toContain('Hidden: affiliate links')
     expect(container('A1').querySelector('p')?.textContent).toBe('body')
   })
@@ -100,9 +100,9 @@ describe('PageController', () => {
     controller.addPosts([affiliate('S1')])
     controller.scan()
     click('S1', 'Show')
-    expect(container('S1').classList.contains('lr-collapse')).toBe(false)
+    expect(container('S1').classList.contains('rt-collapse')).toBe(false)
     click('S1', 'Keep hiding')
-    expect(container('S1').classList.contains('lr-collapse')).toBe(true)
+    expect(container('S1').classList.contains('rt-collapse')).toBe(true)
     click('S1', 'Show')
     click('S1', 'Not spam')
     await Promise.resolve()
@@ -126,7 +126,7 @@ describe('PageController', () => {
     const { controller } = setup({ ...defaultSettings(), display: 'blur' })
     controller.addPosts([affiliate('B1')])
     controller.scan()
-    expect(container('B1').classList.contains('lr-blur')).toBe(true)
+    expect(container('B1').classList.contains('rt-blur')).toBe(true)
   })
 
   it('only tags in tag-only mode', () => {
@@ -134,7 +134,7 @@ describe('PageController', () => {
     const { controller } = setup({ ...defaultSettings(), tagOnly: true })
     controller.addPosts([affiliate('T1')])
     controller.scan()
-    expect(container('T1').classList.contains('lr-collapse')).toBe(false)
+    expect(container('T1').classList.contains('rt-collapse')).toBe(false)
     expect(bar('T1')?.textContent).toContain('Tagged: affiliate links')
   })
 

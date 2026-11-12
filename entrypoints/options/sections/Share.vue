@@ -18,7 +18,7 @@ function download(): void {
   const blob = new Blob([exportSettings(props.settings, exportName.value.trim())], { type: 'application/json' })
   const link = document.createElement('a')
   link.href = URL.createObjectURL(blob)
-  link.download = 'lint-roller-settings.json'
+  link.download = 'refined-threads-settings.json'
   link.click()
   URL.revokeObjectURL(link.href)
 }

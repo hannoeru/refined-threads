@@ -1,8 +1,8 @@
-# Lint Roller for Threads
+# Refined Threads
 
 A browser extension that hides or tags spam and bot posts on Threads web (`threads.com`, `threads.net`). It works on install with no setup. Users can tune it with simple switches, write their own scoring rules, and share their settings as a JSON file.
 
-Chinese name: 黏毛滾輪 for Threads. License: MIT.
+The name follows [Refined GitHub](https://github.com/refined-github/refined-github), a browser extension that makes GitHub cleaner. Refined Threads is not affiliated with Meta or with Refined GitHub. License: MIT.
 
 ## What users get
 
@@ -28,7 +28,7 @@ flowchart LR
     Engine["rule engine"]
     View["collapse / blur / tag bar"]
   end
-  Hook -- "lint-roller:posts" --> Catalog
+  Hook -- "refined-threads:posts" --> Catalog
   Lookups -- "about / profile request" --> Hook
   Hook -- "about / profile result" --> Lookups
   Catalog --> Engine
@@ -61,7 +61,7 @@ Export writes this format. Import and the advanced editor accept it.
 
 ```json
 {
-  "format": "lint-roller-settings",
+  "format": "refined-threads-settings",
   "name": "My spam filter",
   "description": "Optional text for the people you share it with.",
   "settings": {
@@ -130,4 +130,4 @@ To load a build by hand, open `chrome://extensions`, turn on developer mode, and
 
 - **Store release.** Store listings, screenshots, and a privacy policy for the Chrome Web Store, Edge Add-ons, and Firefox Add-ons.
 - **Safari.** It needs an Xcode wrapper and an Apple Developer account.
-- **Report link.** `src/ui/links.ts` points "Report a problem" to `https://github.com/hanlee/lint-roller/issues`. That repository does not exist yet.
+- **Report link.** `src/ui/links.ts` points "Report a problem" to `https://github.com/hanlee/refined-threads/issues`. That repository does not exist yet.

@@ -32,23 +32,23 @@ export type ViewHandlers = {
   allow: () => void
 }
 
-const BAR = 'lr-bar'
-const STATE_CLASSES = ['lr-collapse', 'lr-blur', 'lr-revealed', 'lr-tagged']
+const BAR = 'rt-bar'
+const STATE_CLASSES = ['rt-collapse', 'rt-blur', 'rt-revealed', 'rt-tagged']
 
 export const STYLE = `
-.lr-collapse > :not(.lr-bar) { display: none !important; }
-.lr-blur > :not(.lr-bar) { filter: blur(10px); pointer-events: none; user-select: none; }
-.lr-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 6px 12px; padding: 6px 10px;
+.rt-collapse > :not(.rt-bar) { display: none !important; }
+.rt-blur > :not(.rt-bar) { filter: blur(10px); pointer-events: none; user-select: none; }
+.rt-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 6px 12px; padding: 6px 10px;
   border-radius: 10px; font: 13px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
   background: rgba(91, 30, 158, 0.08); color: #3b1468; border: 1px solid rgba(91, 30, 158, 0.25); cursor: default; }
-.lr-bar.lr-tag { background: rgba(166, 226, 46, 0.14); border-color: rgba(110, 160, 20, 0.45); color: #2f4a06; }
-.lr-bar-text { flex: 1 1 auto; min-width: 0; }
-.lr-bar button { font: inherit; padding: 2px 10px; border-radius: 999px; border: 1px solid currentColor;
+.rt-bar.rt-tag { background: rgba(166, 226, 46, 0.14); border-color: rgba(110, 160, 20, 0.45); color: #2f4a06; }
+.rt-bar-text { flex: 1 1 auto; min-width: 0; }
+.rt-bar button { font: inherit; padding: 2px 10px; border-radius: 999px; border: 1px solid currentColor;
   background: transparent; color: inherit; cursor: pointer; }
-.lr-bar button:focus-visible { outline: 2px solid #5b1e9e; outline-offset: 2px; }
+.rt-bar button:focus-visible { outline: 2px solid #5b1e9e; outline-offset: 2px; }
 @media (prefers-color-scheme: dark) {
-  .lr-bar { background: rgba(167, 120, 230, 0.14); color: #e2d2fb; border-color: rgba(167, 120, 230, 0.4); }
-  .lr-bar.lr-tag { background: rgba(166, 226, 46, 0.12); color: #d6f59a; border-color: rgba(166, 226, 46, 0.4); }
+  .rt-bar { background: rgba(167, 120, 230, 0.14); color: #e2d2fb; border-color: rgba(167, 120, 230, 0.4); }
+  .rt-bar.rt-tag { background: rgba(166, 226, 46, 0.12); color: #d6f59a; border-color: rgba(166, 226, 46, 0.4); }
 }
 `
 
@@ -68,35 +68,35 @@ function button(doc: Document, label: string, onClick: () => void): HTMLButtonEl
 export function clearView(container: Element): void {
   container.classList.remove(...STATE_CLASSES)
   container.querySelector(`:scope > .${BAR}`)?.remove()
-  delete (container as HTMLElement).dataset.lrKey
+  delete (container as HTMLElement).dataset.rtKey
 }
 
 export function renderView(container: HTMLElement, state: ViewState, text: ViewText, handlers: ViewHandlers): void {
   const key = JSON.stringify([state.verdict.action, state.labels, state.display, state.revealed])
-  if (container.dataset.lrKey === key && container.querySelector(`:scope > .${BAR}`)) return
+  if (container.dataset.rtKey === key && container.querySelector(`:scope > .${BAR}`)) return
   clearView(container)
   if (state.verdict.action === 'none') return
-  container.dataset.lrKey = key
+  container.dataset.rtKey = key
   const doc = container.ownerDocument
   const bar = doc.createElement('div')
   bar.className = BAR
   bar.setAttribute('role', 'note')
   for (const type of STOPPED) bar.addEventListener(type, (event) => event.stopPropagation())
   const message = doc.createElement('span')
-  message.className = 'lr-bar-text'
+  message.className = 'rt-bar-text'
   const reasons = state.labels.join(', ')
   bar.append(message)
   if (state.verdict.action === 'tag') {
-    bar.classList.add('lr-tag')
-    container.classList.add('lr-tagged')
+    bar.classList.add('rt-tag')
+    container.classList.add('rt-tagged')
     message.textContent = text.tagged(reasons)
     bar.append(button(doc, text.notSpam, handlers.allow))
   } else if (!state.revealed) {
-    container.classList.add(state.display === 'blur' ? 'lr-blur' : 'lr-collapse')
+    container.classList.add(state.display === 'blur' ? 'rt-blur' : 'rt-collapse')
     message.textContent = text.hidden(reasons)
     bar.append(button(doc, text.show, handlers.reveal))
   } else {
-    container.classList.add('lr-revealed')
+    container.classList.add('rt-revealed')
     message.textContent = text.hidden(reasons)
     bar.append(button(doc, text.notSpam, handlers.allow), button(doc, text.keepHiding, handlers.conceal))
   }

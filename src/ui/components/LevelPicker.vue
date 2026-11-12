@@ -19,9 +19,9 @@ defineProps<{ compact?: boolean }>()
 <style>
 .levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .level { display: flex; flex-direction: column; gap: 4px; padding: 12px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); cursor: pointer; }
-.level.selected { border-color: var(--roller); box-shadow: inset 0 0 0 1px var(--roller); }
+.level.selected { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
 .level-input { position: absolute; opacity: 0; width: 1px; height: 1px; }
-.level:has(.level-input:focus-visible) { outline: 2px solid var(--roller); outline-offset: 2px; }
+.level:has(.level-input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
 .level-name { font-family: var(--heading); font-weight: 700; }
 .level-description { font-size: 13px; }
 .levels.compact .level { padding: 8px; }

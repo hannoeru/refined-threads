@@ -5,12 +5,12 @@ export const THREADS_MATCHES = [
   'https://threads.net/*',
 ]
 
-export const POSTS_EVENT = 'lint-roller:posts'
-export const ABOUT_REQUEST_EVENT = 'lint-roller:about-request'
-export const ABOUT_RESULT_EVENT = 'lint-roller:about-result'
+export const POSTS_EVENT = 'refined-threads:posts'
+export const ABOUT_REQUEST_EVENT = 'refined-threads:about-request'
+export const ABOUT_RESULT_EVENT = 'refined-threads:about-result'
 
-export const PROFILE_REQUEST_EVENT = 'lint-roller:profile-request'
-export const PROFILE_RESULT_EVENT = 'lint-roller:profile-result'
+export const PROFILE_REQUEST_EVENT = 'refined-threads:profile-request'
+export const PROFILE_RESULT_EVENT = 'refined-threads:profile-result'
 
 export type LookupFailure = { pk: string; ok: false; status: number | null; retryAfterMs: number | null }
 

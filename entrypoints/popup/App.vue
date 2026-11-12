@@ -74,11 +74,11 @@ body { width: 340px; }
 .sheet { position: relative; overflow: hidden; padding: 18px 16px 14px; border-radius: 18px; background: var(--surface);
   border: 1px solid var(--line); background-image: radial-gradient(var(--line) 1px, transparent 1px); background-size: 9px 9px; }
 .sheet.off { opacity: 0.55; }
-.sheet-count { font-family: var(--heading); font-size: 44px; font-weight: 800; line-height: 1; color: var(--roller); }
+.sheet-count { font-family: var(--heading); font-size: 44px; font-weight: 800; line-height: 1; color: var(--accent); }
 .sheet-label { font-weight: 600; }
 .sheet-tagged { font-size: 13px; }
 .sheet-specks { position: absolute; inset: 10px 12px auto auto; width: 120px; height: 56px; }
-.speck { position: absolute; width: 7px; height: 4px; border-radius: 3px; background: var(--lint);
+.speck { position: absolute; width: 7px; height: 4px; border-radius: 3px; background: var(--highlight);
   left: calc(mod(var(--i) * 37, 110) * 1px); top: calc(mod(var(--i) * 23, 50) * 1px); transform: rotate(calc(var(--i) * 41deg)); }
 .top-rules { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
 .top-rules li { display: flex; justify-content: space-between; }

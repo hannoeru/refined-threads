@@ -1,6 +1,6 @@
 {
   "extName": {
-    "message": "黏毛滾輪 for Threads"
+    "message": "Refined Threads"
   },
   "extDescription": {
     "message": "自動隱藏 Threads 上的垃圾與機器人貼文。安裝即可使用，設定只存在你的瀏覽器。"
@@ -14,7 +14,7 @@
     }
   },
   "bar_tagged": {
-    "message": "黏毛滾輪：$VALUE$",
+    "message": "Refined Threads：$VALUE$",
     "placeholders": {
       "value": {
         "content": "$1"
@@ -377,7 +377,7 @@
     "message": "你在 Threads 上已受到保護。"
   },
   "welcome_lead": {
-    "message": "黏毛滾輪已經在隱藏垃圾與機器人貼文。選擇你要的嚴格程度，之後隨時可以改。"
+    "message": "Refined Threads 已經在隱藏垃圾與機器人貼文。選擇你要的嚴格程度，之後隨時可以改。"
   },
   "welcome_privacy": {
     "message": "你的設定只存在你的瀏覽器。不需要帳號，也沒有追蹤。"

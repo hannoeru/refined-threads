@@ -14,7 +14,7 @@ export default defineConfig({
     host_permissions: THREADS_MATCHES,
     browser_specific_settings: {
       gecko: {
-        id: 'lint-roller@hanlee.co',
+        id: 'refined-threads@hanlee.co',
         strict_min_version: '128.0',
         data_collection_permissions: { required: ['none'] },
       },
