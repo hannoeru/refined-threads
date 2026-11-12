@@ -1,7 +1,19 @@
-import { ABOUT_REQUEST_EVENT, ABOUT_RESULT_EVENT, type AboutRequest, type AboutResult, POSTS_EVENT } from '../bridge'
+import {
+  ABOUT_REQUEST_EVENT,
+  ABOUT_RESULT_EVENT,
+  type AboutRequest,
+  type AboutResult,
+  type LookupFailure,
+  POSTS_EVENT,
+  PROFILE_REQUEST_EVENT,
+  PROFILE_RESULT_EVENT,
+  type ProfileRequest,
+  type ProfileResult,
+} from '../bridge'
 import type { Post } from '../model'
 import { buildAboutRequest, findVersioningId, parseAboutResponse, retryAfterMs, type Session, sessionFromBody } from './about'
 import { parseBootstrap, parsePayloadText } from './parse'
+import { readDescription } from './profile'
 
 const SKIPPED_QUERIES = new Set(['useBarcelonaBatchedDynamicPostCountsSubscriptionQuery'])
 
@@ -68,36 +80,49 @@ export function installHook(win: Window & typeof globalThis): void {
     return response
   }
 
-  const lookup = async ({ pk }: AboutRequest): Promise<AboutResult> => {
-    const versioningId = findVersioningId(win.document)
-    if (session === null || versioningId === null) return { pk, ok: false, status: null, retryAfterMs: null }
-    try {
-      const request = buildAboutRequest(win.location.origin, session, versioningId, pk)
-      const response = await fetch.call(win, request.url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-        body: request.body,
-        credentials: 'include',
-      })
-      if (!response.ok) {
-        return { pk, ok: false, status: response.status, retryAfterMs: retryAfterMs(response.headers.get('Retry-After')) }
-      }
-      return parseAboutResponse(pk, await response.text())
-    } catch {
-      return { pk, ok: false, status: null, retryAfterMs: null }
-    }
-  }
-  win.addEventListener(ABOUT_REQUEST_EVENT, (event) => {
-    let request: AboutRequest
-    try {
-      request = JSON.parse(String((event as CustomEvent).detail))
-    } catch {
-      return
-    }
-    void lookup(request).then((result) =>
-      win.dispatchEvent(new win.CustomEvent(ABOUT_RESULT_EVENT, { detail: JSON.stringify(result) })),
-    )
+  const failure = (pk: string, response: Response | null): LookupFailure => ({
+    pk,
+    ok: false,
+    status: response?.status ?? null,
+    retryAfterMs: response ? retryAfterMs(response.headers.get('Retry-After')) : null,
   })
+
+  const about = async ({ pk }: AboutRequest): Promise<AboutResult> => {
+    const versioningId = findVersioningId(win.document)
+    if (session === null || versioningId === null) return failure(pk, null)
+    const request = buildAboutRequest(win.location.origin, session, versioningId, pk)
+    const response = await fetch.call(win, request.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+      body: request.body,
+      credentials: 'include',
+    })
+    return response.ok ? parseAboutResponse(pk, await response.text()) : failure(pk, response)
+  }
+
+  const profile = async ({ pk, username }: ProfileRequest): Promise<ProfileResult> => {
+    const response = await fetch.call(win, new URL(`/@${encodeURIComponent(username)}`, win.location.origin), { credentials: 'include' })
+    return response.ok ? { pk, ok: true, description: await readDescription(response) } : failure(pk, response)
+  }
+
+  const serve = <Request extends { pk: string }, Result>(
+    requestEvent: string,
+    resultEvent: string,
+    handle: (request: Request) => Promise<Result>,
+  ) =>
+    win.addEventListener(requestEvent, (event) => {
+      let request: Request
+      try {
+        request = JSON.parse(String((event as CustomEvent).detail))
+      } catch {
+        return
+      }
+      void handle(request)
+        .catch(() => failure(request.pk, null))
+        .then((result) => win.dispatchEvent(new win.CustomEvent(resultEvent, { detail: JSON.stringify(result) })))
+    })
+  serve(ABOUT_REQUEST_EVENT, ABOUT_RESULT_EVENT, about)
+  serve(PROFILE_REQUEST_EVENT, PROFILE_RESULT_EVENT, profile)
 
   const bootstrap = () => {
     try {
