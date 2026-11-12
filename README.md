@@ -121,7 +121,7 @@ pnpm dev:firefox    # Firefox with hot reload
 pnpm check          # typecheck, tests, Chrome build, Firefox build
 pnpm zip            # store package for Chrome and Edge
 pnpm zip:firefox    # store package for Firefox Add-ons
-pnpm icons          # regenerate public/icon/*.png from assets/icon/option-3.png
+pnpm icons          # regenerate public/icon/*.png from assets/icon/option-1.png
 ```
 
 To load a build by hand, open `chrome://extensions`, turn on developer mode, and load `.output/chrome-mv3`. In Firefox, open `about:debugging#/runtime/this-firefox` and load `.output/firefox-mv3/manifest.json`.
