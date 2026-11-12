@@ -65,5 +65,13 @@
   },
   "menu_allow_account": {
     "message": "Never hide this account"
+  },
+  "reason_country": {
+    "message": "account based in $COUNTRY$",
+    "placeholders": {
+      "country": {
+        "content": "$1"
+      }
+    }
   }
 }

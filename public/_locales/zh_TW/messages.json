@@ -65,5 +65,13 @@
   },
   "menu_allow_account": {
     "message": "永遠不要隱藏這個帳號"
+  },
+  "reason_country": {
+    "message": "帳號所在地：$COUNTRY$",
+    "placeholders": {
+      "country": {
+        "content": "$1"
+      }
+    }
   }
 }

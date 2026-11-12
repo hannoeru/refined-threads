@@ -11,6 +11,7 @@ export type PostAuthor = {
   isPrivate: boolean
   following: boolean
   followedBy: boolean
+  country: string | null
 }
 
 export type Post = {
@@ -32,11 +33,22 @@ export type Post = {
 }
 
 export const POSTS_EVENT = 'lint-roller:posts'
+export const COUNTRY_REQUEST_EVENT = 'lint-roller:country-request'
+export const COUNTRY_RESULT_EVENT = 'lint-roller:country-result'
+
+export type CountryRequest = { pk: string }
+
+export type CountryResult =
+  | { pk: string; ok: true; name: string | null; visible: boolean }
+  | { pk: string; ok: false; status: number | null; retryAfterMs: number | null }
 
 export const LEVELS = ['light', 'balanced', 'strict'] as const
 export type Level = (typeof LEVELS)[number]
 
-export const DISPLAYS = ['collapse', 'blur', 'mark'] as const
+export const ACTIONS = ['hide', 'tag'] as const
+export type Action = (typeof ACTIONS)[number]
+
+export const DISPLAYS = ['collapse', 'blur'] as const
 export type Display = (typeof DISPLAYS)[number]
 
 export const PRESET_IDS = [
@@ -71,6 +83,7 @@ export const FIELDS = [
   'author.isPrivate',
   'author.following',
   'author.followedBy',
+  'author.country',
   'counts.likes',
   'counts.replies',
   'counts.reposts',
@@ -110,6 +123,8 @@ export const RuleSchema = v.strictObject({
 })
 export type Rule = v.InferOutput<typeof RuleSchema>
 
+const CountryCode = v.pipe(v.string(), v.trim(), v.toUpperCase(), v.regex(/^[A-Z]{2}$/))
+
 const Handle = v.pipe(v.string(), v.trim(), v.toLowerCase(), v.regex(/^[a-z0-9._]{1,30}$/))
 
 export const RuleFileSchema = v.strictObject({
@@ -121,12 +136,15 @@ export const RuleFileSchema = v.strictObject({
   hiddenAccounts: v.optional(v.array(Handle), []),
   allowedAccounts: v.optional(v.array(Handle), []),
   rules: v.optional(v.array(RuleSchema), []),
+  countries: v.optional(v.array(CountryCode), []),
+  countryAction: v.optional(v.picklist(ACTIONS), 'hide'),
 })
 export type RuleFile = v.InferOutput<typeof RuleFileSchema>
 
 export const SettingsSchema = v.strictObject({
   enabled: v.optional(v.boolean(), true),
   level: v.optional(v.picklist(LEVELS), 'balanced'),
+  action: v.optional(v.picklist(ACTIONS), 'hide'),
   display: v.optional(v.picklist(DISPLAYS), 'collapse'),
   ruleFile: v.optional(RuleFileSchema, () => v.parse(RuleFileSchema, { version: 1 })),
 })
@@ -140,7 +158,8 @@ export type Reason =
   | { kind: 'word'; word: string }
   | { kind: 'host'; host: string }
   | { kind: 'hidden-account' }
+  | { kind: 'country'; country: string }
 
-export type Verdict = { hide: boolean; score: number; reasons: Reason[] }
+export type Verdict = { action: 'none' | Action; score: number; reasons: Reason[] }
 
 export type Stats = { day: string; hidden: number; byReason: Record<string, number> }
