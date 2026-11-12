@@ -131,6 +131,26 @@ describe('account-info', () => {
     expect(badge.previousElementSibling?.className).toBe('name')
   })
 
+  it('shows whether the author follows you, and optionally whether you follow them, without a lookup', () => {
+    document.body.innerHTML = postContainer('F1')
+    const lookups = fakeLookups()
+    const posts = catalogWith([makePost({ code: 'F1', author: { pk: 'p1', username: 'amy', followedBy: true, following: true } })])
+    run('account-info', { 'account-info': { enabled: true, options: { youFollow: true, flag: false, age: false } } }, posts, lookups)
+    const badge = document.querySelector('.rt-account-info') as HTMLElement
+    expect([...badge.children].map((item) => item.textContent)).toEqual(['Follows you', 'Following'])
+    expect(badge.hidden).toBe(false)
+  })
+
+  it('shows no follow details for strangers, and none when the switches are off', () => {
+    const { lookups, items } = setup({ age: false })
+    lookups.resolve('p1', { country: 'JP' })
+    expect(items().map((item) => item.text)).toEqual(['🇯🇵'])
+    document.body.innerHTML = postContainer('F2')
+    const posts = catalogWith([makePost({ code: 'F2', author: { pk: 'p2', username: 'amy', followedBy: true } })])
+    run('account-info', { 'account-info': { enabled: true, options: { followsYou: false, flag: false, age: false } } }, posts, fakeLookups())
+    expect((document.querySelector('.rt-account-info') as HTMLElement).hidden).toBe(true)
+  })
+
   it('shows each detail only when its switch is on', () => {
     const { lookups, items } = setup({ flag: false, countryName: true, age: false })
     lookups.resolve('p1', { country: 'TW', ageMonths: 5, followers: 10, posts: 3 })

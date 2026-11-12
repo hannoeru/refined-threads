@@ -13,6 +13,7 @@ const STYLE = `
 .${BADGE} > span { flex: none; }
 .${BADGE} > span + span::before { content: "·"; margin: 0 4px; }
 .${BADGE} > .rt-ai-hidden { font-style: italic; }
+.${BADGE} > .rt-ai-follows-you, .${BADGE} > .rt-ai-you-follow { font-weight: 600; }
 `
 
 const flag = (code: string) => String.fromCodePoint(...[...code].map((letter) => 0x1f1a5 + letter.charCodeAt(0)))
@@ -23,6 +24,8 @@ export default defineFeature({
   id: 'account-info',
   enabledByDefault: false,
   options: {
+    followsYou: { type: 'boolean', default: true },
+    youFollow: { type: 'boolean', default: false },
     flag: { type: 'boolean', default: true },
     countryName: { type: 'boolean', default: false },
     age: { type: 'boolean', default: true },
@@ -37,6 +40,7 @@ export default defineFeature({
     const compact = new Intl.NumberFormat(language, { notation: 'compact' })
     const regions = new Intl.DisplayNames(language ? [language] : [], { type: 'region' })
     const badges = new Map<string, Set<HTMLElement>>()
+    const relations = new Map<string, { followedBy: boolean; following: boolean }>()
 
     ctx.addStyle(STYLE)
 
@@ -55,9 +59,23 @@ export default defineFeature({
       return items
     }
 
+    const relation = (pk: string): Item[] => {
+      const { followedBy = false, following = false } = relations.get(pk) ?? {}
+      const result: Item[] = []
+      if (options.followsYou && followedBy) {
+        const text = t('feature_account_info_follows_you')
+        result.push({ kind: 'follows-you', text, title: text })
+      }
+      if (options.youFollow && following) {
+        const text = t('feature_account_info_you_follow')
+        result.push({ kind: 'you-follow', text, title: text })
+      }
+      return result
+    }
+
     const items = (pk: string): Item[] => {
       const data = lookups.data(pk)
-      const result = place(data)
+      const result = [...relation(pk), ...place(data)]
       if (options.age && data.ageMonths !== null) {
         const years = Math.floor(data.ageMonths / 12)
         const text = years >= 1 ? t('feature_account_info_age_years', [String(years)]) : t('feature_account_info_age_months', [String(data.ageMonths)])
@@ -104,6 +122,7 @@ export default defineFeature({
       badge.setAttribute('role', 'note')
       if (header) header.append(badge)
       else slot!.after(badge)
+      relations.set(post.author.pk, { followedBy: post.author.followedBy, following: post.author.following })
       const set = badges.get(post.author.pk) ?? new Set()
       set.add(badge)
       badges.set(post.author.pk, set)

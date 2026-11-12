@@ -663,7 +663,7 @@
     "message": "帳號資訊"
   },
   "feature_account_info_description": {
-    "message": "在每個作者名稱下方顯示一行小字：帳號所在地、加入 Threads 多久，以及粉絲數和貼文數。每 1.5 到 2 秒查詢一個帳號。"
+    "message": "在每個作者名稱下方顯示一行小字：對方是否追蹤你、帳號所在地、加入 Threads 多久，以及粉絲數和貼文數。所在地、年齡和數量每 1.5 到 2 秒查詢一個帳號。"
   },
   "feature_account_info_option_age": {
     "message": "加入 Threads 多久"
@@ -820,5 +820,17 @@
   },
   "feature_absolute_timestamps_pattern_help": {
     "message": "日期格式選擇「自訂格式」時會使用自訂格式。YYYY 年、MM 月、MMM 月份名稱、DD 日、ddd 星期、HH 或 h 小時、mm 分、A 上午/下午。其他文字請放在 [方括號] 內。"
+  },
+  "feature_account_info_option_followsYou": {
+    "message": "對方追蹤你"
+  },
+  "feature_account_info_option_youFollow": {
+    "message": "你追蹤對方"
+  },
+  "feature_account_info_follows_you": {
+    "message": "追蹤你"
+  },
+  "feature_account_info_you_follow": {
+    "message": "已追蹤"
   }
 }

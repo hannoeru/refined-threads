@@ -19,6 +19,8 @@ export const MESSAGES: Record<string, string> = {
   feature_account_info_posts: '$1 posts',
   feature_account_info_based_in: 'Based in $1',
   feature_account_info_location_hidden: 'Location hidden',
+  feature_account_info_follows_you: 'Follows you',
+  feature_account_info_you_follow: 'Following',
 }
 
 export const translate = (key: string, subs: string[] = []) => (MESSAGES[key] ?? '').replace('$1', subs[0] ?? '')

@@ -663,7 +663,7 @@
     "message": "Account info"
   },
   "feature_account_info_description": {
-    "message": "Shows a small line of details under each author name: where the account is based, how long it has been on Threads, and its follower and post counts. Looks up one account every 1.5 to 2 seconds."
+    "message": "Shows a small line of details under each author name: whether they follow you, where the account is based, how long it has been on Threads, and its follower and post counts. Location, age, and counts look up one account every 1.5 to 2 seconds."
   },
   "feature_account_info_option_age": {
     "message": "How long on Threads"
@@ -820,5 +820,17 @@
   },
   "feature_absolute_timestamps_pattern_help": {
     "message": "The custom pattern is used when the date format is \"Custom pattern\". YYYY year, MM month, MMM month name, DD day, ddd weekday, HH or h hour, mm minutes, A AM/PM. Put other text in [brackets]."
+  },
+  "feature_account_info_option_followsYou": {
+    "message": "Follows you"
+  },
+  "feature_account_info_option_youFollow": {
+    "message": "You follow them"
+  },
+  "feature_account_info_follows_you": {
+    "message": "Follows you"
+  },
+  "feature_account_info_you_follow": {
+    "message": "Following"
   }
 }
