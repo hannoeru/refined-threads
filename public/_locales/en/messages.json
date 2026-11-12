@@ -642,19 +642,7 @@
     "message": "Real dates"
   },
   "feature_absolute_timestamps_description": {
-    "message": "Shows the date and time of each post instead of \"5h\" or \"2d\"."
-  },
-  "feature_absolute_timestamps_option_format": {
-    "message": "Show"
-  },
-  "feature_absolute_timestamps_option_format_date_time": {
-    "message": "Date and time"
-  },
-  "feature_absolute_timestamps_option_format_date": {
-    "message": "Date only"
-  },
-  "feature_absolute_timestamps_option_format_relative_and_date": {
-    "message": "Relative time and date"
+    "message": "Shows the date of each post instead of \"5h\" or \"2d\", in the format you choose."
   },
   "feature_keyboard_navigation_name": {
     "message": "Keyboard navigation"
@@ -793,5 +781,44 @@
   },
   "welcome_more_link": {
     "message": "See all features"
+  },
+  "feature_absolute_timestamps_option_style": {
+    "message": "Date format"
+  },
+  "feature_absolute_timestamps_option_style_medium": {
+    "message": "Medium (Nov 13, 2026)"
+  },
+  "feature_absolute_timestamps_option_style_short": {
+    "message": "Short (11/13/26)"
+  },
+  "feature_absolute_timestamps_option_style_long": {
+    "message": "Long (November 13, 2026)"
+  },
+  "feature_absolute_timestamps_option_style_iso": {
+    "message": "ISO (2026-11-13)"
+  },
+  "feature_absolute_timestamps_option_style_us": {
+    "message": "US (11/13/2026)"
+  },
+  "feature_absolute_timestamps_option_style_eu": {
+    "message": "European (13/11/2026)"
+  },
+  "feature_absolute_timestamps_option_style_custom": {
+    "message": "Custom pattern"
+  },
+  "feature_absolute_timestamps_option_time": {
+    "message": "Show the time"
+  },
+  "feature_absolute_timestamps_option_relative": {
+    "message": "Keep \"5h\" in front of the date"
+  },
+  "feature_absolute_timestamps_option_pattern": {
+    "message": "Custom pattern"
+  },
+  "feature_absolute_timestamps_preview": {
+    "message": "Preview"
+  },
+  "feature_absolute_timestamps_pattern_help": {
+    "message": "The custom pattern is used when the date format is \"Custom pattern\". YYYY year, MM month, MMM month name, DD day, ddd weekday, HH or h hour, mm minutes, A AM/PM. Put other text in [brackets]."
   }
 }

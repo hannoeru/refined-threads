@@ -642,19 +642,7 @@
     "message": "實際日期"
   },
   "feature_absolute_timestamps_description": {
-    "message": "顯示每則貼文的日期與時間，而不是「5 小時」或「2 天」。"
-  },
-  "feature_absolute_timestamps_option_format": {
-    "message": "顯示"
-  },
-  "feature_absolute_timestamps_option_format_date_time": {
-    "message": "日期和時間"
-  },
-  "feature_absolute_timestamps_option_format_date": {
-    "message": "只有日期"
-  },
-  "feature_absolute_timestamps_option_format_relative_and_date": {
-    "message": "相對時間和日期"
+    "message": "用你選擇的格式顯示每則貼文的日期，而不是「5 小時」或「2 天」。"
   },
   "feature_keyboard_navigation_name": {
     "message": "鍵盤瀏覽"
@@ -793,5 +781,44 @@
   },
   "welcome_more_link": {
     "message": "查看所有功能"
+  },
+  "feature_absolute_timestamps_option_style": {
+    "message": "日期格式"
+  },
+  "feature_absolute_timestamps_option_style_medium": {
+    "message": "中等（2026年11月13日）"
+  },
+  "feature_absolute_timestamps_option_style_short": {
+    "message": "簡短（2026/11/13）"
+  },
+  "feature_absolute_timestamps_option_style_long": {
+    "message": "完整（2026年11月13日 星期五）"
+  },
+  "feature_absolute_timestamps_option_style_iso": {
+    "message": "ISO（2026-11-13）"
+  },
+  "feature_absolute_timestamps_option_style_us": {
+    "message": "美式（11/13/2026）"
+  },
+  "feature_absolute_timestamps_option_style_eu": {
+    "message": "歐式（13/11/2026）"
+  },
+  "feature_absolute_timestamps_option_style_custom": {
+    "message": "自訂格式"
+  },
+  "feature_absolute_timestamps_option_time": {
+    "message": "顯示時間"
+  },
+  "feature_absolute_timestamps_option_relative": {
+    "message": "在日期前保留「5 小時」"
+  },
+  "feature_absolute_timestamps_option_pattern": {
+    "message": "自訂格式"
+  },
+  "feature_absolute_timestamps_preview": {
+    "message": "預覽"
+  },
+  "feature_absolute_timestamps_pattern_help": {
+    "message": "日期格式選擇「自訂格式」時會使用自訂格式。YYYY 年、MM 月、MMM 月份名稱、DD 日、ddd 星期、HH 或 h 小時、mm 分、A 上午/下午。其他文字請放在 [方括號] 內。"
   }
 }

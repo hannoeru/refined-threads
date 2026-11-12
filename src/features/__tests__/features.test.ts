@@ -27,19 +27,27 @@ beforeEach(() => {
 })
 
 describe('absolute-timestamps', () => {
-  it('shows the full date and time, and restores the relative time when turned off', () => {
-    document.body.innerHTML = postContainer('A1', 'amy', '2026-03-04T05:06:00.000Z')
-    const runtime = run('absolute-timestamps', { 'absolute-timestamps': { enabled: true, options: { format: 'date' } } })
-    const time = document.querySelector('time')!
-    expect(time.textContent).toBe(new Intl.DateTimeFormat('en', { dateStyle: 'medium' }).format(new Date('2026-03-04T05:06:00.000Z')))
-    runtime.stopAll()
-    expect(time.textContent).toBe('1h')
+  it('is off by default', () => {
+    document.body.innerHTML = postContainer('A0')
+    run('absolute-timestamps', {})
+    expect(document.querySelector('time')!.textContent).toBe('1h')
   })
 
-  it('can keep the relative time next to the date', () => {
-    document.body.innerHTML = postContainer('A2')
-    run('absolute-timestamps', { 'absolute-timestamps': { enabled: true, options: { format: 'relative-and-date' } } })
-    expect(document.querySelector('time')!.textContent).toMatch(/^1h · /)
+  it('shows the date in the chosen style, and restores the relative time when turned off', () => {
+    document.body.innerHTML = postContainer('A1', 'amy', '2026-03-04T05:06:00')
+    const runtime = run('absolute-timestamps', { 'absolute-timestamps': { enabled: true, options: { style: 'iso', time: false } } })
+    const time = document.querySelector('time')!
+    expect(time.textContent).toBe('2026-03-04')
+    expect(time.title).not.toBe('')
+    runtime.stopAll()
+    expect(time.textContent).toBe('1h')
+    expect(time.hasAttribute('title')).toBe(false)
+  })
+
+  it('uses a custom pattern and can keep the relative time in front', () => {
+    document.body.innerHTML = postContainer('A2', 'amy', '2026-03-04T05:06:00')
+    run('absolute-timestamps', { 'absolute-timestamps': { enabled: true, options: { style: 'custom', pattern: 'D MMM HH:mm', relative: true } } })
+    expect(document.querySelector('time')!.textContent).toBe('1h · 4 Mar 05:06')
   })
 })
 
