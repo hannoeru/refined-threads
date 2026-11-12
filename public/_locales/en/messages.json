@@ -357,7 +357,7 @@
     "message": "Protection is off"
   },
   "hidden_today": {
-    "message": "posts hidden today"
+    "message": "hidden today"
   },
   "tagged_today": {
     "message": "$VALUE$ more tagged",

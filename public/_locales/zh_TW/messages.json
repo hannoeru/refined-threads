@@ -357,7 +357,7 @@
     "message": "保護已關閉"
   },
   "hidden_today": {
-    "message": "今天隱藏的貼文"
+    "message": "今天已隱藏"
   },
   "tagged_today": {
     "message": "另外標記了 $VALUE$ 則",
