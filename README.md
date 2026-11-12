@@ -140,4 +140,3 @@ To load a build by hand, open `chrome://extensions`, turn on developer mode, and
 
 - **Store release.** Store listings, screenshots, and a privacy policy for the Chrome Web Store, Edge Add-ons, and Firefox Add-ons.
 - **Safari.** It needs an Xcode wrapper and an Apple Developer account.
-- **Report link.** `src/ui/links.ts` points "Report a problem" to `https://github.com/hanlee/refined-threads/issues`. That repository does not exist yet.
