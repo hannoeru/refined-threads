@@ -1,71 +1,90 @@
-import { authorLinkOf, POST_CONTAINER, postCodeOf } from '../../threads/dom'
 import type { ProfileData } from '../../profile/lookups'
+import { nameSlotOf, POST_CONTAINER, postCodeOf, THREADS_THEME } from '../../threads/dom'
 import { defineFeature } from '../api'
 
 const BADGE = 'rt-account-info'
 
+const STYLE = `
+.${BADGE} { display: inline-flex; flex: 0 1 auto; align-items: center; gap: 4px; min-width: 0; overflow: hidden; font-size: 13px; line-height: 18px; font-weight: 400; color: ${THREADS_THEME.secondary}; white-space: nowrap; }
+.${BADGE}[hidden] { display: none; }
+.${BADGE} > span { flex: none; display: inline-flex; align-items: center; gap: 3px; padding: 0 6px; border-radius: 999px; background: ${THREADS_THEME.pill}; }
+.${BADGE} > .rt-ai-flag { padding: 0 4px; font-size: 14px; background: none; }
+.${BADGE} > .rt-ai-hidden { font-style: italic; }
+`
+
 const flag = (code: string) => String.fromCodePoint(...[...code].map((letter) => 0x1f1a5 + letter.charCodeAt(0)))
+
+type Item = { kind: string; text: string; title: string }
 
 export default defineFeature({
   id: 'account-info',
   enabledByDefault: false,
   options: {
-    geo: { type: 'select', default: 'flag', choices: ['flag', 'flag-name', 'name', 'off'] },
+    flag: { type: 'boolean', default: true },
+    countryName: { type: 'boolean', default: false },
     age: { type: 'boolean', default: true },
     followers: { type: 'boolean', default: false },
+    posts: { type: 'boolean', default: false },
   },
   init(ctx) {
     const { options, lookups, t } = ctx
-    const needs = { about: options.geo !== 'off' || options.age, profile: options.followers }
+    const showsPlace = options.flag || options.countryName
+    const needs = { about: showsPlace || options.age, profile: options.followers || options.posts }
     const language = t('@@ui_locale').replace('_', '-') || undefined
     const compact = new Intl.NumberFormat(language, { notation: 'compact' })
     const regions = new Intl.DisplayNames(language ? [language] : [], { type: 'region' })
     const badges = new Map<string, Set<HTMLElement>>()
 
-    ctx.addStyle(`.${BADGE} { margin-inline-start: 6px; font-size: 12px; opacity: 0.75; white-space: nowrap; }`)
+    ctx.addStyle(STYLE)
 
-    const geo = (data: ProfileData): { short: string; full: string } | null => {
-      if (options.geo === 'off') return null
+    const place = (data: ProfileData): Item[] => {
+      if (!showsPlace) return []
       if (data.countryHidden) {
-        const full = `🏴 ${t('feature_account_info_location_hidden')}`
-        return { short: options.geo === 'flag' ? '🏴' : options.geo === 'name' ? t('feature_account_info_location_hidden') : full, full }
+        const hidden = t('feature_account_info_location_hidden')
+        return [{ kind: 'hidden', text: options.countryName ? `🏴 ${hidden}` : '🏴', title: hidden }]
       }
       const name = data.country ? (regions.of(data.country) ?? data.country) : data.countryName
-      if (!name) return null
-      const mark = data.country ? flag(data.country) : ''
-      const full = [mark, name].filter(Boolean).join(' ')
-      return { short: options.geo === 'flag' ? mark || name : options.geo === 'name' ? name : full, full }
+      if (!name) return []
+      const title = t('feature_account_info_based_in', [name])
+      const items: Item[] = []
+      if (options.flag && data.country) items.push({ kind: 'flag', text: flag(data.country), title })
+      if (options.countryName || items.length === 0) items.push({ kind: 'country', text: name, title })
+      return items
     }
 
-    const describe = (pk: string): { text: string; title: string } => {
+    const items = (pk: string): Item[] => {
       const data = lookups.data(pk)
-      const short: string[] = []
-      const full: string[] = []
-      const place = geo(data)
-      if (place) {
-        short.push(place.short)
-        full.push(place.full)
-      }
+      const result = place(data)
       if (options.age && data.ageMonths !== null) {
-        const age = data.ageMonths >= 12 ? t('feature_account_info_age_years', [String(Math.floor(data.ageMonths / 12))]) : t('feature_account_info_age_months', [String(data.ageMonths)])
-        short.push(age)
-        full.push(age)
+        const years = Math.floor(data.ageMonths / 12)
+        const text = years >= 1 ? t('feature_account_info_age_years', [String(years)]) : t('feature_account_info_age_months', [String(data.ageMonths)])
+        result.push({ kind: 'age', text, title: t('feature_account_info_age_title', [text]) })
       }
       if (options.followers && data.followers !== null) {
-        const followers = t('feature_account_info_followers', [compact.format(data.followers)])
-        short.push(followers)
-        full.push(followers)
+        const text = t('feature_account_info_followers', [compact.format(data.followers)])
+        result.push({ kind: 'followers', text, title: text })
       }
-      return { text: short.join(' · '), title: full.join(' · ') }
+      if (options.posts && data.posts !== null) {
+        const text = t('feature_account_info_posts', [compact.format(data.posts)])
+        result.push({ kind: 'posts', text, title: text })
+      }
+      return result
     }
 
     const refresh = (pk: string) => {
-      const { text, title } = describe(pk)
+      const list = items(pk)
       for (const badge of badges.get(pk) ?? []) {
-        badge.textContent = text
-        badge.title = title
-        badge.setAttribute('aria-label', title)
-        badge.hidden = text === ''
+        badge.replaceChildren(
+          ...list.map((item) => {
+            const span = ctx.document.createElement('span')
+            span.className = `rt-ai-${item.kind}`
+            span.textContent = item.text
+            span.title = item.title
+            return span
+          }),
+        )
+        badge.setAttribute('aria-label', list.map((item) => item.title).join(', '))
+        badge.hidden = list.length === 0
       }
     }
 
@@ -73,11 +92,12 @@ export default defineFeature({
       const code = postCodeOf(container)
       const post = code ? ctx.posts.get(code) : undefined
       if (!post) return
-      const link = authorLinkOf(container, post.author.username)
-      if (!link || link.nextElementSibling?.classList.contains(BADGE)) return
+      const slot = nameSlotOf(container, post.author.username)
+      if (!slot || slot.nextElementSibling?.classList.contains(BADGE)) return
       const badge = ctx.document.createElement('span')
       badge.className = BADGE
-      link.after(badge)
+      badge.setAttribute('role', 'note')
+      slot.after(badge)
       const set = badges.get(post.author.pk) ?? new Set()
       set.add(badge)
       badges.set(post.author.pk, set)

@@ -54,7 +54,7 @@ describe('SpamFilter', () => {
     document.body.innerHTML = postContainer('A1')
     setup([affiliate('A1')])
     expect(container('A1').classList.contains('rt-collapse')).toBe(true)
-    expect(bar('A1')?.textContent).toContain('Hidden: affiliate links')
+    expect(bar('A1')?.textContent).toContain('Hidden: affiliate link')
     expect(container('A1').querySelector('p')?.textContent).toBe('body')
   })
 
@@ -96,11 +96,33 @@ describe('SpamFilter', () => {
     expect(container('B1').classList.contains('rt-blur')).toBe(true)
   })
 
-  it('only tags in tag-only mode', () => {
+  it('only tags in tag-only mode, with a chip next to the author name', () => {
     document.body.innerHTML = postContainer('T1')
     setup([affiliate('T1')], { ...defaultSettings(), tagOnly: true })
+    const chip = container('T1').querySelector('.rt-chip') as HTMLElement
     expect(container('T1').classList.contains('rt-collapse')).toBe(false)
-    expect(bar('T1')?.textContent).toContain('Tagged: affiliate links')
+    expect(bar('T1')).toBeNull()
+    expect(chip.previousElementSibling?.className).toBe('name')
+    expect(chip.textContent).toBe('affiliate link×')
+    expect(chip.title).toBe('Tagged: affiliate link')
+  })
+
+  it('allows the author from the chip with one click, without opening the post', async () => {
+    document.body.innerHTML = postContainer('T2')
+    let opened = false
+    container('T2').addEventListener('click', () => (opened = true))
+    const { saved } = setup([affiliate('T2')], { ...defaultSettings(), tagOnly: true })
+    container('T2').querySelector<HTMLButtonElement>('.rt-chip button')!.click()
+    await Promise.resolve()
+    expect(opened).toBe(false)
+    expect(container('T2').querySelector('.rt-chip')).toBeNull()
+    expect(readList(saved[0]!.ruleFile, 'allowed-accounts')).toEqual(['amy'])
+  })
+
+  it('falls back to a bar when the author row is not found', () => {
+    document.body.innerHTML = `<div data-pressable-container="true" id="c-T3"><a href="/@amy/post/T3"><time datetime="2026-01-01">1h</time></a></div>`
+    setup([affiliate('T3')], { ...defaultSettings(), tagOnly: true })
+    expect(bar('T3')?.textContent).toContain('Tagged: affiliate link')
   })
 
   it('labels a country match with the flag and the country name, and asks for profile data', () => {

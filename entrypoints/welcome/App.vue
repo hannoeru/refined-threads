@@ -14,6 +14,7 @@ const level = computed({
 })
 const openThreads = () => void browser.tabs.create({ url: THREADS_URL })
 const openSettings = () => void browser.runtime.openOptionsPage()
+const featuresUrl = browser.runtime.getURL('/options.html#features')
 </script>
 
 <template>
@@ -23,6 +24,7 @@ const openSettings = () => void browser.runtime.openOptionsPage()
     <p class="welcome-lead">{{ t('welcome_lead') }}</p>
     <LevelPicker v-model="level" />
     <p class="muted">{{ t('welcome_privacy') }}</p>
+    <p class="welcome-more">{{ t('welcome_more') }} <a :href="featuresUrl">{{ t('welcome_more_link') }}</a></p>
     <div class="welcome-actions">
       <button type="button" class="button primary" @click="openThreads">{{ t('open_threads') }}</button>
       <button type="button" class="button" @click="openSettings">{{ t('open_settings') }}</button>
@@ -35,5 +37,7 @@ const openSettings = () => void browser.runtime.openOptionsPage()
 .welcome-icon { border-radius: 22px; }
 .welcome h1 { font-size: clamp(30px, 5vw, 44px); font-weight: 800; letter-spacing: -0.01em; }
 .welcome-lead { font-size: 18px; max-width: 56ch; }
+.welcome-more { padding: 12px 14px; border-radius: var(--radius-lg); background: var(--accent-soft); }
+.welcome-more a { color: var(--accent); font-weight: 600; }
 .welcome-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 </style>

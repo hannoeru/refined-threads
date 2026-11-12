@@ -1,5 +1,6 @@
 import type { Post, Settings, Stats } from '../../model'
-import { addAccount, ruleLabel } from '../../rules/edit'
+import { addAccount, isBuiltIn, ruleLabel } from '../../rules/edit'
+import { nameSlotOf } from '../../threads/dom'
 import { type CompiledRules, compileRules, CopyTracker, evaluate } from '../../rules/engine'
 import type { AccountLookups, PostStream } from '../api'
 import { CONTAINER, clearView, postCode, renderView, STYLE, type ViewText } from './view'
@@ -26,7 +27,7 @@ export class SpamFilter {
   #compiled: CompiledRules
   #revealed = new Set<string>()
   #counted = new Set<string>()
-  #frame: number | null = null
+  #timer: ReturnType<typeof setTimeout> | null = null
   #regionNames: Intl.DisplayNames | null
 
   constructor(private readonly deps: SpamFilterDeps) {
@@ -57,7 +58,7 @@ export class SpamFilter {
       'abort',
       () => {
         observer.disconnect()
-        if (this.#frame !== null) document.defaultView?.cancelAnimationFrame(this.#frame)
+        if (this.#timer !== null) clearTimeout(this.#timer)
         for (const container of document.querySelectorAll(CONTAINER)) clearView(container)
       },
       { once: true },
@@ -72,12 +73,11 @@ export class SpamFilter {
   }
 
   schedule(): void {
-    const win = this.deps.document.defaultView
-    if (this.#frame !== null || !win || this.deps.signal.aborted) return
-    this.#frame = win.requestAnimationFrame(() => {
-      this.#frame = null
+    if (this.#timer !== null || this.deps.signal.aborted) return
+    this.#timer = setTimeout(() => {
+      this.#timer = null
       this.scan()
-    })
+    }, 16)
   }
 
   scan(): void {
@@ -106,7 +106,7 @@ export class SpamFilter {
     const labels = verdict.reasons.map((reason) =>
       reason.id === 'countries' && post.author.country
         ? `${flag(post.author.country)} ${this.#regionNames?.of(post.author.country) ?? post.author.country}`
-        : ruleLabel(reason, (key) => t(key)),
+        : reason.name || (isBuiltIn(reason.id) && t(`reason_${reason.id.replaceAll('-', '_')}`)) || ruleLabel(reason, (key) => t(key)),
     )
     const text: ViewText = {
       hidden: (reasons) => t('bar_hidden', [reasons]),
@@ -117,7 +117,13 @@ export class SpamFilter {
     }
     renderView(
       container,
-      { verdict, labels, display: this.#settings.display, revealed: this.#revealed.has(post.code) },
+      {
+        verdict,
+        labels,
+        display: this.#settings.display,
+        revealed: this.#revealed.has(post.code),
+        slot: nameSlotOf(container, post.author.username),
+      },
       text,
       {
         reveal: () => this.#toggle(post.code, true),

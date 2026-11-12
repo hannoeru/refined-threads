@@ -1,4 +1,4 @@
-import { permalinkOf, POST_CONTAINER } from '../../threads/dom'
+import { permalinkOf, POST_CONTAINER, THREADS_THEME } from '../../threads/dom'
 import { defineFeature } from '../api'
 
 const CURRENT = 'rt-keyboard-current'
@@ -11,7 +11,7 @@ export default defineFeature({
   enabledByDefault: false,
   shortcuts: { j: 'next', k: 'previous', o: 'open' },
   init(ctx) {
-    ctx.addStyle(`.${CURRENT} { outline: 3px solid #a6e22e; outline-offset: -3px; border-radius: 12px; }`)
+    ctx.addStyle(`.${CURRENT} { box-shadow: inset 3px 0 0 ${THREADS_THEME.link}; background: ${THREADS_THEME.hover}; scroll-margin: 80px; }`)
     let current: HTMLElement | null = null
 
     const posts = () =>

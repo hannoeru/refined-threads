@@ -80,57 +80,74 @@ describe('keyboard-navigation', () => {
 })
 
 describe('account-info', () => {
-  it('shows a badge after the author name and fills it when the lookup arrives', () => {
+  const setup = (options: Record<string, unknown>) => {
     document.body.innerHTML = postContainer('I1')
     const lookups = fakeLookups()
+    const wanted: unknown[] = []
+    const want = lookups.lookups.want
+    lookups.lookups.want = (pk, username, needs) => {
+      wanted.push(needs)
+      want(pk, username, needs)
+    }
     const posts = catalogWith([makePost({ code: 'I1', author: { pk: 'p1', username: 'amy' } })])
-    const runtime = run('account-info', { 'account-info': { enabled: true, options: { followers: true } } }, posts, lookups)
+    const runtime = run('account-info', { 'account-info': { enabled: true, options } }, posts, lookups)
     const badge = () => document.querySelector('.rt-account-info') as HTMLElement | null
-    expect(lookups.wanted).toEqual(['p1'])
-    expect(badge()?.previousElementSibling?.textContent).toBe('amy')
+    const items = () => [...(badge()?.children ?? [])].map((item) => ({ text: item.textContent, title: (item as HTMLElement).title }))
+    return { lookups, runtime, badge, items, wanted }
+  }
+
+  it('places one badge in the author row between the name and the time, and fills it when data arrives', () => {
+    const { lookups, runtime, badge, items } = setup({ followers: true, posts: true })
+    expect(badge()?.previousElementSibling?.className).toBe('name')
+    expect(badge()?.nextElementSibling?.querySelector('time')).not.toBeNull()
     expect(badge()?.hidden).toBe(true)
-    lookups.resolve('p1', { country: 'JP', ageMonths: 30, followers: 1200 })
-    expect(badge()?.textContent).toBe('🇯🇵 · 2y on Threads · 1.2K followers')
+    lookups.resolve('p1', { country: 'JP', ageMonths: 30, followers: 1200, posts: 4515 })
+    expect(items()).toEqual([
+      { text: '🇯🇵', title: 'Based in Japan' },
+      { text: '2y', title: 'On Threads for 2y' },
+      { text: '1.2K followers', title: '1.2K followers' },
+      { text: '4.5K posts', title: '4.5K posts' },
+    ])
+    expect(badge()?.getAttribute('aria-label')).toBe('Based in Japan, On Threads for 2y, 1.2K followers, 4.5K posts')
     runtime.stopAll()
     expect(badge()).toBeNull()
   })
 
-  const badgeFor = (options: Record<string, unknown>, profile: Record<string, unknown>) => {
-    document.body.innerHTML = postContainer('G1')
-    const lookups = fakeLookups()
-    const posts = catalogWith([makePost({ code: 'G1', author: { pk: 'p1', username: 'amy' } })])
-    run('account-info', { 'account-info': { enabled: true, options: { age: false, ...options } } }, posts, lookups)
-    lookups.resolve('p1', profile)
-    const badge = document.querySelector('.rt-account-info') as HTMLElement
-    return { text: badge.textContent, title: badge.title, hidden: badge.hidden }
-  }
-
-  it('shows the flag by default, with the country name in the tooltip', () => {
-    expect(badgeFor({}, { country: 'TW', countryName: '台灣' })).toEqual({ text: '🇹🇼', title: '🇹🇼 Taiwan', hidden: false })
+  it('shows each detail only when its switch is on', () => {
+    const { lookups, items } = setup({ flag: false, countryName: true, age: false })
+    lookups.resolve('p1', { country: 'TW', ageMonths: 5, followers: 10, posts: 3 })
+    expect(items().map((item) => item.text)).toEqual(['Taiwan'])
   })
 
-  it('can show the flag with the name, or the name only', () => {
-    expect(badgeFor({ geo: 'flag-name' }, { country: 'JP' }).text).toBe('🇯🇵 Japan')
-    expect(badgeFor({ geo: 'name' }, { country: 'JP' }).text).toBe('Japan')
+  it('shows both the flag and the country name when both are on', () => {
+    const { lookups, items } = setup({ countryName: true, age: false })
+    lookups.resolve('p1', { country: 'TW' })
+    expect(items().map((item) => item.text)).toEqual(['🇹🇼', 'Taiwan'])
+  })
+
+  it('shows months for accounts younger than a year', () => {
+    const { lookups, items } = setup({ flag: false })
+    lookups.resolve('p1', { ageMonths: 5 })
+    expect(items()).toEqual([{ text: '5mo', title: 'On Threads for 5mo' }])
   })
 
   it('marks accounts that hide their location', () => {
-    expect(badgeFor({}, { countryHidden: true })).toEqual({ text: '🏴', title: '🏴 Location hidden', hidden: false })
-    expect(badgeFor({ geo: 'name' }, { countryHidden: true }).text).toBe('Location hidden')
+    const flagOnly = setup({ age: false })
+    flagOnly.lookups.resolve('p1', { countryHidden: true })
+    expect(flagOnly.items()).toEqual([{ text: '🏴', title: 'Location hidden' }])
+    const named = setup({ countryName: true, age: false })
+    named.lookups.resolve('p1', { countryHidden: true })
+    expect(named.items().map((item) => item.text)).toEqual(['🏴 Location hidden'])
   })
 
   it('shows the name from Threads when it is not a known country', () => {
-    expect(badgeFor({}, { country: null, countryName: 'Atlantis' }).text).toBe('Atlantis')
+    const { lookups, items } = setup({ age: false })
+    lookups.resolve('p1', { country: null, countryName: 'Atlantis' })
+    expect(items().map((item) => item.text)).toEqual(['Atlantis'])
   })
 
-  it('shows nothing about location when geo is off, and asks for no About lookup', () => {
-    document.body.innerHTML = postContainer('G2')
-    const lookups = fakeLookups()
-    const wanted: unknown[] = []
-    lookups.lookups.want = (_pk, _username, needs) => void wanted.push(needs)
-    const posts = catalogWith([makePost({ code: 'G2', author: { pk: 'p2', username: 'amy' } })])
-    run('account-info', { 'account-info': { enabled: true, options: { geo: 'off', age: false, followers: true } } }, posts, lookups)
-    expect(wanted).toEqual([{ about: false, profile: true }])
+  it('asks only for the lookups the switches need', () => {
+    expect(setup({ flag: false, age: false, followers: true }).wanted).toEqual([{ about: false, profile: true }])
+    expect(setup({}).wanted).toEqual([{ about: true, profile: false }])
   })
 })
-

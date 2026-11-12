@@ -17,3 +17,26 @@ export function authorLinkOf(container: Element, username: string): HTMLAnchorEl
   }
   return null
 }
+
+export function nameSlotOf(container: Element, username: string): Element | null {
+  const link = authorLinkOf(container, username)
+  if (!link) return null
+  const permalink = permalinkOf(container)
+  let slot: Element = link
+  while (slot.parentElement && slot.parentElement !== container) {
+    if (permalink && slot.parentElement.contains(permalink)) return slot
+    slot = slot.parentElement
+  }
+  return link
+}
+
+export const THREADS_THEME = {
+  text: 'var(--barcelona-primary-text, currentColor)',
+  secondary: 'var(--barcelona-secondary-icon, rgb(119, 119, 119))',
+  surface: 'var(--barcelona-elevated-background, rgba(127, 127, 127, 0.08))',
+  pill: 'var(--barcelona-author-pill-background, rgba(127, 127, 127, 0.12))',
+  outline: 'var(--barcelona-primary-column-outline, rgba(127, 127, 127, 0.25))',
+  hover: 'var(--barcelona-hovered-background, rgba(127, 127, 127, 0.06))',
+  link: 'var(--barcelona-link-text, rgb(0, 149, 246))',
+  error: 'var(--barcelona-error-text, rgb(255, 48, 64))',
+} as const

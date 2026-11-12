@@ -6,7 +6,7 @@
     "message": "自動隱藏 Threads 上的垃圾與機器人貼文。安裝即可使用，設定只存在你的瀏覽器。"
   },
   "bar_hidden": {
-    "message": "已隱藏：$VALUE$",
+    "message": "已隱藏 · $VALUE$",
     "placeholders": {
       "value": {
         "content": "$1"
@@ -14,7 +14,7 @@
     }
   },
   "bar_tagged": {
-    "message": "Refined Threads：$VALUE$",
+    "message": "Refined Threads 標記：$VALUE$",
     "placeholders": {
       "value": {
         "content": "$1"
@@ -43,7 +43,7 @@
     "message": "字詞與帳號"
   },
   "section_profile": {
-    "message": "帳號檢查"
+    "message": "帳號篩選"
   },
   "section_rules": {
     "message": "我的規則"
@@ -350,12 +350,6 @@
   "tag_only_active": {
     "message": "測試模式開啟中：貼文只會被標記，不會隱藏。"
   },
-  "protection_on": {
-    "message": "垃圾過濾已開啟"
-  },
-  "protection_off": {
-    "message": "垃圾過濾已關閉"
-  },
   "hidden_today": {
     "message": "今天已隱藏"
   },
@@ -635,9 +629,6 @@
   "features_back": {
     "message": "所有功能"
   },
-  "all_features": {
-    "message": "所有功能"
-  },
   "spam_filter_settings": {
     "message": "垃圾過濾設定"
   },
@@ -684,16 +675,16 @@
     "message": "帳號資訊"
   },
   "feature_account_info_description": {
-    "message": "在名稱旁顯示帳號所在地（來自「關於此個人檔案」）、帳號年齡和粉絲數。每 1.5 到 2 秒查詢一個帳號。"
+    "message": "在名稱旁顯示作者的資訊：帳號所在地、加入 Threads 多久，以及粉絲數和貼文數。每 1.5 到 2 秒查詢一個帳號。"
   },
   "feature_account_info_option_age": {
-    "message": "帳號年齡"
+    "message": "加入 Threads 多久"
   },
   "feature_account_info_option_followers": {
     "message": "粉絲數"
   },
   "feature_account_info_age_years": {
-    "message": "加入 $VALUE$ 年",
+    "message": "$VALUE$ 年",
     "placeholders": {
       "value": {
         "content": "$1"
@@ -701,7 +692,7 @@
     }
   },
   "feature_account_info_age_months": {
-    "message": "加入 $VALUE$ 個月",
+    "message": "$VALUE$ 個月",
     "placeholders": {
       "value": {
         "content": "$1"
@@ -709,29 +700,98 @@
     }
   },
   "feature_account_info_followers": {
-    "message": "$VALUE$ 位粉絲",
+    "message": "$VALUE$ 粉絲",
     "placeholders": {
       "value": {
         "content": "$1"
       }
     }
   },
-  "feature_account_info_option_geo": {
-    "message": "所在地"
-  },
-  "feature_account_info_option_geo_flag": {
-    "message": "國旗"
-  },
-  "feature_account_info_option_geo_flag_name": {
-    "message": "國旗和國家名稱"
-  },
-  "feature_account_info_option_geo_name": {
-    "message": "國家名稱"
-  },
-  "feature_account_info_option_geo_off": {
-    "message": "不顯示"
-  },
   "feature_account_info_location_hidden": {
     "message": "已隱藏所在地"
+  },
+  "feature_account_info_option_flag": {
+    "message": "國旗"
+  },
+  "feature_account_info_option_countryName": {
+    "message": "國家名稱"
+  },
+  "feature_account_info_option_posts": {
+    "message": "貼文數"
+  },
+  "feature_account_info_based_in": {
+    "message": "所在地：$VALUE$",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "feature_account_info_age_title": {
+    "message": "加入 Threads：$VALUE$",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "feature_account_info_posts": {
+    "message": "$VALUE$ 貼文",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "reason_followed": {
+    "message": "你追蹤的人"
+  },
+  "reason_allowed_accounts": {
+    "message": "在你的允許清單"
+  },
+  "reason_hidden_accounts": {
+    "message": "在你的隱藏清單"
+  },
+  "reason_blocked_words": {
+    "message": "含有封鎖的字詞"
+  },
+  "reason_blocked_sites": {
+    "message": "連結到封鎖的網站"
+  },
+  "reason_countries": {
+    "message": "封鎖的國家"
+  },
+  "reason_new_accounts": {
+    "message": "新帳號"
+  },
+  "reason_few_followers": {
+    "message": "粉絲很少"
+  },
+  "reason_few_posts": {
+    "message": "貼文很少"
+  },
+  "reason_affiliate_links": {
+    "message": "分潤連結"
+  },
+  "reason_engagement_bait": {
+    "message": "騙互動"
+  },
+  "reason_copy_paste_replies": {
+    "message": "複製貼上的回覆"
+  },
+  "reason_ai_label": {
+    "message": "AI 標籤"
+  },
+  "reason_generated_names": {
+    "message": "自動產生的名稱"
+  },
+  "reason_strangers_in_replies": {
+    "message": "附連結的陌生人"
+  },
+  "welcome_more": {
+    "message": "Refined Threads 還有更多功能：實際日期、鍵盤瀏覽，以及名稱旁的帳號資訊。"
+  },
+  "welcome_more_link": {
+    "message": "查看所有功能"
   }
 }
