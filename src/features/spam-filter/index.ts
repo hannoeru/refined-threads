@@ -15,6 +15,7 @@ export default defineFeature({
       settings,
       posts: ctx.posts,
       lookups: ctx.lookups,
+      observe: ctx.observe,
       translate: ctx.t,
       addStyle: ctx.addStyle,
       saveSettings,

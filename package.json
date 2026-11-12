@@ -15,7 +15,8 @@
     "test": "vitest run",
     "check": "pnpm compile && pnpm test && pnpm build && pnpm build:firefox",
     "postinstall": "wxt prepare",
-    "icons": "node scripts/icons.mjs"
+    "icons": "node scripts/icons.mjs",
+    "bench": "vitest run --config vitest.perf.config.ts"
   },
   "dependencies": {
     "valibot": "1.5.0",

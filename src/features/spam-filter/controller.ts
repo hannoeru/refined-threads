@@ -1,7 +1,7 @@
 import type { Post, Settings, Stats } from '../../model'
 import { addAccount, isBuiltIn, ruleLabel } from '../../rules/edit'
 import { nameSlotOf } from '../../threads/dom'
-import { type CompiledRules, compileRules, CopyTracker, evaluate } from '../../rules/engine'
+import { type CompiledRules, compileRules, CopyTracker, evaluate, normalizeCopyText } from '../../rules/engine'
 import type { AccountLookups, PostStream } from '../api'
 import { CONTAINER, clearView, postCode, renderView, STYLE, type ViewText } from './view'
 
@@ -10,13 +10,16 @@ export type SpamFilterDeps = {
   signal: AbortSignal
   settings: Settings
   posts: PostStream
-  lookups: Pick<AccountLookups, 'data' | 'want'>
+  lookups: AccountLookups
+  observe: <E extends Element>(selector: string, callback: (element: E) => void) => void
   translate: (key: string, substitutions?: string[]) => string
   addStyle: (css: string) => void
   saveSettings: (settings: Settings) => Promise<void>
   recordStats: (update: (stats: Stats) => Stats) => void
   today: () => string
 }
+
+const MAX_TEXTS = 5000
 
 const flag = (code: string) => String.fromCodePoint(...[...code].map((letter) => 0x1f1a5 + letter.charCodeAt(0)))
 
@@ -28,6 +31,12 @@ export class SpamFilter {
   #revealed = new Set<string>()
   #counted = new Set<string>()
   #timer: ReturnType<typeof setTimeout> | null = null
+  #pending = new Set<HTMLElement>()
+  #all = false
+  #codes = new WeakMap<Element, string>()
+  #waiting = new Map<string, Set<HTMLElement>>()
+  #shown = new Map<string, Set<HTMLElement>>()
+  #sameText = new Map<string, Set<string>>()
   #regionNames: Intl.DisplayNames | null
 
   constructor(private readonly deps: SpamFilterDeps) {
@@ -44,20 +53,18 @@ export class SpamFilter {
   start(): void {
     const { document, signal } = this.deps
     this.deps.addStyle(STYLE)
-    this.deps.posts.subscribe((posts) => {
-      for (const post of posts) {
-        if (this.#recorded.has(post.code)) continue
-        this.#recorded.add(post.code)
-        this.#copies.record(post)
-      }
-      this.schedule()
-    }, signal)
-    const observer = new MutationObserver(() => this.schedule())
-    observer.observe(document.documentElement, { childList: true, subtree: true })
+    this.deps.posts.subscribe((posts) => this.#postsArrived(posts), signal)
+    this.deps.lookups.subscribe(() => this.#scheduleAll(), signal)
+    this.deps.observe<HTMLElement>(CONTAINER, (container) => this.#queue(container))
+    this.deps.observe<HTMLElement>('a[href*="/post/"] time', (time) => {
+      const container = time.closest<HTMLElement>(CONTAINER)
+      if (!container) return
+      this.#codes.delete(container)
+      this.#queue(container)
+    })
     signal.addEventListener(
       'abort',
       () => {
-        observer.disconnect()
         if (this.#timer !== null) clearTimeout(this.#timer)
         for (const container of document.querySelectorAll(CONTAINER)) clearView(container)
       },
@@ -69,24 +76,102 @@ export class SpamFilter {
   setSettings(settings: Settings): void {
     this.#settings = settings
     this.#compiled = compileRules(settings)
-    this.schedule()
-  }
-
-  schedule(): void {
-    if (this.#timer !== null || this.deps.signal.aborted) return
-    this.#timer = setTimeout(() => {
-      this.#timer = null
-      this.scan()
-    }, 16)
+    this.#scheduleAll()
   }
 
   scan(): void {
     if (this.deps.signal.aborted) return
-    for (const container of this.deps.document.querySelectorAll<HTMLElement>(CONTAINER)) {
-      const code = postCode(container)
-      const post = code ? this.deps.posts.get(code) : undefined
-      if (post) this.#process(container, post)
+    this.#pending.clear()
+    this.#all = false
+    for (const container of this.deps.document.querySelectorAll<HTMLElement>(CONTAINER)) this.#check(container)
+  }
+
+  #postsArrived(posts: Post[]): void {
+    for (const post of posts) {
+      if (!this.#recorded.has(post.code)) {
+        this.#recorded.add(post.code)
+        this.#rememberText(post)
+        if (this.#copies.record(post) > 1) this.#queueSameText(post)
+      }
+      for (const container of this.#waiting.get(post.code) ?? []) this.#pending.add(container)
+      this.#waiting.delete(post.code)
     }
+    this.#schedule()
+  }
+
+  #rememberText(post: Post): void {
+    const key = normalizeCopyText(post.text)
+    if (key.length < 12) return
+    const codes = this.#sameText.get(key)
+    if (codes) {
+      codes.add(post.code)
+      return
+    }
+    if (this.#sameText.size >= MAX_TEXTS) this.#sameText.delete(this.#sameText.keys().next().value!)
+    this.#sameText.set(key, new Set([post.code]))
+  }
+
+  #queueSameText(post: Post): void {
+    if (!this.#compiled.needs.copies) return
+    for (const code of this.#sameText.get(normalizeCopyText(post.text)) ?? []) {
+      for (const container of this.#shown.get(code) ?? []) {
+        if (container.isConnected) this.#pending.add(container)
+        else this.#shown.get(code)?.delete(container)
+      }
+    }
+  }
+
+  #queue(container: HTMLElement): void {
+    this.#pending.add(container)
+    this.#schedule()
+  }
+
+  #scheduleAll(): void {
+    this.#all = true
+    this.#schedule()
+  }
+
+  #schedule(): void {
+    if (this.#timer !== null || this.deps.signal.aborted) return
+    this.#timer = setTimeout(() => {
+      this.#timer = null
+      this.#flush()
+    }, 16)
+  }
+
+  #flush(): void {
+    if (this.deps.signal.aborted) return
+    if (this.#all) {
+      this.scan()
+      return
+    }
+    const pending = [...this.#pending]
+    this.#pending.clear()
+    for (const container of pending) if (container.isConnected) this.#check(container)
+  }
+
+  #codeOf(container: HTMLElement): string | null {
+    const cached = this.#codes.get(container)
+    if (cached !== undefined) return cached
+    const code = postCode(container)
+    if (code) this.#codes.set(container, code)
+    return code
+  }
+
+  #check(container: HTMLElement): void {
+    const code = this.#codeOf(container)
+    if (!code) return
+    const post = this.deps.posts.get(code)
+    if (post) {
+      const shown = this.#shown.get(code) ?? new Set()
+      shown.add(container)
+      this.#shown.set(code, shown)
+      this.#process(container, post)
+      return
+    }
+    const waiting = this.#waiting.get(code) ?? new Set()
+    waiting.add(container)
+    this.#waiting.set(code, waiting)
   }
 
   #process(container: HTMLElement, stored: Post): void {

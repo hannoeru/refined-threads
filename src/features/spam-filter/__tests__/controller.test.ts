@@ -1,10 +1,11 @@
 // @vitest-environment happy-dom
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { defaultSettings, type Settings, type Stats } from '../../../model'
 import type { ProfileData } from '../../../profile/lookups'
 import { readList, writeList } from '../../../rules/edit'
 import { catalogWith, fakeLookups, postContainer, translate } from '../../../testing/feature'
 import { makePost } from '../../../testing/post'
+import { observe } from '../../services/observe'
 import { SpamFilter } from '../controller'
 import { postCode } from '../view'
 
@@ -14,7 +15,7 @@ function setup(posts: Post[], settings: Settings = defaultSettings(), profile: P
   const saved: Settings[] = []
   const controller = new AbortController()
   const catalog = catalogWith(posts)
-  const { lookups, wanted } = fakeLookups(profile)
+  const { lookups, wanted, resolve } = fakeLookups(profile)
   let stats: Stats = { day: '', hidden: 0, tagged: 0, byRule: {} }
   const filter = new SpamFilter({
     document,
@@ -22,6 +23,7 @@ function setup(posts: Post[], settings: Settings = defaultSettings(), profile: P
     settings,
     posts: catalog,
     lookups,
+    observe: (selector, callback) => observe(document, selector, callback, controller.signal),
     translate,
     addStyle: () => undefined,
     saveSettings: async (next) => void saved.push(next),
@@ -29,7 +31,7 @@ function setup(posts: Post[], settings: Settings = defaultSettings(), profile: P
     today: () => '2026-11-12',
   })
   filter.start()
-  return { filter, catalog, controller, saved, wanted, stats: () => stats }
+  return { filter, catalog, controller, saved, wanted, resolve, stats: () => stats }
 }
 
 const container = (code: string) => document.getElementById(`c-${code}`)!
@@ -46,6 +48,52 @@ describe('postCode', () => {
   it('reads the code from the permalink that holds the timestamp, not from quoted posts', () => {
     document.body.innerHTML = postContainer('OWN').replace('<p>body</p>', '<a href="/@bob/post/QUOTED">quoted</a>')
     expect(postCode(container('OWN'))).toBe('OWN')
+  })
+})
+
+afterEach(() => vi.useRealTimers())
+
+describe('SpamFilter updates', () => {
+  it('applies post data that arrives after its container, without a manual scan', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+    document.body.innerHTML = postContainer('W1')
+    const { catalog } = setup([])
+    catalog.add([affiliate('W1')])
+    await vi.advanceTimersByTimeAsync(20)
+    expect(bar('W1')).not.toBeNull()
+  })
+
+  it('re-checks posts when account lookups finish', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+    document.body.innerHTML = postContainer('W2')
+    const settings = defaultSettings()
+    settings.ruleFile = writeList(settings.ruleFile, 'countries', ['JP'])
+    const { resolve } = setup([makePost({ code: 'W2', author: { pk: 'p9', username: 'amy' } })], settings)
+    expect(bar('W2')).toBeNull()
+    resolve('p9', { country: 'JP' })
+    await vi.advanceTimersByTimeAsync(20)
+    expect(bar('W2')).not.toBeNull()
+  })
+
+  it('hides earlier copy-paste replies when a third copy arrives', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+    const reply = (code: string, pk: string) => makePost({ code, isReply: true, text: 'Great post, check my profile!', author: { pk, username: 'amy' } })
+    document.body.innerHTML = postContainer('C1') + postContainer('C2')
+    const { catalog } = setup([reply('C1', 'a'), reply('C2', 'b')])
+    expect(bar('C1')).toBeNull()
+    catalog.add([reply('C3', 'c')])
+    await vi.advanceTimersByTimeAsync(20)
+    expect(bar('C1')?.textContent).toContain('Hidden')
+    expect(bar('C2')?.textContent).toContain('Hidden')
+  })
+
+  it('processes posts that Threads adds to the page later', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+    const { catalog } = setup([])
+    catalog.add([affiliate('W3')])
+    document.body.insertAdjacentHTML('beforeend', postContainer('W3'))
+    await vi.advanceTimersByTimeAsync(20)
+    expect(bar('W3')).not.toBeNull()
   })
 })
 
