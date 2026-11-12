@@ -4,6 +4,7 @@ import { defaultSettings } from '../../../model'
 import { catalogWith, fakeLookups, postContainer, translate } from '../../../testing/feature'
 import { makePost } from '../../../testing/post'
 import { observe } from '../../services/observe'
+import { alwaysVisible } from '../../services/visible'
 import { SpamFilter } from '../controller'
 
 const POSTS = 150
@@ -28,6 +29,7 @@ function start(initialPosts: typeof posts) {
     posts: catalog,
     lookups: fakeLookups().lookups,
     observe: (selector, callback) => observe(document, selector, callback, controller.signal),
+    whenVisible: alwaysVisible,
     translate,
     addStyle: () => undefined,
     saveSettings: async () => undefined,

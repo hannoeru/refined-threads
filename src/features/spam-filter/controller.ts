@@ -3,6 +3,7 @@ import { addAccount, isBuiltIn, ruleLabel } from '../../rules/edit'
 import { nameSlotOf } from '../../threads/dom'
 import { type CompiledRules, compileRules, CopyTracker, evaluate, normalizeCopyText } from '../../rules/engine'
 import type { AccountLookups, PostStream } from '../api'
+import type { WhenVisible } from '../services/visible'
 import { CONTAINER, clearView, postCode, renderView, STYLE, type ViewText } from './view'
 
 export type SpamFilterDeps = {
@@ -12,6 +13,7 @@ export type SpamFilterDeps = {
   posts: PostStream
   lookups: AccountLookups
   observe: <E extends Element>(selector: string, callback: (element: E) => void) => void
+  whenVisible: WhenVisible
   translate: (key: string, substitutions?: string[]) => string
   addStyle: (css: string) => void
   saveSettings: (settings: Settings) => Promise<void>
@@ -177,7 +179,7 @@ export class SpamFilter {
   #process(container: HTMLElement, stored: Post): void {
     const needs = this.#compiled.needs
     if ((needs.about || needs.profile) && !stored.author.following) {
-      this.deps.lookups.want(stored.author.pk, stored.author.username, needs)
+      this.deps.whenVisible(container, () => this.deps.lookups.want(stored.author.pk, stored.author.username, needs))
     }
     const { country, ageMonths, followers, posts } = this.deps.lookups.data(stored.author.pk)
     const post: Post = { ...stored, author: { ...stored.author, country, ageMonths, followers, posts } }

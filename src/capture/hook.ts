@@ -80,16 +80,17 @@ export function installHook(win: Window & typeof globalThis): void {
     return response
   }
 
-  const failure = (pk: string, response: Response | null): LookupFailure => ({
+  const failure = (pk: string, reason: LookupFailure['reason'], response: Response | null = null): LookupFailure => ({
     pk,
     ok: false,
+    reason,
     status: response?.status ?? null,
     retryAfterMs: response ? retryAfterMs(response.headers.get('Retry-After')) : null,
   })
 
   const about = async ({ pk }: AboutRequest): Promise<AboutResult> => {
     const versioningId = findVersioningId(win.document)
-    if (session === null || versioningId === null) return failure(pk, null)
+    if (session === null || versioningId === null) return failure(pk, 'no-session')
     const request = buildAboutRequest(win.location.origin, session, versioningId, pk)
     const response = await fetch.call(win, request.url, {
       method: 'POST',
@@ -97,12 +98,12 @@ export function installHook(win: Window & typeof globalThis): void {
       body: request.body,
       credentials: 'include',
     })
-    return response.ok ? parseAboutResponse(pk, await response.text()) : failure(pk, response)
+    return response.ok ? parseAboutResponse(pk, await response.text()) : failure(pk, 'http', response)
   }
 
   const profile = async ({ pk, username }: ProfileRequest): Promise<ProfileResult> => {
     const response = await fetch.call(win, new URL(`/@${encodeURIComponent(username)}`, win.location.origin), { credentials: 'include' })
-    return response.ok ? { pk, ok: true, description: await readDescription(response) } : failure(pk, response)
+    return response.ok ? { pk, ok: true, description: await readDescription(response) } : failure(pk, 'http', response)
   }
 
   const serve = <Request extends { pk: string }, Result>(
@@ -118,7 +119,7 @@ export function installHook(win: Window & typeof globalThis): void {
         return
       }
       void handle(request)
-        .catch(() => failure(request.pk, null))
+        .catch(() => failure(request.pk, 'network'))
         .then((result) => win.dispatchEvent(new win.CustomEvent(resultEvent, { detail: JSON.stringify(result) })))
     })
   serve(ABOUT_REQUEST_EVENT, ABOUT_RESULT_EVENT, about)

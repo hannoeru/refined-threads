@@ -42,6 +42,7 @@ const BACKOFF_MAX = 300_000
 const MAX_QUEUE = 200
 const MAX_ENTRIES = 5000
 const SAVE_DELAY = 2000
+const NO_SESSION_RETRY = 5000
 
 const EVENTS: Record<Kind, { request: string; result: string }> = {
   about: { request: ABOUT_REQUEST_EVENT, result: ABOUT_RESULT_EVENT },
@@ -122,6 +123,7 @@ export class ProfileLookups {
     try {
       const queue = this.#queues[kind]
       while (queue.size > 0) {
+        await this.#whenVisible()
         const [pk, username] = [...queue.entries()].at(-1)!
         queue.delete(pk)
         if (this.#fresh(pk, kind)) continue
@@ -170,6 +172,10 @@ export class ProfileLookups {
       this.onChange(pk)
       return null
     }
+    if (result && !result.ok && result.reason === 'no-session') {
+      if (!this.#queues[kind].has(pk)) this.#queues[kind].set(pk, username)
+      return NO_SESSION_RETRY
+    }
     if (result?.status === 429) {
       this.#backoff[kind] = Math.min(BACKOFF_MAX, this.#backoff[kind] ? this.#backoff[kind] * 2 : BACKOFF_START)
       if (!this.#queues[kind].has(pk)) this.#queues[kind].set(pk, username)
@@ -179,6 +185,12 @@ export class ProfileLookups {
     else entry.profileFailedAt = now
     this.#scheduleSave()
     return null
+  }
+
+  #whenVisible(): Promise<void> {
+    const doc = (this.win as Partial<Window>).document
+    if (!doc?.hidden) return Promise.resolve()
+    return new Promise((resolve) => doc.addEventListener('visibilitychange', () => resolve(), { once: true }))
   }
 
   #scheduleSave(): void {

@@ -12,7 +12,13 @@ export const ABOUT_RESULT_EVENT = 'refined-threads:about-result'
 export const PROFILE_REQUEST_EVENT = 'refined-threads:profile-request'
 export const PROFILE_RESULT_EVENT = 'refined-threads:profile-result'
 
-export type LookupFailure = { pk: string; ok: false; status: number | null; retryAfterMs: number | null }
+export type LookupFailure = {
+  pk: string
+  ok: false
+  reason: 'no-session' | 'http' | 'network' | 'parse'
+  status: number | null
+  retryAfterMs: number | null
+}
 
 export type ProfileRequest = { pk: string; username: string }
 

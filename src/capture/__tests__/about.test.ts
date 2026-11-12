@@ -48,7 +48,7 @@ describe('country lookup', () => {
       joined: '2023年7月 · 1億人以上',
     })
     expect(parseAboutResponse('1', about(null, false, 'July 2023'))).toMatchObject({ country: null, countryVisible: false, joined: 'July 2023' })
-    expect(parseAboutResponse('1', '<!DOCTYPE html>')).toEqual({ pk: '1', ok: false, status: 200, retryAfterMs: null })
+    expect(parseAboutResponse('1', '<!DOCTYPE html>')).toEqual({ pk: '1', ok: false, reason: 'parse', status: 200, retryAfterMs: null })
   })
 
   it('reads Retry-After in seconds', () => {

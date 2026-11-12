@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { fakeLookups, translate } from '../../testing/feature'
 import { defineFeature } from '../api'
 import { FeatureRuntime } from '../runtime'
+import { alwaysVisible } from '../services/visible'
 import { PostCatalog } from '../services/posts'
 
 function setup() {
@@ -39,6 +40,7 @@ function setup() {
     lookups: fakeLookups().lookups,
     t: translate,
     url: () => url,
+    whenVisible: () => alwaysVisible,
     report: (id) => void errors.push(id),
   })
   return { runtime, log, errors, go: (next: string) => (url = new URL(next)) }

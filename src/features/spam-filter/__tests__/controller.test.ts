@@ -6,6 +6,7 @@ import { readList, writeList } from '../../../rules/edit'
 import { catalogWith, fakeLookups, postContainer, translate } from '../../../testing/feature'
 import { makePost } from '../../../testing/post'
 import { observe } from '../../services/observe'
+import { alwaysVisible } from '../../services/visible'
 import { SpamFilter } from '../controller'
 import { postCode } from '../view'
 
@@ -24,6 +25,7 @@ function setup(posts: Post[], settings: Settings = defaultSettings(), profile: P
     posts: catalog,
     lookups,
     observe: (selector, callback) => observe(document, selector, callback, controller.signal),
+    whenVisible: alwaysVisible,
     translate,
     addStyle: () => undefined,
     saveSettings: async (next) => void saved.push(next),

@@ -91,10 +91,10 @@ export function parseAboutResponse(pk: string, text: string): AboutResult {
   try {
     data = JSON.parse(stripGuard(text))
   } catch {
-    return { pk, ok: false, status: 200, retryAfterMs: null }
+    return { pk, ok: false, reason: 'parse', status: 200, retryAfterMs: null }
   }
   const items = (data as { payload?: { layout?: { bloks_payload?: { data?: unknown } } } })?.payload?.layout?.bloks_payload?.data
-  if (!Array.isArray(items)) return { pk, ok: false, status: 200, retryAfterMs: null }
+  if (!Array.isArray(items)) return { pk, ok: false, reason: 'parse', status: 200, retryAfterMs: null }
   const initial = (key: string): unknown =>
     items.find((item) => (item as { data?: { key?: unknown } })?.data?.key === key)?.data?.initial
   const country = initial(COUNTRY_KEY)

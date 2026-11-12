@@ -127,7 +127,7 @@ export default defineFeature({
       set.add(badge)
       badges.set(post.author.pk, set)
       refresh(post.author.pk)
-      lookups.want(post.author.pk, post.author.username, needs)
+      if (needs.about || needs.profile) ctx.whenVisible(container, () => lookups.want(post.author.pk, post.author.username, needs))
     }
 
     ctx.observe<HTMLElement>(POST_CONTAINER, attach)

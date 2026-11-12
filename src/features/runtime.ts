@@ -1,5 +1,6 @@
 import type { AccountLookups, Feature, FeatureContext, PostStream } from './api'
 import { observe } from './services/observe'
+import type { WhenVisible } from './services/visible'
 import { resolveState, type StoredFeatures } from './state'
 
 export type RuntimeServices = {
@@ -8,6 +9,7 @@ export type RuntimeServices = {
   lookups: AccountLookups
   t: (key: string, substitutions?: string[]) => string
   url: () => URL
+  whenVisible: (signal: AbortSignal) => WhenVisible
   report: (featureId: string, error: unknown) => void
 }
 
@@ -63,6 +65,7 @@ export class FeatureRuntime {
       lookups: this.services.lookups,
       t: this.services.t,
       observe: (selector, callback) => observe(document, selector, callback, signal),
+      whenVisible: this.services.whenVisible(signal),
       addStyle: (css) => {
         const style = document.createElement('style')
         style.dataset.refinedThreads = feature.id

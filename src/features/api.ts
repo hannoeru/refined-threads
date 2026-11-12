@@ -1,5 +1,6 @@
 import type { Post } from '../model'
 import type { ProfileData } from '../profile/lookups'
+import type { WhenVisible } from './services/visible'
 
 export type OptionSpec =
   | { type: 'boolean'; default: boolean }
@@ -37,6 +38,7 @@ export type FeatureContext<Options> = {
   posts: PostStream
   lookups: AccountLookups
   observe: <E extends Element>(selector: string, callback: (element: E) => void) => void
+  whenVisible: WhenVisible
   addStyle: (css: string) => void
   t: (key: string, substitutions?: string[]) => string
 }

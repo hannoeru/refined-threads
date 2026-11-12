@@ -4,6 +4,7 @@ import type { AccountLookups } from '../../src/features/api'
 import { FEATURES } from '../../src/features/registry'
 import { FeatureRuntime } from '../../src/features/runtime'
 import { PostCatalog } from '../../src/features/services/posts'
+import { createWhenVisible } from '../../src/features/services/visible'
 import { featuresItem } from '../../src/features/state'
 import { type Cache, ProfileLookups } from '../../src/profile/lookups'
 
@@ -35,6 +36,7 @@ export default defineContentScript({
       lookups,
       t: (key, substitutions) => browser.i18n.getMessage(key as never, substitutions) || '',
       url: () => new URL(location.href),
+      whenVisible: (signal) => createWhenVisible(window, signal),
       report: (id, error) => console.error(`[Refined Threads] ${id} failed`, error),
     })
 

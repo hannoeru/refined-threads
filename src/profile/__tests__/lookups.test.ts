@@ -5,8 +5,8 @@ import { type Cache, ProfileLookups } from '../lookups'
 
 const NOW = Date.UTC(2026, 10, 12)
 
-function setup(respond: { about?: (pk: string) => object; profile?: (pk: string) => object } = {}) {
-  const win = new EventTarget() as Window
+function setup(respond: { about?: (pk: string) => object; profile?: (pk: string) => object } = {}, doc?: Document) {
+  const win = Object.assign(new EventTarget(), doc ? { document: doc } : {}) as Window
   const requests: string[] = []
   const waits: number[] = []
   const changed: string[] = []
@@ -64,7 +64,7 @@ describe('ProfileLookups', () => {
     lookups.want('3', 'c', { about: true, profile: false })
     lookups.want('3', 'c', { about: true, profile: false })
     await settle()
-    expect(requests).toEqual(['about-request:1', 'about-request:3', 'about-request:2'])
+    expect(requests).toEqual(['about-request:3', 'about-request:2', 'about-request:1'])
     expect(waits).toEqual([1500, 1500, 1500])
     lookups.want('1', 'a', { about: true, profile: false })
     await settle()
@@ -74,7 +74,7 @@ describe('ProfileLookups', () => {
   it('backs off after a rate limit and retries the same account', async () => {
     let calls = 0
     const { lookups, requests, waits } = setup({
-      about: () => (++calls === 1 ? { ok: false, status: 429, retryAfterMs: null } : { ok: true, country: '日本', countryVisible: true, joined: null }),
+      about: () => (++calls === 1 ? { ok: false, reason: 'http', status: 429, retryAfterMs: null } : { ok: true, country: '日本', countryVisible: true, joined: null }),
     })
     lookups.want('9', 'z', { about: true, profile: false })
     await settle()
@@ -85,7 +85,7 @@ describe('ProfileLookups', () => {
   })
 
   it('does not retry a failed account for a day', async () => {
-    const { lookups, requests } = setup({ about: () => ({ ok: false, status: 500, retryAfterMs: null }) })
+    const { lookups, requests } = setup({ about: () => ({ ok: false, reason: 'http', status: 500, retryAfterMs: null }) })
     lookups.want('5', 'q', { about: true, profile: false })
     await settle()
     lookups.want('5', 'q', { about: true, profile: false })
@@ -100,5 +100,31 @@ describe('ProfileLookups', () => {
     await vi.advanceTimersByTimeAsync(0)
     await vi.advanceTimersByTimeAsync(2000)
     expect(saved()?.['7']?.about?.country).toBe('JP')
+  })
+
+  it('retries after the page session is ready, without marking the account as failed', async () => {
+    let calls = 0
+    const { lookups, requests, waits } = setup({
+      about: () => (++calls === 1 ? { ok: false, reason: 'no-session', status: null, retryAfterMs: null } : { ok: true, country: '日本', countryVisible: true, joined: null }),
+    })
+    lookups.want('4', 'w', { about: true, profile: false })
+    await settle()
+    await settle()
+    expect(requests).toEqual(['about-request:4', 'about-request:4'])
+    expect(waits[0]).toBe(5000)
+    expect(lookups.data('4').country).toBe('JP')
+  })
+
+  it('waits while the tab is hidden, and continues when it is shown', async () => {
+    let hidden = true
+    const doc = Object.assign(new EventTarget(), { get hidden() { return hidden } }) as unknown as Document
+    const { lookups, requests } = setup({ about: () => ({ ok: true, country: null, countryVisible: true, joined: null }) }, doc)
+    lookups.want('6', 'h', { about: true, profile: false })
+    await settle()
+    expect(requests).toEqual([])
+    hidden = false
+    doc.dispatchEvent(new Event('visibilitychange'))
+    await settle()
+    expect(requests).toEqual(['about-request:6'])
   })
 })

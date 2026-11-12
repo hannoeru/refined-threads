@@ -16,6 +16,7 @@ export default defineFeature({
       posts: ctx.posts,
       lookups: ctx.lookups,
       observe: ctx.observe,
+      whenVisible: ctx.whenVisible,
       translate: ctx.t,
       addStyle: ctx.addStyle,
       saveSettings,

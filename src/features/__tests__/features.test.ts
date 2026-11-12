@@ -4,6 +4,7 @@ import { catalogWith, fakeLookups, postContainer, translate } from '../../testin
 import { makePost } from '../../testing/post'
 import type { Feature } from '../api'
 import { FeatureRuntime } from '../runtime'
+import { alwaysVisible } from '../services/visible'
 import { featureById } from '../registry'
 import type { StoredFeatures } from '../state'
 
@@ -14,6 +15,7 @@ function run(id: string, stored: StoredFeatures, posts = catalogWith([]), lookup
     lookups: lookups.lookups,
     t: translate,
     url: () => new URL('https://www.threads.com/'),
+    whenVisible: () => alwaysVisible,
     report: (_, error) => {
       throw error
     },
