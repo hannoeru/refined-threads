@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "@wxt-dev/module-vue": "1.0.3",
+    "happy-dom": "21.0.4",
     "typescript": "5.9.3",
     "vitest": "5.1.0",
     "vue-tsc": "3.3.14",
