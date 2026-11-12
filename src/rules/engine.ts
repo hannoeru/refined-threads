@@ -1,83 +1,72 @@
-import type { Action, Condition, Field, Post, PresetId, Reason, Rule, Settings, Verdict } from '../model'
+import {
+  ABOUT_FIELDS,
+  type Condition,
+  type Field,
+  type Outcome,
+  type Post,
+  PROFILE_FIELDS,
+  type Reason,
+  type Rule,
+  type Settings,
+  type Verdict,
+} from '../model'
 import { hostMatches, linkHost } from './hosts'
-import { PRESETS, type Preset } from './presets'
 
-type CompiledCondition = (post: Post) => boolean
+type Test = (post: Post, ctx: EvaluateContext) => boolean
 
-type CompiledRule = { id: string; weight: number; test: CompiledCondition }
+type CompiledRule = Reason & { target: Rule['target']; score: number; test: Test }
 
 export type CompiledRules = {
   enabled: boolean
-  action: Action
-  countries: Set<string>
-  countryAction: Action
-  threshold: number
-  presets: Preset[]
+  tagOnly: boolean
+  scoring: { posts: Outcome; replies: Outcome }
   rules: CompiledRule[]
-  words: string[]
-  hosts: string[]
-  hidden: Set<string>
-  allowed: Set<string>
+  needs: { about: boolean; profile: boolean; copies: boolean }
 }
 
 export type EvaluateContext = { copies: (post: Post) => number }
 
-type FieldValue = string | number | boolean | string[]
+type FieldValue = string | number | boolean | string[] | null
 
-function fieldValue(post: Post, field: Field): FieldValue {
-  switch (field) {
-    case 'author.username':
-      return post.author.username
-    case 'author.fullName':
-      return post.author.fullName
-    case 'author.bio':
-      return post.author.bio
-    case 'author.isVerified':
-      return post.author.isVerified
-    case 'author.isPrivate':
-      return post.author.isPrivate
-    case 'author.following':
-      return post.author.following
-    case 'author.followedBy':
-      return post.author.followedBy
-    case 'author.country':
-      return post.author.country ?? ''
-    case 'counts.likes':
-      return post.counts.likes
-    case 'counts.replies':
-      return post.counts.replies
-    case 'counts.reposts':
-      return post.counts.reposts
-    case 'counts.quotes':
-      return post.counts.quotes
-    default:
-      return post[field]
-  }
+function fieldValue(post: Post, field: Field, ctx: EvaluateContext): FieldValue {
+  if (field === 'copies') return ctx.copies(post)
+  if (field.startsWith('author.')) return post.author[field.slice(7) as keyof Post['author']]
+  if (field.startsWith('counts.')) return post.counts[field.slice(7) as keyof Post['counts']]
+  return post[field as Exclude<Field, `author.${string}` | `counts.${string}` | 'copies'>] as FieldValue
 }
 
 const strings = (value: FieldValue): string[] =>
   Array.isArray(value) ? value : typeof value === 'string' ? [value] : []
 
-function compileCondition(condition: Condition): CompiledCondition | null {
-  if ('all' in condition) {
-    const parts = condition.all.map(compileCondition)
+const numeric = (value: FieldValue): number | null =>
+  Array.isArray(value) ? value.length : typeof value === 'number' ? value : null
+
+function fieldsOf(condition: Condition): Field[] {
+  if ('all' in condition) return condition.all.flatMap(fieldsOf)
+  if ('any' in condition) return condition.any.flatMap(fieldsOf)
+  if ('not' in condition) return fieldsOf(condition.not)
+  return [condition.field]
+}
+
+function compileCondition(condition: Condition): Test | null {
+  if ('all' in condition || 'any' in condition) {
+    const list = 'all' in condition ? condition.all : condition.any
+    const parts = list.map(compileCondition)
     if (parts.some((part) => part === null)) return null
-    return (post) => parts.every((part) => part!(post))
-  }
-  if ('any' in condition) {
-    const parts = condition.any.map(compileCondition)
-    if (parts.some((part) => part === null)) return null
-    return (post) => parts.some((part) => part!(post))
+    const tests = parts as Test[]
+    return 'all' in condition
+      ? (post, ctx) => tests.every((test) => test(post, ctx))
+      : (post, ctx) => tests.some((test) => test(post, ctx))
   }
   if ('not' in condition) {
     const inner = compileCondition(condition.not)
-    return inner && ((post) => !inner(post))
+    return inner && ((post, ctx) => !inner(post, ctx))
   }
-  const read = (post: Post) => fieldValue(post, condition.field)
-  if ('is' in condition) return (post) => read(post) === condition.is
+  const read = (post: Post, ctx: EvaluateContext) => fieldValue(post, condition.field, ctx)
+  if ('is' in condition) return (post, ctx) => read(post, ctx) === condition.is
   if ('in' in condition) {
     const list = new Set(condition.in.map((item) => item.toLowerCase()))
-    return (post) => strings(read(post)).some((item) => list.has(item.toLowerCase()))
+    return (post, ctx) => strings(read(post, ctx)).some((item) => list.has(item.toLowerCase()))
   }
   if ('matches' in condition) {
     let pattern: RegExp
@@ -86,86 +75,74 @@ function compileCondition(condition: Condition): CompiledCondition | null {
     } catch {
       return null
     }
-    return (post) => strings(read(post)).some((item) => pattern.test(item))
+    return (post, ctx) => strings(read(post, ctx)).some((item) => pattern.test(item))
   }
   if ('contains_any' in condition) {
-    const needles = condition.contains_any.map((needle) => needle.toLowerCase())
-    return (post) =>
-      strings(read(post)).some((item) => {
+    const needles = condition.contains_any.map((needle) => needle.toLowerCase()).filter(Boolean)
+    return (post, ctx) =>
+      strings(read(post, ctx)).some((item) => {
         const haystack = item.toLowerCase()
         return needles.some((needle) => haystack.includes(needle))
       })
   }
   if ('host_in' in condition) {
     const targets = condition.host_in.map((host) => host.toLowerCase())
-    return (post) =>
-      strings(read(post)).some((link) => {
+    return (post, ctx) =>
+      strings(read(post, ctx)).some((link) => {
         const host = linkHost(link)
         return host !== null && targets.some((target) => hostMatches(host, target))
       })
   }
-  if ('gt' in condition) return (post) => Number(read(post)) > condition.gt
-  return (post) => Number(read(post)) < condition.lt
-}
-
-function compileRule(rule: Rule): CompiledRule | null {
-  const test = compileCondition(rule.when)
-  return test && { id: rule.id, weight: rule.weight, test }
+  const limit = 'gt' in condition ? condition.gt : condition.lt
+  const above = 'gt' in condition
+  return (post, ctx) => {
+    const value = numeric(read(post, ctx))
+    return value !== null && (above ? value > limit : value < limit)
+  }
 }
 
 export function compileRules(settings: Settings): CompiledRules {
-  const file = settings.ruleFile
+  const rules: CompiledRule[] = []
+  const fields = new Set<Field>()
+  for (const rule of settings.ruleFile.rules) {
+    if (!rule.enabled) continue
+    const test = compileCondition(rule.when)
+    if (test === null) continue
+    for (const field of fieldsOf(rule.when)) fields.add(field)
+    rules.push({ id: rule.id, name: rule.name, effect: rule.effect, target: rule.target, score: rule.score, test })
+  }
   return {
     enabled: settings.enabled,
-    action: settings.action,
-    countries: new Set(file.countries),
-    countryAction: file.countryAction,
-    threshold: file.threshold,
-    presets: [...new Set(file.presets)].map((id: PresetId) => PRESETS[id]),
-    rules: file.rules.map(compileRule).filter((rule): rule is CompiledRule => rule !== null),
-    words: file.words.map((word) => word.toLowerCase()),
-    hosts: file.hosts.map((host) => host.toLowerCase()),
-    hidden: new Set(file.hiddenAccounts),
-    allowed: new Set(file.allowedAccounts),
+    tagOnly: settings.tagOnly,
+    scoring: settings.ruleFile.scoring,
+    rules,
+    needs: {
+      about: ABOUT_FIELDS.some((field) => fields.has(field)),
+      profile: PROFILE_FIELDS.some((field) => fields.has(field)),
+      copies: fields.has('copies'),
+    },
   }
 }
 
-const KEEP: Verdict = { action: 'none', score: 0, reasons: [] }
+const NONE: Verdict = { action: 'none', score: 0, reasons: [] }
 
-export function evaluate(post: Post, rules: CompiledRules, ctx: EvaluateContext): Verdict {
-  if (!rules.enabled) return KEEP
-  const username = post.author.username.toLowerCase()
-  if (rules.allowed.has(username) || post.author.following) return KEEP
-  const decisive = (reason: Reason): Verdict => ({ action: rules.action, score: rules.threshold, reasons: [reason] })
-  if (rules.hidden.has(username)) return decisive({ kind: 'hidden-account' })
-
-  const text = post.text.toLowerCase()
-  const word = rules.words.find((candidate) => text.includes(candidate))
-  if (word !== undefined) return decisive({ kind: 'word', word })
-
-  const hosts = [...post.links, ...post.selfReplyLinks].map(linkHost).filter((host): host is string => host !== null)
-  const host = rules.hosts.find((target) => hosts.some((candidate) => hostMatches(candidate, target)))
-  if (host !== undefined) return decisive({ kind: 'host', host })
-
-  const country = post.author.country
-  const countryMatch = country !== null && rules.countries.has(country)
-  if (countryMatch && rules.countryAction === 'hide') return decisive({ kind: 'country', country })
-
-  const reasons: Reason[] = countryMatch ? [{ kind: 'country', country }] : []
-  let score = 0
-  const presetCtx = { copies: rules.presets.some((preset) => preset.id === 'copy-paste-replies') ? ctx.copies(post) : 0 }
-  for (const preset of rules.presets) {
-    if (!preset.test(post, presetCtx)) continue
-    score += preset.weight
-    reasons.push({ kind: 'preset', id: preset.id })
+export function evaluate(post: Post, compiled: CompiledRules, ctx: EvaluateContext): Verdict {
+  if (!compiled.enabled) return NONE
+  const target = post.isReply ? 'replies' : 'posts'
+  const matched: CompiledRule[] = []
+  for (const rule of compiled.rules) {
+    if (rule.target !== 'all' && rule.target !== target) continue
+    if (!rule.test(post, ctx)) continue
+    if (rule.effect === 'allow') return NONE
+    matched.push(rule)
   }
-  for (const rule of rules.rules) {
-    if (!rule.test(post)) continue
-    score += rule.weight
-    reasons.push({ kind: 'rule', id: rule.id })
-  }
-  const action = score >= rules.threshold ? rules.action : countryMatch ? 'tag' : 'none'
-  return { action, score, reasons: action === 'none' ? [] : reasons }
+  const score = matched.reduce((sum, rule) => sum + (rule.effect === 'score' ? rule.score : 0), 0)
+  const { tagAt, hideAt } = compiled.scoring[target]
+  const hide = matched.some((rule) => rule.effect === 'hide') || (hideAt !== null && score >= hideAt)
+  const tag = matched.some((rule) => rule.effect === 'tag') || (tagAt !== null && score >= tagAt)
+  const action = hide ? (compiled.tagOnly ? 'tag' : 'hide') : tag ? 'tag' : 'none'
+  if (action === 'none') return { action, score, reasons: [] }
+  return { action, score, reasons: matched.map(({ id, name, effect }) => ({ id, name, effect })) }
 }
 
 const MIN_COPY_LENGTH = 12
@@ -201,22 +178,5 @@ export class CopyTracker {
   count(post: Post): number {
     const key = normalizeCopyText(post.text)
     return key.length < MIN_COPY_LENGTH ? 0 : (this.#authors.get(key)?.size ?? 0)
-  }
-}
-
-export function reasonMessageKey(reason: Reason): string {
-  switch (reason.kind) {
-    case 'preset':
-      return `reason_${reason.id.replaceAll('-', '_')}`
-    case 'rule':
-      return 'reason_rule'
-    case 'word':
-      return 'reason_word'
-    case 'host':
-      return 'reason_host'
-    case 'hidden-account':
-      return 'reason_hidden_account'
-    case 'country':
-      return 'reason_country'
   }
 }

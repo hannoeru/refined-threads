@@ -1,91 +1,150 @@
-import * as v from 'valibot'
 import { describe, expect, it } from 'vitest'
-import { LEVEL_PRESETS, type Level, type Rule, type Settings, SettingsSchema } from '../../model'
+import { defaultSettings, type Level, type Rule, type Settings } from '../../model'
 import { makePost } from '../../testing/post'
-import { compileRules, CopyTracker, evaluate, type EvaluateContext, reasonMessageKey } from '../engine'
+import { addAccount, applyLevel, writeList } from '../edit'
+import { compileRules, CopyTracker, evaluate, type EvaluateContext } from '../engine'
 
-const settings = (ruleFile: Record<string, unknown> = {}, extra: Partial<Settings> = {}): Settings =>
-  ({ ...v.parse(SettingsSchema, { ruleFile: { version: 1, ...ruleFile } }), ...extra })
+type Post = ReturnType<typeof makePost>
 
-const noCopies = { copies: () => 0 }
+const noCopies: EvaluateContext = { copies: () => 0 }
 
-const verdict = (post = makePost(), file: Record<string, unknown> = {}, ctx: EvaluateContext = noCopies) =>
-  evaluate(post, compileRules(settings(file)), ctx)
+const run = (post: Post, settings: Settings = defaultSettings(), ctx = noCopies) => evaluate(post, compileRules(settings), ctx)
 
-const ruleVerdict = (rule: Rule['when'], post = makePost()) =>
-  verdict(post, { presets: [], rules: [{ id: 'mine', weight: 3, when: rule }] })
+const withRules = (rules: Partial<Rule>[], patch: Partial<Settings> = {}): Settings => {
+  const settings = defaultSettings()
+  settings.ruleFile.rules = rules.map((rule, index) => ({
+    id: `r${index}`,
+    name: '',
+    enabled: true,
+    target: 'all',
+    effect: 'score',
+    score: 1,
+    when: { field: 'isReply', is: true },
+    ...rule,
+  }))
+  return { ...settings, ...patch }
+}
 
-describe('evaluate short-circuits', () => {
-  const affiliate = makePost({ links: ['https://shopee.tw/item/1'] })
+const ids = (post: Post, settings: Settings, ctx = noCopies) => run(post, settings, ctx).reasons.map((reason) => reason.id)
 
-  it('never hides when protection is off', () => {
-    const rules = compileRules(settings({}, { enabled: false }))
-    expect(evaluate(affiliate, rules, noCopies).action).toBe('none')
+describe('default settings', () => {
+  it('keep normal posts and posts from people you follow', () => {
+    expect(run(makePost()).action).toBe('none')
+    expect(run(makePost({ links: ['https://shopee.tw/x'], author: { following: true } })).action).toBe('none')
   })
 
-  it('never hides allowed accounts or accounts you follow', () => {
-    expect(verdict(affiliate, { allowedAccounts: ['someone'] }).action).toBe('none')
-    expect(verdict(makePost({ links: affiliate.links, author: { following: true } })).action).toBe('none')
+  it('hide affiliate spam, engagement bait, and copy-paste replies', () => {
+    expect(ids(makePost({ selfReplyLinks: ['https://s.shopee.tw/abc'] }), defaultSettings())).toEqual(['affiliate-links'])
+    expect(run(makePost({ text: '想要的留言+1 我私訊你' })).action).toBe('hide')
+    expect(run(makePost({ text: '詳細は固定ポストから' })).action).toBe('hide')
+    expect(run(makePost({ isReply: true, text: 'Nice! Check my profile' }), defaultSettings(), { copies: () => 3 }).action).toBe('hide')
+    expect(run(makePost({ isReply: false, text: 'Nice! Check my profile' }), defaultSettings(), { copies: () => 3 }).action).toBe('none')
   })
 
-  it('always hides hidden accounts, matching the handle case-insensitively', () => {
-    const post = makePost({ author: { username: 'SpamBot' } })
-    expect(verdict(post, { hiddenAccounts: ['spambot'] })).toEqual({
-      action: 'hide',
-      score: 3,
-      reasons: [{ kind: 'hidden-account' }],
-    })
-  })
-
-  it('hides a post with a blocked word or a link to a blocked site', () => {
-    expect(verdict(makePost({ text: 'Buy CHEAP followers' }), { words: ['cheap followers'] }).reasons).toEqual([
-      { kind: 'word', word: 'cheap followers' },
-    ])
-    expect(verdict(makePost({ selfReplyLinks: ['https://go.example.com/x'] }), { hosts: ['example.com'] }).reasons).toEqual([
-      { kind: 'host', host: 'example.com' },
-    ])
-    expect(verdict(makePost({ links: ['https://notexample.com'] }), { hosts: ['example.com'] }).action).toBe('none')
+  it('never hide when protection is off', () => {
+    expect(run(makePost({ links: ['https://shopee.tw/x'] }), { ...defaultSettings(), enabled: false }).action).toBe('none')
   })
 })
 
-describe('presets', () => {
-  const only = (preset: string, post: ReturnType<typeof makePost>, copies = 0) =>
-    verdict(post, { presets: [preset], threshold: 1 }, { copies: () => copies })
+describe('list rules', () => {
+  const settingsWith = (id: Parameters<typeof writeList>[1], values: string[]) => {
+    const settings = defaultSettings()
+    settings.ruleFile = writeList(settings.ruleFile, id, values)
+    return settings
+  }
 
-  it('affiliate-links matches affiliate hosts in the post or in the author self-replies', () => {
-    expect(only('affiliate-links', makePost({ links: ['https://s.shopee.tw/abc'] })).action).toBe('hide')
-    expect(only('affiliate-links', makePost({ selfReplyLinks: ['https://amzn.to/xyz'] })).action).toBe('hide')
-    expect(only('affiliate-links', makePost({ links: ['https://bit.ly/xyz'] })).action).toBe('none')
+  it('hide posts from hidden accounts, with blocked words, or with links to blocked sites', () => {
+    expect(run(makePost({ author: { username: 'spambot' } }), settingsWith('hidden-accounts', ['spambot'])).action).toBe('hide')
+    expect(run(makePost({ text: 'Buy CHEAP followers' }), settingsWith('blocked-words', ['cheap followers'])).action).toBe('hide')
+    expect(run(makePost({ selfReplyLinks: ['https://go.example.com/x'] }), settingsWith('blocked-sites', ['example.com'])).action).toBe('hide')
+    expect(run(makePost({ links: ['https://notexample.com'] }), settingsWith('blocked-sites', ['example.com'])).action).toBe('none')
   })
 
-  it('engagement-bait matches bait phrases in English, Chinese, and Japanese', () => {
-    expect(only('engagement-bait', makePost({ text: 'Want it? Comment +1 below' })).action).toBe('hide')
-    expect(only('engagement-bait', makePost({ text: '想要的留言+1 我私訊你' })).action).toBe('hide')
-    expect(only('engagement-bait', makePost({ text: '詳細は固定ポストから' })).action).toBe('hide')
-    expect(only('engagement-bait', makePost({ text: 'I left a comment on your post' })).action).toBe('none')
+  it('never act on allowed accounts, even when other rules match', () => {
+    const settings = defaultSettings()
+    settings.ruleFile = addAccount(settings.ruleFile, 'hidden-accounts', 'amy')
+    settings.ruleFile = addAccount(settings.ruleFile, 'allowed-accounts', 'amy')
+    expect(run(makePost({ author: { username: 'amy' }, links: ['https://shopee.tw/x'] }), settings).action).toBe('none')
   })
 
-  it('copy-paste-replies needs a reply seen from three or more authors', () => {
-    expect(only('copy-paste-replies', makePost({ isReply: true }), 3).action).toBe('hide')
-    expect(only('copy-paste-replies', makePost({ isReply: true }), 2).action).toBe('none')
-    expect(only('copy-paste-replies', makePost({ isReply: false }), 5).action).toBe('none')
+  it('hide posts from blocked countries once the country is known', () => {
+    const settings = settingsWith('countries', ['JP'])
+    expect(run(makePost({ author: { country: 'JP' } }), settings).action).toBe('hide')
+    expect(run(makePost({ author: { country: null } }), settings).action).toBe('none')
+    expect(run(makePost({ author: { country: 'TW' } }), settings).action).toBe('none')
+  })
+})
+
+describe('effects, targets, and scoring', () => {
+  it('a tag rule tags without hiding, and lists the rule as the reason', () => {
+    const settings = withRules([{ id: 'young', name: 'Young account', effect: 'tag', when: { field: 'author.ageMonths', lt: 6 } }])
+    expect(run(makePost({ author: { ageMonths: 2 } }), settings)).toEqual({
+      action: 'tag',
+      score: 0,
+      reasons: [{ id: 'young', name: 'Young account', effect: 'tag' }],
+    })
+    expect(run(makePost({ author: { ageMonths: null } }), settings).action).toBe('none')
   })
 
-  it('ai-label matches posts with an AI label', () => {
-    expect(only('ai-label', makePost({ hasAiLabel: true })).action).toBe('hide')
+  it('scores add up, and posts and replies use their own thresholds', () => {
+    const settings = withRules([
+      { id: 'few-followers', score: 1, when: { field: 'author.followers', lt: 10 } },
+      { id: 'few-posts', score: 1, when: { field: 'author.posts', lt: 5 } },
+    ])
+    settings.ruleFile.scoring = { posts: { tagAt: 2, hideAt: null }, replies: { tagAt: 1, hideAt: 2 } }
+    const weak = { author: { followers: 3, posts: 1 } }
+    expect(run(makePost(weak), settings)).toMatchObject({ action: 'tag', score: 2 })
+    expect(run(makePost({ ...weak, isReply: true }), settings)).toMatchObject({ action: 'hide', score: 2 })
+    expect(run(makePost({ author: { followers: 3, posts: 50 }, isReply: true }), settings)).toMatchObject({ action: 'tag', score: 1 })
   })
 
-  it('generated-names matches number-tail handles but not verified accounts', () => {
-    expect(only('generated-names', makePost({ author: { username: 'lucy_wang83921' } })).action).toBe('hide')
-    expect(only('generated-names', makePost({ author: { username: 'amy.lin.shop.2024' } })).action).toBe('hide')
-    expect(only('generated-names', makePost({ author: { username: 'lucy83921', isVerified: true } })).action).toBe('none')
-    expect(only('generated-names', makePost({ author: { username: 'lucy_wang' } })).action).toBe('none')
+  it('a negative score lowers the total', () => {
+    const settings = withRules([
+      { id: 'bad', score: 3, when: { field: 'text', contains_any: ['deal'] } },
+      { id: 'trusted', score: -2, when: { field: 'author.isVerified', is: true } },
+    ])
+    expect(run(makePost({ text: 'deal', author: { isVerified: true } }), settings)).toMatchObject({ action: 'none', score: 1 })
   })
 
-  it('strangers-in-replies matches replies with links or mentions from strangers', () => {
-    expect(only('strangers-in-replies', makePost({ isReply: true, mentions: ['x'] })).action).toBe('hide')
-    expect(only('strangers-in-replies', makePost({ isReply: true, mentions: ['x'], author: { followedBy: true } })).action).toBe('none')
-    expect(only('strangers-in-replies', makePost({ isReply: true })).action).toBe('none')
+  it('a rule for replies ignores posts, and a rule for posts ignores replies', () => {
+    const settings = withRules([
+      { id: 'replies-only', target: 'replies', effect: 'hide', when: { field: 'text', contains_any: ['x'] } },
+      { id: 'posts-only', target: 'posts', effect: 'tag', when: { field: 'text', contains_any: ['x'] } },
+    ])
+    expect(ids(makePost({ text: 'x', isReply: true }), settings)).toEqual(['replies-only'])
+    expect(ids(makePost({ text: 'x', isReply: false }), settings)).toEqual(['posts-only'])
+  })
+
+  it('tag-only mode turns every hide into a tag', () => {
+    const settings = withRules([{ effect: 'hide', when: { field: 'text', contains_any: ['x'] } }], { tagOnly: true })
+    expect(run(makePost({ text: 'x' }), settings).action).toBe('tag')
+  })
+
+  it('disabled rules and rules with an invalid pattern do nothing', () => {
+    expect(run(makePost({ text: 'x' }), withRules([{ enabled: false, effect: 'hide', when: { field: 'text', contains_any: ['x'] } }])).action).toBe('none')
+    expect(run(makePost(), withRules([{ effect: 'hide', when: { field: 'text', matches: '(' } }])).action).toBe('none')
+  })
+})
+
+describe('operators', () => {
+  const hit = (when: Rule['when'], post: Post) => run(post, withRules([{ effect: 'hide', when }])).action === 'hide'
+
+  it('is, in, matches, contains_any, host_in, gt, and lt', () => {
+    expect(hit({ field: 'author.isVerified', is: true }, makePost({ author: { isVerified: true } }))).toBe(true)
+    expect(hit({ field: 'language', in: ['ZH'] }, makePost({ language: 'zh' }))).toBe(true)
+    expect(hit({ field: 'author.username', matches: '^bot_\\d+$' }, makePost({ author: { username: 'bot_12' } }))).toBe(true)
+    expect(hit({ field: 'mentions', contains_any: ['brand'] }, makePost({ mentions: ['bigbrand'] }))).toBe(true)
+    expect(hit({ field: 'links', host_in: ['example.org'] }, makePost({ links: ['https://a.example.org/'] }))).toBe(true)
+    expect(hit({ field: 'counts.likes', gt: 10 }, makePost({ counts: { likes: 11 } }))).toBe(true)
+    expect(hit({ field: 'counts.likes', lt: 10 }, makePost({ counts: { likes: 11 } }))).toBe(false)
+    expect(hit({ field: 'links', gt: 1 }, makePost({ links: ['https://a.com', 'https://b.com'] }))).toBe(true)
+  })
+
+  it('all, any, and not combine conditions', () => {
+    const post = makePost({ text: 'free gift' })
+    expect(hit({ all: [{ field: 'text', contains_any: ['gift'] }, { not: { field: 'author.followedBy', is: true } }] }, post)).toBe(true)
+    expect(hit({ any: [{ field: 'text', contains_any: ['nope'] }, { field: 'text', contains_any: ['free'] }] }, post)).toBe(true)
+    expect(hit({ not: { field: 'text', contains_any: ['free'] } }, post)).toBe(false)
   })
 })
 
@@ -96,12 +155,15 @@ describe('levels', () => {
     bait: makePost({ text: 'link in bio for the deal' }),
     copyPaste: makePost({ isReply: true, text: 'Great post, check my profile!' }),
     aiLabel: makePost({ hasAiLabel: true }),
-    strangerGeneratedLink: makePost({ isReply: true, links: ['https://example.com'], author: { username: 'amy88812' } }),
+    strangerReply: makePost({ isReply: true, links: ['https://example.com'], author: { username: 'amy88812' } }),
   }
-  const hidden = (level: Level) =>
-    Object.entries(fixtures)
-      .filter(([, post]) => verdict(post, { presets: LEVEL_PRESETS[level] }, { copies: (p) => (p === fixtures.copyPaste ? 3 : 1) }).action === 'hide')
+  const hidden = (level: Level) => {
+    const settings = { ...defaultSettings(), level, ruleFile: applyLevel(defaultSettings().ruleFile, level) }
+    const ctx: EvaluateContext = { copies: (post) => (post === fixtures.copyPaste ? 3 : 1) }
+    return Object.entries(fixtures)
+      .filter(([, post]) => run(post, settings, ctx).action === 'hide')
       .map(([name]) => name)
+  }
 
   it('light hides only affiliate spam', () => {
     expect(hidden('light')).toEqual(['affiliate'])
@@ -111,98 +173,22 @@ describe('levels', () => {
     expect(hidden('balanced')).toEqual(['affiliate', 'bait', 'copyPaste'])
   })
 
-  it('strict also hides AI-labeled posts, and weak signals need to add up', () => {
+  it('strict also hides AI-labeled posts and replies where weak signals add up', () => {
     expect(hidden('strict')).toEqual(['affiliate', 'bait', 'copyPaste', 'aiLabel'])
-    const weakPlusWeak = verdict(fixtures.strangerGeneratedLink, { presets: LEVEL_PRESETS.strict, threshold: 2 })
-    expect(weakPlusWeak.reasons).toEqual([
-      { kind: 'preset', id: 'generated-names' },
-      { kind: 'preset', id: 'strangers-in-replies' },
-    ])
-    expect(weakPlusWeak.action).toBe('hide')
+    const settings = { ...defaultSettings(), ruleFile: applyLevel(defaultSettings().ruleFile, 'strict') }
+    expect(ids(fixtures.strangerReply, settings)).toEqual(['generated-names', 'strangers-in-replies'])
+    expect(run(fixtures.strangerReply, settings).action).toBe('tag')
   })
 })
 
-describe('custom rule operators', () => {
-  it('is, in, matches, contains_any, host_in, gt, and lt', () => {
-    expect(ruleVerdict({ field: 'author.isVerified', is: true }, makePost({ author: { isVerified: true } })).action).toBe('hide')
-    expect(ruleVerdict({ field: 'language', in: ['ZH'] }, makePost({ language: 'zh' })).action).toBe('hide')
-    expect(ruleVerdict({ field: 'author.username', matches: '^bot_\\d+$' }, makePost({ author: { username: 'bot_12' } })).action).toBe('hide')
-    expect(ruleVerdict({ field: 'mentions', contains_any: ['brand'] }, makePost({ mentions: ['bigbrand'] })).action).toBe('hide')
-    expect(ruleVerdict({ field: 'links', host_in: ['example.org'] }, makePost({ links: ['https://a.example.org/'] })).action).toBe('hide')
-    expect(ruleVerdict({ field: 'counts.likes', gt: 10 }, makePost({ counts: { likes: 11 } })).action).toBe('hide')
-    expect(ruleVerdict({ field: 'counts.likes', lt: 10 }, makePost({ counts: { likes: 11 } })).action).toBe('none')
-  })
-
-  it('all, any, and not combine conditions', () => {
-    const post = makePost({ text: 'free gift', author: { followedBy: false } })
-    expect(
-      ruleVerdict({ all: [{ field: 'text', contains_any: ['gift'] }, { not: { field: 'author.followedBy', is: true } }] }, post).action,
-    ).toBe('hide')
-    expect(ruleVerdict({ any: [{ field: 'text', contains_any: ['nope'] }, { field: 'text', contains_any: ['free'] }] }, post).action).toBe('hide')
-    expect(ruleVerdict({ not: { field: 'text', contains_any: ['free'] } }, post).action).toBe('none')
-  })
-
-  it('ignores a rule whose pattern does not compile', () => {
-    expect(ruleVerdict({ field: 'text', matches: '(' }).action).toBe('none')
-  })
-
-  it('adds custom rule weight to preset weight and reports both reasons', () => {
-    const post = makePost({ isReply: true, mentions: ['x'] })
-    const result = verdict(post, {
-      presets: ['strangers-in-replies'],
-      rules: [{ id: 'mine', weight: 2, when: { field: 'isReply', is: true } }],
-    })
-    expect(result).toEqual({
-      action: 'hide',
-      score: 3,
-      reasons: [
-        { kind: 'preset', id: 'strangers-in-replies' },
-        { kind: 'rule', id: 'mine' },
-      ],
-    })
-  })
-})
-
-describe('countries and actions', () => {
-  const fromJapan = makePost({ author: { country: 'JP' } })
-
-  it('blocks a post from a blocked country', () => {
-    expect(verdict(fromJapan, { countries: ['jp'] })).toEqual({ action: 'hide', score: 3, reasons: [{ kind: 'country', country: 'JP' }] })
-  })
-
-  it('only tags a post from a blocked country when the country action is tag', () => {
-    expect(verdict(fromJapan, { countries: ['JP'], countryAction: 'tag' })).toEqual({
-      action: 'tag',
-      score: 0,
-      reasons: [{ kind: 'country', country: 'JP' }],
-    })
-  })
-
-  it('still hides a tagged-country post that other signals hide, and lists both reasons', () => {
-    const post = makePost({ links: ['https://shopee.tw/x'], author: { country: 'JP' } })
-    expect(verdict(post, { countries: ['JP'], countryAction: 'tag' })).toEqual({
-      action: 'hide',
-      score: 3,
-      reasons: [
-        { kind: 'country', country: 'JP' },
-        { kind: 'preset', id: 'affiliate-links' },
-      ],
-    })
-  })
-
-  it('does nothing while the country is unknown, or for other countries', () => {
-    expect(verdict(makePost(), { countries: ['JP'] }).action).toBe('none')
-    expect(verdict(makePost({ author: { country: 'TW' } }), { countries: ['JP'] }).action).toBe('none')
-  })
-
-  it('tags instead of hiding everything when the global action is tag', () => {
-    const rules = compileRules({ ...settings({ countries: ['JP'] }), action: 'tag' })
-    expect(evaluate(fromJapan, rules, noCopies).action).toBe('tag')
-    expect(evaluate(makePost({ links: ['https://shopee.tw/x'] }), rules, noCopies).action).toBe('tag')
-  })
-
-  it('lets custom rules read the author country', () => {
-    expect(ruleVerdict({ field: 'author.country', in: ['jp'] }, fromJapan).action).toBe('hide')
+describe('lookup needs', () => {
+  it('asks for profile data only when an enabled rule reads it', () => {
+    expect(compileRules(defaultSettings()).needs).toEqual({ about: true, profile: false, copies: true })
+    const settings = defaultSettings()
+    settings.ruleFile.rules = settings.ruleFile.rules.filter((rule) => rule.id !== 'countries')
+    expect(compileRules(settings).needs.about).toBe(false)
+    settings.ruleFile.rules.find((rule) => rule.id === 'few-posts')!.enabled = true
+    expect(compileRules(settings).needs.profile).toBe(true)
   })
 })
 
@@ -221,12 +207,5 @@ describe('CopyTracker', () => {
     const tracker = new CopyTracker()
     tracker.record(makePost({ text: 'nice', author: { pk: 'a' } }))
     expect(tracker.record(makePost({ text: 'nice', author: { pk: 'b' } }))).toBe(0)
-  })
-})
-
-describe('reasonMessageKey', () => {
-  it('maps reasons to locale keys', () => {
-    expect(reasonMessageKey({ kind: 'preset', id: 'copy-paste-replies' })).toBe('reason_copy_paste_replies')
-    expect(reasonMessageKey({ kind: 'hidden-account' })).toBe('reason_hidden_account')
   })
 })

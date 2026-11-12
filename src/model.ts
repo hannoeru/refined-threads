@@ -1,7 +1,5 @@
 import * as v from 'valibot'
 
-export type Surface = 'feed' | 'post' | 'profile' | 'search' | 'activity' | 'other'
-
 export type PostAuthor = {
   pk: string
   username: string
@@ -12,6 +10,9 @@ export type PostAuthor = {
   following: boolean
   followedBy: boolean
   country: string | null
+  ageMonths: number | null
+  followers: number | null
+  posts: number | null
 }
 
 export type Post = {
@@ -32,40 +33,17 @@ export type Post = {
   selfReplyLinks: string[]
 }
 
-export const POSTS_EVENT = 'lint-roller:posts'
-export const COUNTRY_REQUEST_EVENT = 'lint-roller:country-request'
-export const COUNTRY_RESULT_EVENT = 'lint-roller:country-result'
-
-export type CountryRequest = { pk: string }
-
-export type CountryResult =
-  | { pk: string; ok: true; name: string | null; visible: boolean }
-  | { pk: string; ok: false; status: number | null; retryAfterMs: number | null }
-
 export const LEVELS = ['light', 'balanced', 'strict'] as const
 export type Level = (typeof LEVELS)[number]
-
-export const ACTIONS = ['hide', 'tag'] as const
-export type Action = (typeof ACTIONS)[number]
 
 export const DISPLAYS = ['collapse', 'blur'] as const
 export type Display = (typeof DISPLAYS)[number]
 
-export const PRESET_IDS = [
-  'affiliate-links',
-  'engagement-bait',
-  'copy-paste-replies',
-  'ai-label',
-  'generated-names',
-  'strangers-in-replies',
-] as const
-export type PresetId = (typeof PRESET_IDS)[number]
+export const EFFECTS = ['hide', 'tag', 'score', 'allow'] as const
+export type Effect = (typeof EFFECTS)[number]
 
-export const LEVEL_PRESETS: Record<Level, readonly PresetId[]> = {
-  light: ['affiliate-links'],
-  balanced: ['affiliate-links', 'engagement-bait', 'copy-paste-replies'],
-  strict: ['affiliate-links', 'engagement-bait', 'copy-paste-replies', 'ai-label', 'generated-names', 'strangers-in-replies'],
-}
+export const TARGETS = ['all', 'posts', 'replies'] as const
+export type Target = (typeof TARGETS)[number]
 
 export const FIELDS = [
   'text',
@@ -76,6 +54,7 @@ export const FIELDS = [
   'isPaidPartnership',
   'isReply',
   'selfReplyLinks',
+  'copies',
   'author.username',
   'author.fullName',
   'author.bio',
@@ -84,6 +63,9 @@ export const FIELDS = [
   'author.following',
   'author.followedBy',
   'author.country',
+  'author.ageMonths',
+  'author.followers',
+  'author.posts',
   'counts.likes',
   'counts.replies',
   'counts.reposts',
@@ -91,23 +73,25 @@ export const FIELDS = [
 ] as const
 export type Field = (typeof FIELDS)[number]
 
+export const ABOUT_FIELDS: readonly Field[] = ['author.country', 'author.ageMonths']
+export const PROFILE_FIELDS: readonly Field[] = ['author.followers', 'author.posts']
+
 const MAX_PATTERN = 200
 
-const Leaf = v.union([
-  v.strictObject({ field: v.picklist(FIELDS), is: v.union([v.string(), v.number(), v.boolean()]) }),
-  v.strictObject({ field: v.picklist(FIELDS), in: v.array(v.string()) }),
-  v.strictObject({ field: v.picklist(FIELDS), matches: v.pipe(v.string(), v.maxLength(MAX_PATTERN)) }),
-  v.strictObject({ field: v.picklist(FIELDS), contains_any: v.array(v.string()) }),
-  v.strictObject({ field: v.picklist(FIELDS), host_in: v.array(v.string()) }),
-  v.strictObject({ field: v.picklist(FIELDS), gt: v.number() }),
-  v.strictObject({ field: v.picklist(FIELDS), lt: v.number() }),
-])
+const FieldSchema = v.picklist(FIELDS)
 
-export type Condition =
-  | v.InferOutput<typeof Leaf>
-  | { all: Condition[] }
-  | { any: Condition[] }
-  | { not: Condition }
+const Leaf = v.union([
+  v.strictObject({ field: FieldSchema, is: v.union([v.string(), v.number(), v.boolean()]) }),
+  v.strictObject({ field: FieldSchema, in: v.array(v.string()) }),
+  v.strictObject({ field: FieldSchema, matches: v.pipe(v.string(), v.maxLength(MAX_PATTERN)) }),
+  v.strictObject({ field: FieldSchema, contains_any: v.array(v.string()) }),
+  v.strictObject({ field: FieldSchema, host_in: v.array(v.string()) }),
+  v.strictObject({ field: FieldSchema, gt: v.number() }),
+  v.strictObject({ field: FieldSchema, lt: v.number() }),
+])
+export type LeafCondition = v.InferOutput<typeof Leaf>
+
+export type Condition = LeafCondition | { all: Condition[] } | { any: Condition[] } | { not: Condition }
 
 export const ConditionSchema: v.GenericSchema<Condition> = v.union([
   Leaf,
@@ -117,34 +101,146 @@ export const ConditionSchema: v.GenericSchema<Condition> = v.union([
 ])
 
 export const RuleSchema = v.strictObject({
-  id: v.pipe(v.string(), v.minLength(1), v.maxLength(64)),
-  weight: v.pipe(v.number(), v.minValue(0), v.maxValue(100)),
+  id: v.pipe(v.string(), v.regex(/^[a-z0-9-]{1,64}$/)),
+  name: v.optional(v.pipe(v.string(), v.maxLength(80)), ''),
+  enabled: v.optional(v.boolean(), true),
+  target: v.optional(v.picklist(TARGETS), 'all'),
+  effect: v.optional(v.picklist(EFFECTS), 'score'),
+  score: v.optional(v.pipe(v.number(), v.minValue(-100), v.maxValue(100)), 1),
   when: ConditionSchema,
 })
 export type Rule = v.InferOutput<typeof RuleSchema>
 
-const CountryCode = v.pipe(v.string(), v.trim(), v.toUpperCase(), v.regex(/^[A-Z]{2}$/))
+const Threshold = v.nullable(v.pipe(v.number(), v.minValue(1), v.maxValue(100)))
 
-const Handle = v.pipe(v.string(), v.trim(), v.toLowerCase(), v.regex(/^[a-z0-9._]{1,30}$/))
+const Outcome = v.strictObject({ tagAt: Threshold, hideAt: Threshold })
+export type Outcome = v.InferOutput<typeof Outcome>
+
+export const AFFILIATE_HOSTS = [
+  'shopee.tw',
+  'shopee.com',
+  'shopee.sg',
+  'shopee.com.my',
+  'shopee.ph',
+  'shopee.co.id',
+  'shopee.vn',
+  'shopee.co.th',
+  'shopee.com.br',
+  'shp.ee',
+  'amzn.to',
+  'amzn.asia',
+  'a.co',
+  'a.r10.to',
+  'hb.afl.rakuten.co.jp',
+  'af.moshimo.com',
+  'momo.dm',
+  's.click.aliexpress.com',
+  's.click.taobao.com',
+]
+
+export const BAIT_PHRASES = [
+  'comment +1',
+  'comment "yes"',
+  'drop a 🔥',
+  'link in bio',
+  'link in my bio',
+  'dm me for',
+  'dm me the word',
+  '留言+1',
+  '留言 +1',
+  '私訊我',
+  '私我拿',
+  '想要的留言',
+  '連結在留言',
+  '連結放留言',
+  '連結在首頁',
+  'コメントで',
+  'プロフのリンク',
+  '固定ポストから',
+]
+
+export const BUILT_IN_RULES = [
+  { id: 'followed', effect: 'allow', when: { field: 'author.following', is: true } },
+  { id: 'allowed-accounts', effect: 'allow', when: { field: 'author.username', in: [] } },
+  { id: 'hidden-accounts', effect: 'hide', when: { field: 'author.username', in: [] } },
+  { id: 'blocked-words', effect: 'hide', when: { field: 'text', contains_any: [] } },
+  {
+    id: 'blocked-sites',
+    effect: 'hide',
+    when: { any: [{ field: 'links', host_in: [] }, { field: 'selfReplyLinks', host_in: [] }] },
+  },
+  { id: 'countries', effect: 'hide', when: { field: 'author.country', in: [] } },
+  { id: 'new-accounts', enabled: false, effect: 'tag', when: { field: 'author.ageMonths', lt: 6 } },
+  { id: 'few-followers', enabled: false, effect: 'score', score: 1, when: { field: 'author.followers', lt: 10 } },
+  { id: 'few-posts', enabled: false, effect: 'score', score: 1, when: { field: 'author.posts', lt: 5 } },
+  {
+    id: 'affiliate-links',
+    effect: 'score',
+    score: 3,
+    when: { any: [{ field: 'links', host_in: AFFILIATE_HOSTS }, { field: 'selfReplyLinks', host_in: AFFILIATE_HOSTS }] },
+  },
+  { id: 'engagement-bait', effect: 'score', score: 3, when: { field: 'text', contains_any: BAIT_PHRASES } },
+  {
+    id: 'copy-paste-replies',
+    target: 'replies',
+    effect: 'score',
+    score: 3,
+    when: { field: 'copies', gt: 2 },
+  },
+  { id: 'ai-label', enabled: false, effect: 'score', score: 3, when: { field: 'hasAiLabel', is: true } },
+  {
+    id: 'generated-names',
+    enabled: false,
+    effect: 'score',
+    score: 1,
+    when: {
+      all: [
+        { any: [{ field: 'author.username', matches: '^[a-z._]+\\d{4,}$' }, { field: 'author.username', matches: '^[a-z0-9]+(?:[._][a-z0-9]+){2,}\\d+$' }] },
+        { not: { field: 'author.isVerified', is: true } },
+      ],
+    },
+  },
+  {
+    id: 'strangers-in-replies',
+    enabled: false,
+    target: 'replies',
+    effect: 'score',
+    score: 1,
+    when: {
+      all: [
+        { field: 'author.followedBy', is: false },
+        { any: [{ field: 'links', gt: 0 }, { field: 'mentions', gt: 0 }] },
+      ],
+    },
+  },
+] as const satisfies readonly v.InferInput<typeof RuleSchema>[]
+
+export type BuiltInRuleId = (typeof BUILT_IN_RULES)[number]['id']
+
+export const BUILT_IN_IDS: readonly string[] = BUILT_IN_RULES.map((rule) => rule.id)
+
+export const LEVEL_RULES: Record<Level, readonly BuiltInRuleId[]> = {
+  light: ['affiliate-links'],
+  balanced: ['affiliate-links', 'engagement-bait', 'copy-paste-replies'],
+  strict: ['affiliate-links', 'engagement-bait', 'copy-paste-replies', 'ai-label', 'generated-names', 'strangers-in-replies'],
+}
+
+export const LEVEL_TOGGLED: readonly BuiltInRuleId[] = [...new Set(Object.values(LEVEL_RULES).flat())]
 
 export const RuleFileSchema = v.strictObject({
   version: v.literal(1),
-  threshold: v.optional(v.pipe(v.number(), v.minValue(1)), 3),
-  presets: v.optional(v.array(v.picklist(PRESET_IDS)), () => [...LEVEL_PRESETS.balanced]),
-  words: v.optional(v.array(v.pipe(v.string(), v.trim(), v.minLength(1))), []),
-  hosts: v.optional(v.array(v.pipe(v.string(), v.trim(), v.toLowerCase(), v.minLength(1))), []),
-  hiddenAccounts: v.optional(v.array(Handle), []),
-  allowedAccounts: v.optional(v.array(Handle), []),
-  rules: v.optional(v.array(RuleSchema), []),
-  countries: v.optional(v.array(CountryCode), []),
-  countryAction: v.optional(v.picklist(ACTIONS), 'hide'),
+  scoring: v.optional(v.strictObject({ posts: Outcome, replies: Outcome }), () => ({
+    posts: { tagAt: 2, hideAt: 3 },
+    replies: { tagAt: 2, hideAt: 3 },
+  })),
+  rules: v.optional(v.array(RuleSchema), () => structuredClone(BUILT_IN_RULES) as unknown as v.InferInput<typeof RuleSchema>[]),
 })
 export type RuleFile = v.InferOutput<typeof RuleFileSchema>
 
 export const SettingsSchema = v.strictObject({
   enabled: v.optional(v.boolean(), true),
   level: v.optional(v.picklist(LEVELS), 'balanced'),
-  action: v.optional(v.picklist(ACTIONS), 'hide'),
+  tagOnly: v.optional(v.boolean(), false),
   display: v.optional(v.picklist(DISPLAYS), 'collapse'),
   ruleFile: v.optional(RuleFileSchema, () => v.parse(RuleFileSchema, { version: 1 })),
 })
@@ -152,14 +248,8 @@ export type Settings = v.InferOutput<typeof SettingsSchema>
 
 export const defaultSettings = (): Settings => v.parse(SettingsSchema, {})
 
-export type Reason =
-  | { kind: 'preset'; id: PresetId }
-  | { kind: 'rule'; id: string }
-  | { kind: 'word'; word: string }
-  | { kind: 'host'; host: string }
-  | { kind: 'hidden-account' }
-  | { kind: 'country'; country: string }
+export type Reason = { id: string; name: string; effect: Effect }
 
-export type Verdict = { action: 'none' | Action; score: number; reasons: Reason[] }
+export type Verdict = { action: 'none' | 'tag' | 'hide'; score: number; reasons: Reason[] }
 
-export type Stats = { day: string; hidden: number; byReason: Record<string, number> }
+export type Stats = { day: string; hidden: number; tagged: number; byRule: Record<string, number> }

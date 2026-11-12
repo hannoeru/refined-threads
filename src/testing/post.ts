@@ -1,7 +1,7 @@
 import type { Post, PostAuthor } from '../model'
 
 type PostInput = Partial<Omit<Post, 'author' | 'counts'>> & {
-  author?: Partial<PostAuthor>
+  author?: { [K in keyof PostAuthor]?: PostAuthor[K] }
   counts?: Partial<Post['counts']>
 }
 
@@ -32,6 +32,9 @@ export function makePost(input: PostInput = {}): Post {
       following: false,
       followedBy: false,
       country: null,
+      ageMonths: null,
+      followers: null,
+      posts: null,
       ...author,
     },
     counts: { likes: 0, replies: 0, reposts: 0, quotes: 0, ...counts },

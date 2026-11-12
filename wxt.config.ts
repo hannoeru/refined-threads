@@ -1,4 +1,5 @@
 import { defineConfig } from 'wxt'
+import { THREADS_MATCHES } from './src/bridge'
 
 export default defineConfig({
   srcDir: '.',
@@ -10,7 +11,7 @@ export default defineConfig({
     description: '__MSG_extDescription__',
     default_locale: 'en',
     permissions: ['storage', 'contextMenus'],
-    host_permissions: ['https://www.threads.com/*', 'https://threads.com/*', 'https://www.threads.net/*', 'https://threads.net/*'],
+    host_permissions: THREADS_MATCHES,
     browser_specific_settings: {
       gecko: {
         id: 'lint-roller@hanlee.co',

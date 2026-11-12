@@ -23,5 +23,5 @@ export function watchSettings(callback: (settings: Settings) => void): () => voi
 export const today = (): string => new Date().toISOString().slice(0, 10)
 
 export const statsItem = storage.defineItem<Stats>('local:stats', {
-  fallback: { day: '', hidden: 0, byReason: {} },
+  fallback: { day: '', hidden: 0, tagged: 0, byRule: {} },
 })
