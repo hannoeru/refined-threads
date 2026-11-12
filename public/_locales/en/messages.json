@@ -5,40 +5,18 @@
   "extDescription": {
     "message": "Hides spam and bot posts on Threads. Works on install. Your data stays in your browser."
   },
-  "reason_affiliate_links": {
-    "message": "affiliate links"
-  },
-  "reason_engagement_bait": {
-    "message": "engagement bait"
-  },
-  "reason_copy_paste_replies": {
-    "message": "copy-paste reply"
-  },
-  "reason_ai_label": {
-    "message": "AI label"
-  },
-  "reason_generated_names": {
-    "message": "auto-generated name"
-  },
-  "reason_strangers_in_replies": {
-    "message": "stranger in replies"
-  },
-  "reason_rule": {
-    "message": "your rule"
-  },
-  "reason_word": {
-    "message": "blocked word"
-  },
-  "reason_host": {
-    "message": "blocked site"
-  },
-  "reason_hidden_account": {
-    "message": "hidden account"
-  },
   "bar_hidden": {
-    "message": "Hidden: $REASONS$",
+    "message": "Hidden: $VALUE$",
     "placeholders": {
-      "reasons": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "bar_tagged": {
+    "message": "Lint Roller: $VALUE$",
+    "placeholders": {
+      "value": {
         "content": "$1"
       }
     }
@@ -52,26 +30,591 @@
   "bar_keep_hiding": {
     "message": "Keep hiding"
   },
-  "bar_marked": {
-    "message": "Lint Roller: $REASONS$",
-    "placeholders": {
-      "reasons": {
-        "content": "$1"
-      }
-    }
-  },
   "menu_hide_account": {
     "message": "Hide posts from this account"
   },
   "menu_allow_account": {
     "message": "Never hide this account"
   },
-  "reason_country": {
-    "message": "account based in $COUNTRY$",
+  "section_protection": {
+    "message": "Protection"
+  },
+  "section_lists": {
+    "message": "Words and accounts"
+  },
+  "section_profile": {
+    "message": "Account checks"
+  },
+  "section_rules": {
+    "message": "My rules"
+  },
+  "section_look": {
+    "message": "How it looks"
+  },
+  "section_share": {
+    "message": "Share and presets"
+  },
+  "settings_title": {
+    "message": "Settings"
+  },
+  "level_label": {
+    "message": "Protection level"
+  },
+  "level_light": {
+    "message": "Light"
+  },
+  "level_light_description": {
+    "message": "Hides only clear spam, such as affiliate links."
+  },
+  "level_balanced": {
+    "message": "Balanced"
+  },
+  "level_balanced_description": {
+    "message": "Also hides engagement bait and copy-paste replies."
+  },
+  "level_strict": {
+    "message": "Strict"
+  },
+  "level_strict_description": {
+    "message": "Also checks AI labels, auto-made names, and strangers in replies."
+  },
+  "rule_followed": {
+    "message": "People you follow"
+  },
+  "rule_followed_description": {
+    "message": "Never hides posts from people you follow."
+  },
+  "rule_allowed_accounts": {
+    "message": "Allowed accounts"
+  },
+  "rule_allowed_accounts_description": {
+    "message": "Never hides these accounts."
+  },
+  "rule_hidden_accounts": {
+    "message": "Hidden accounts"
+  },
+  "rule_hidden_accounts_description": {
+    "message": "Always hides these accounts."
+  },
+  "rule_blocked_words": {
+    "message": "Blocked words"
+  },
+  "rule_blocked_words_description": {
+    "message": "Posts that contain one of these words."
+  },
+  "rule_blocked_sites": {
+    "message": "Blocked sites"
+  },
+  "rule_blocked_sites_description": {
+    "message": "Posts that link to one of these sites."
+  },
+  "rule_countries": {
+    "message": "Account country"
+  },
+  "rule_countries_description": {
+    "message": "Accounts based in one of the countries you pick."
+  },
+  "rule_new_accounts": {
+    "message": "New accounts"
+  },
+  "rule_new_accounts_description": {
+    "message": "Accounts that joined Threads only a short time ago."
+  },
+  "rule_few_followers": {
+    "message": "Few followers"
+  },
+  "rule_few_followers_description": {
+    "message": "Accounts with fewer followers than your limit."
+  },
+  "rule_few_posts": {
+    "message": "Few posts"
+  },
+  "rule_few_posts_description": {
+    "message": "Accounts with fewer posts than your limit."
+  },
+  "rule_affiliate_links": {
+    "message": "Affiliate links"
+  },
+  "rule_affiliate_links_description": {
+    "message": "Shopee, Amazon, Rakuten, and other affiliate links, also in the author's own replies."
+  },
+  "rule_engagement_bait": {
+    "message": "Engagement bait"
+  },
+  "rule_engagement_bait_description": {
+    "message": "Phrases like \"comment +1\" or \"link in bio\"."
+  },
+  "rule_copy_paste_replies": {
+    "message": "Copy-paste replies"
+  },
+  "rule_copy_paste_replies_description": {
+    "message": "The same reply text from three or more accounts."
+  },
+  "rule_ai_label": {
+    "message": "AI label"
+  },
+  "rule_ai_label_description": {
+    "message": "Posts that Threads marks as made with AI."
+  },
+  "rule_generated_names": {
+    "message": "Auto-made names"
+  },
+  "rule_generated_names_description": {
+    "message": "Usernames like name_83921 that bots often use."
+  },
+  "rule_strangers_in_replies": {
+    "message": "Strangers in replies"
+  },
+  "rule_strangers_in_replies_description": {
+    "message": "Replies with links or mentions from people who do not follow you."
+  },
+  "threshold_new_accounts": {
+    "message": "Joined less than this many months ago"
+  },
+  "threshold_few_followers": {
+    "message": "Fewer followers than"
+  },
+  "threshold_few_posts": {
+    "message": "Fewer posts than"
+  },
+  "effect_label": {
+    "message": "What happens"
+  },
+  "effect_points": {
+    "message": "Points"
+  },
+  "effect_for": {
+    "message": "What happens for $VALUE$",
     "placeholders": {
-      "country": {
+      "value": {
         "content": "$1"
       }
     }
+  },
+  "effect_hide": {
+    "message": "Hide"
+  },
+  "effect_tag": {
+    "message": "Tag"
+  },
+  "effect_score": {
+    "message": "Add points"
+  },
+  "effect_allow": {
+    "message": "Never hide"
+  },
+  "target_all": {
+    "message": "Posts and replies"
+  },
+  "target_posts": {
+    "message": "Posts"
+  },
+  "target_replies": {
+    "message": "Replies"
+  },
+  "field_text": {
+    "message": "Post text"
+  },
+  "field_language": {
+    "message": "Language"
+  },
+  "field_author_username": {
+    "message": "Username"
+  },
+  "field_author_fullName": {
+    "message": "Display name"
+  },
+  "field_author_bio": {
+    "message": "Bio"
+  },
+  "field_author_country": {
+    "message": "Account country (code)"
+  },
+  "field_links": {
+    "message": "Links"
+  },
+  "field_mentions": {
+    "message": "Mentions"
+  },
+  "field_selfReplyLinks": {
+    "message": "Links in the author's own replies"
+  },
+  "field_hasAiLabel": {
+    "message": "Has AI label"
+  },
+  "field_isPaidPartnership": {
+    "message": "Paid partnership"
+  },
+  "field_isReply": {
+    "message": "Is a reply"
+  },
+  "field_author_isVerified": {
+    "message": "Verified account"
+  },
+  "field_author_isPrivate": {
+    "message": "Private account"
+  },
+  "field_author_following": {
+    "message": "You follow them"
+  },
+  "field_author_followedBy": {
+    "message": "They follow you"
+  },
+  "field_copies": {
+    "message": "Accounts with the same text"
+  },
+  "field_author_ageMonths": {
+    "message": "Account age in months"
+  },
+  "field_author_followers": {
+    "message": "Followers"
+  },
+  "field_author_posts": {
+    "message": "Posts"
+  },
+  "field_counts_likes": {
+    "message": "Likes"
+  },
+  "field_counts_replies": {
+    "message": "Replies"
+  },
+  "field_counts_reposts": {
+    "message": "Reposts"
+  },
+  "field_counts_quotes": {
+    "message": "Quotes"
+  },
+  "op_contains_any": {
+    "message": "contains any of"
+  },
+  "op_contains_any_placeholder": {
+    "message": "word, another word"
+  },
+  "op_in": {
+    "message": "is one of"
+  },
+  "op_in_placeholder": {
+    "message": "value, another value"
+  },
+  "op_matches": {
+    "message": "matches pattern"
+  },
+  "op_matches_placeholder": {
+    "message": "^bot_\\d+$"
+  },
+  "op_host_in": {
+    "message": "links to site"
+  },
+  "op_host_in_placeholder": {
+    "message": "example.com, spam.net"
+  },
+  "op_is": {
+    "message": "is"
+  },
+  "op_is_placeholder": {
+    "message": "value"
+  },
+  "op_gt": {
+    "message": "is more than"
+  },
+  "op_gt_placeholder": {
+    "message": "10"
+  },
+  "op_lt": {
+    "message": "is less than"
+  },
+  "op_lt_placeholder": {
+    "message": "10"
+  },
+  "display_title": {
+    "message": "Hidden posts"
+  },
+  "display_collapse": {
+    "message": "Fold away"
+  },
+  "display_collapse_description": {
+    "message": "Shows one thin line with the reason and a Show button."
+  },
+  "display_blur": {
+    "message": "Blur"
+  },
+  "display_blur_description": {
+    "message": "Keeps the post in place but blurred until you click Show."
+  },
+  "tag_only": {
+    "message": "Tag only, never hide"
+  },
+  "tag_only_description": {
+    "message": "A safe test mode. Every post that would be hidden gets a tag instead."
+  },
+  "tag_only_active": {
+    "message": "Test mode is on: posts are tagged, not hidden."
+  },
+  "protection_on": {
+    "message": "Protection is on"
+  },
+  "protection_off": {
+    "message": "Protection is off"
+  },
+  "hidden_today": {
+    "message": "posts hidden today"
+  },
+  "tagged_today": {
+    "message": "$VALUE$ more tagged",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "open_settings": {
+    "message": "Settings"
+  },
+  "report_problem": {
+    "message": "Report a problem"
+  },
+  "welcome_title": {
+    "message": "You are protected on Threads."
+  },
+  "welcome_lead": {
+    "message": "Lint Roller already hides spam and bot posts. Pick how strict it should be. You can change this at any time."
+  },
+  "welcome_privacy": {
+    "message": "Nothing leaves your browser. There is no account and no tracking."
+  },
+  "open_threads": {
+    "message": "Open Threads"
+  },
+  "protection_intro": {
+    "message": "Pick a level, then turn single checks on or off."
+  },
+  "detectors_title": {
+    "message": "Checks"
+  },
+  "lists_intro": {
+    "message": "Posts that match these lists are hidden right away."
+  },
+  "list_words": {
+    "message": "Hide posts that contain these words"
+  },
+  "list_words_placeholder": {
+    "message": "Type a word and press Enter"
+  },
+  "list_sites": {
+    "message": "Hide posts that link to these sites"
+  },
+  "list_hidden_accounts": {
+    "message": "Always hide these accounts"
+  },
+  "list_allowed_accounts": {
+    "message": "Never hide these accounts"
+  },
+  "add": {
+    "message": "Add"
+  },
+  "remove_item": {
+    "message": "Remove $VALUE$",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "chip_invalid": {
+    "message": "This does not look right. Check the spelling."
+  },
+  "profile_intro": {
+    "message": "These checks read each author's \"About this profile\" page or profile page. They only run when you turn them on."
+  },
+  "list_countries": {
+    "message": "Countries"
+  },
+  "list_countries_placeholder": {
+    "message": "Type a country name or code"
+  },
+  "countries_effect": {
+    "message": "Posts from these countries:"
+  },
+  "profile_cost": {
+    "message": "Account checks look up one account every 1.5 to 2 seconds and keep results for up to 30 days. Posts can change a few seconds after they appear."
+  },
+  "rules_intro": {
+    "message": "Write your own checks. Each rule can hide, tag, add points, or protect a post. Points from all rules add up."
+  },
+  "scoring_title": {
+    "message": "Points"
+  },
+  "scoring_intro": {
+    "message": "When the points of a post reach a number, it is tagged or hidden. Leave a box empty to turn that step off."
+  },
+  "scoring_tag_at": {
+    "message": "Tag at"
+  },
+  "scoring_hide_at": {
+    "message": "Hide at"
+  },
+  "scoring_off": {
+    "message": "Off"
+  },
+  "rules_empty": {
+    "message": "You have no rules yet."
+  },
+  "rule_add": {
+    "message": "Add a rule"
+  },
+  "rule_name": {
+    "message": "Rule name"
+  },
+  "rule_name_placeholder": {
+    "message": "Name this rule"
+  },
+  "rule_enabled": {
+    "message": "On"
+  },
+  "rule_applies_to": {
+    "message": "Check"
+  },
+  "rule_match": {
+    "message": "When"
+  },
+  "match_all": {
+    "message": "all of these are true"
+  },
+  "match_any": {
+    "message": "any of these is true"
+  },
+  "condition_field": {
+    "message": "Field"
+  },
+  "condition_operator": {
+    "message": "Comparison"
+  },
+  "condition_value": {
+    "message": "Value"
+  },
+  "condition_remove": {
+    "message": "Remove this condition"
+  },
+  "condition_add": {
+    "message": "Add condition"
+  },
+  "rule_then": {
+    "message": "Then"
+  },
+  "rule_json_only": {
+    "message": "This rule uses nested conditions. Edit it in the advanced editor under Share and presets."
+  },
+  "rule_invalid": {
+    "message": "Fill in every value. Numbers must be numbers, and patterns must be valid."
+  },
+  "rule_delete": {
+    "message": "Delete"
+  },
+  "rule_save": {
+    "message": "Save rule"
+  },
+  "yes": {
+    "message": "Yes"
+  },
+  "no": {
+    "message": "No"
+  },
+  "presets_title": {
+    "message": "Presets"
+  },
+  "presets_intro": {
+    "message": "Add a ready-made set of rules to your settings. Your other rules stay as they are."
+  },
+  "preset_apply": {
+    "message": "Add to my settings"
+  },
+  "preset_affiliate_name": {
+    "message": "Affiliate spam"
+  },
+  "preset_affiliate_description": {
+    "message": "Hides posts that push Shopee, Amazon, and other affiliate links."
+  },
+  "preset_bait_name": {
+    "message": "Engagement bait"
+  },
+  "preset_bait_description": {
+    "message": "Hides \"comment +1\" and \"link in bio\" posts."
+  },
+  "preset_new_accounts_name": {
+    "message": "New and empty accounts"
+  },
+  "preset_new_accounts_description": {
+    "message": "Gives points to new accounts, accounts with few followers, and accounts with few posts. Two signals tag, three hide."
+  },
+  "preset_reply_guard_name": {
+    "message": "Reply guard"
+  },
+  "preset_reply_guard_description": {
+    "message": "Hides copy-paste replies and scores strangers who drop links in replies."
+  },
+  "preset_test_mode_name": {
+    "message": "Test mode"
+  },
+  "preset_test_mode_description": {
+    "message": "Tags posts instead of hiding them, so you can check your rules first."
+  },
+  "export_title": {
+    "message": "Export"
+  },
+  "export_intro": {
+    "message": "Save your settings as a file to back them up or share them with friends."
+  },
+  "export_name": {
+    "message": "File name shown to others"
+  },
+  "export_name_placeholder": {
+    "message": "For example: My spam filter"
+  },
+  "export_button": {
+    "message": "Download file"
+  },
+  "import_title": {
+    "message": "Import"
+  },
+  "import_intro": {
+    "message": "Open a settings file from a friend or from your backup."
+  },
+  "import_unnamed": {
+    "message": "Unnamed settings"
+  },
+  "import_rule_count": {
+    "message": "$VALUE$ rules",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "import_merge": {
+    "message": "Add to my settings"
+  },
+  "import_replace": {
+    "message": "Replace my settings"
+  },
+  "cancel": {
+    "message": "Cancel"
+  },
+  "import_not_json": {
+    "message": "This file is not a settings file."
+  },
+  "import_replaced": {
+    "message": "Your settings were replaced."
+  },
+  "import_merged": {
+    "message": "The rules were added to your settings."
+  },
+  "advanced_title": {
+    "message": "Advanced editor"
+  },
+  "advanced_intro": {
+    "message": "Edit the settings file as JSON. Save is available only when the file is valid."
+  },
+  "advanced_save": {
+    "message": "Save"
   }
 }

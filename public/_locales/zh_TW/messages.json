@@ -5,40 +5,18 @@
   "extDescription": {
     "message": "自動隱藏 Threads 上的垃圾與機器人貼文。安裝即可使用，資料只存在你的瀏覽器。"
   },
-  "reason_affiliate_links": {
-    "message": "分潤連結"
-  },
-  "reason_engagement_bait": {
-    "message": "騙互動"
-  },
-  "reason_copy_paste_replies": {
-    "message": "複製貼上的回覆"
-  },
-  "reason_ai_label": {
-    "message": "AI 標籤"
-  },
-  "reason_generated_names": {
-    "message": "自動產生的帳號名稱"
-  },
-  "reason_strangers_in_replies": {
-    "message": "回覆中的陌生人"
-  },
-  "reason_rule": {
-    "message": "你的規則"
-  },
-  "reason_word": {
-    "message": "封鎖的字詞"
-  },
-  "reason_host": {
-    "message": "封鎖的網站"
-  },
-  "reason_hidden_account": {
-    "message": "已隱藏的帳號"
-  },
   "bar_hidden": {
-    "message": "已隱藏：$REASONS$",
+    "message": "已隱藏：$VALUE$",
     "placeholders": {
-      "reasons": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "bar_tagged": {
+    "message": "黏毛滾輪：$VALUE$",
+    "placeholders": {
+      "value": {
         "content": "$1"
       }
     }
@@ -52,26 +30,591 @@
   "bar_keep_hiding": {
     "message": "繼續隱藏"
   },
-  "bar_marked": {
-    "message": "黏毛滾輪：$REASONS$",
-    "placeholders": {
-      "reasons": {
-        "content": "$1"
-      }
-    }
-  },
   "menu_hide_account": {
     "message": "隱藏這個帳號的貼文"
   },
   "menu_allow_account": {
     "message": "永遠不要隱藏這個帳號"
   },
-  "reason_country": {
-    "message": "帳號所在地：$COUNTRY$",
+  "section_protection": {
+    "message": "保護"
+  },
+  "section_lists": {
+    "message": "字詞與帳號"
+  },
+  "section_profile": {
+    "message": "帳號檢查"
+  },
+  "section_rules": {
+    "message": "我的規則"
+  },
+  "section_look": {
+    "message": "顯示方式"
+  },
+  "section_share": {
+    "message": "分享與預設組合"
+  },
+  "settings_title": {
+    "message": "設定"
+  },
+  "level_label": {
+    "message": "保護等級"
+  },
+  "level_light": {
+    "message": "輕度"
+  },
+  "level_light_description": {
+    "message": "只隱藏明顯的垃圾，例如分潤連結。"
+  },
+  "level_balanced": {
+    "message": "平衡"
+  },
+  "level_balanced_description": {
+    "message": "也隱藏騙互動與複製貼上的回覆。"
+  },
+  "level_strict": {
+    "message": "嚴格"
+  },
+  "level_strict_description": {
+    "message": "也檢查 AI 標籤、自動產生的名稱與回覆中的陌生人。"
+  },
+  "rule_followed": {
+    "message": "你追蹤的人"
+  },
+  "rule_followed_description": {
+    "message": "永遠不隱藏你追蹤的人的貼文。"
+  },
+  "rule_allowed_accounts": {
+    "message": "允許的帳號"
+  },
+  "rule_allowed_accounts_description": {
+    "message": "永遠不隱藏這些帳號。"
+  },
+  "rule_hidden_accounts": {
+    "message": "隱藏的帳號"
+  },
+  "rule_hidden_accounts_description": {
+    "message": "永遠隱藏這些帳號。"
+  },
+  "rule_blocked_words": {
+    "message": "封鎖的字詞"
+  },
+  "rule_blocked_words_description": {
+    "message": "含有這些字詞的貼文。"
+  },
+  "rule_blocked_sites": {
+    "message": "封鎖的網站"
+  },
+  "rule_blocked_sites_description": {
+    "message": "連結到這些網站的貼文。"
+  },
+  "rule_countries": {
+    "message": "帳號所在地"
+  },
+  "rule_countries_description": {
+    "message": "所在地是你選擇的國家的帳號。"
+  },
+  "rule_new_accounts": {
+    "message": "新帳號"
+  },
+  "rule_new_accounts_description": {
+    "message": "剛加入 Threads 不久的帳號。"
+  },
+  "rule_few_followers": {
+    "message": "粉絲很少"
+  },
+  "rule_few_followers_description": {
+    "message": "粉絲數少於你設定的數量的帳號。"
+  },
+  "rule_few_posts": {
+    "message": "貼文很少"
+  },
+  "rule_few_posts_description": {
+    "message": "貼文數少於你設定的數量的帳號。"
+  },
+  "rule_affiliate_links": {
+    "message": "分潤連結"
+  },
+  "rule_affiliate_links_description": {
+    "message": "蝦皮、Amazon、樂天等分潤連結，也包括作者自己回覆裡的連結。"
+  },
+  "rule_engagement_bait": {
+    "message": "騙互動"
+  },
+  "rule_engagement_bait_description": {
+    "message": "像「留言+1」或「連結在首頁」這類句子。"
+  },
+  "rule_copy_paste_replies": {
+    "message": "複製貼上的回覆"
+  },
+  "rule_copy_paste_replies_description": {
+    "message": "三個以上帳號留下相同的回覆文字。"
+  },
+  "rule_ai_label": {
+    "message": "AI 標籤"
+  },
+  "rule_ai_label_description": {
+    "message": "Threads 標示為 AI 產生的貼文。"
+  },
+  "rule_generated_names": {
+    "message": "自動產生的名稱"
+  },
+  "rule_generated_names_description": {
+    "message": "機器人常用的帳號名稱，例如 name_83921。"
+  },
+  "rule_strangers_in_replies": {
+    "message": "回覆中的陌生人"
+  },
+  "rule_strangers_in_replies_description": {
+    "message": "沒有追蹤你的人在回覆中放連結或標記別人。"
+  },
+  "threshold_new_accounts": {
+    "message": "加入未滿幾個月"
+  },
+  "threshold_few_followers": {
+    "message": "粉絲數少於"
+  },
+  "threshold_few_posts": {
+    "message": "貼文數少於"
+  },
+  "effect_label": {
+    "message": "結果"
+  },
+  "effect_points": {
+    "message": "分數"
+  },
+  "effect_for": {
+    "message": "$VALUE$ 的結果",
     "placeholders": {
-      "country": {
+      "value": {
         "content": "$1"
       }
     }
+  },
+  "effect_hide": {
+    "message": "隱藏"
+  },
+  "effect_tag": {
+    "message": "標記"
+  },
+  "effect_score": {
+    "message": "加分"
+  },
+  "effect_allow": {
+    "message": "永不隱藏"
+  },
+  "target_all": {
+    "message": "貼文和回覆"
+  },
+  "target_posts": {
+    "message": "貼文"
+  },
+  "target_replies": {
+    "message": "回覆"
+  },
+  "field_text": {
+    "message": "貼文內容"
+  },
+  "field_language": {
+    "message": "語言"
+  },
+  "field_author_username": {
+    "message": "帳號名稱"
+  },
+  "field_author_fullName": {
+    "message": "顯示名稱"
+  },
+  "field_author_bio": {
+    "message": "個人簡介"
+  },
+  "field_author_country": {
+    "message": "帳號所在地（代碼）"
+  },
+  "field_links": {
+    "message": "連結"
+  },
+  "field_mentions": {
+    "message": "標記"
+  },
+  "field_selfReplyLinks": {
+    "message": "作者自己回覆裡的連結"
+  },
+  "field_hasAiLabel": {
+    "message": "有 AI 標籤"
+  },
+  "field_isPaidPartnership": {
+    "message": "付費合作"
+  },
+  "field_isReply": {
+    "message": "是回覆"
+  },
+  "field_author_isVerified": {
+    "message": "已驗證帳號"
+  },
+  "field_author_isPrivate": {
+    "message": "私人帳號"
+  },
+  "field_author_following": {
+    "message": "你追蹤對方"
+  },
+  "field_author_followedBy": {
+    "message": "對方追蹤你"
+  },
+  "field_copies": {
+    "message": "發出相同文字的帳號數"
+  },
+  "field_author_ageMonths": {
+    "message": "帳號年齡（月）"
+  },
+  "field_author_followers": {
+    "message": "粉絲數"
+  },
+  "field_author_posts": {
+    "message": "貼文數"
+  },
+  "field_counts_likes": {
+    "message": "讚數"
+  },
+  "field_counts_replies": {
+    "message": "回覆數"
+  },
+  "field_counts_reposts": {
+    "message": "轉發數"
+  },
+  "field_counts_quotes": {
+    "message": "引用數"
+  },
+  "op_contains_any": {
+    "message": "包含任一"
+  },
+  "op_contains_any_placeholder": {
+    "message": "字詞, 另一個字詞"
+  },
+  "op_in": {
+    "message": "是其中之一"
+  },
+  "op_in_placeholder": {
+    "message": "值, 另一個值"
+  },
+  "op_matches": {
+    "message": "符合樣式"
+  },
+  "op_matches_placeholder": {
+    "message": "^bot_\\d+$"
+  },
+  "op_host_in": {
+    "message": "連結到網站"
+  },
+  "op_host_in_placeholder": {
+    "message": "example.com, spam.net"
+  },
+  "op_is": {
+    "message": "是"
+  },
+  "op_is_placeholder": {
+    "message": "值"
+  },
+  "op_gt": {
+    "message": "大於"
+  },
+  "op_gt_placeholder": {
+    "message": "10"
+  },
+  "op_lt": {
+    "message": "小於"
+  },
+  "op_lt_placeholder": {
+    "message": "10"
+  },
+  "display_title": {
+    "message": "隱藏的貼文"
+  },
+  "display_collapse": {
+    "message": "收起"
+  },
+  "display_collapse_description": {
+    "message": "只顯示一行原因和「顯示」按鈕。"
+  },
+  "display_blur": {
+    "message": "模糊"
+  },
+  "display_blur_description": {
+    "message": "貼文留在原處但變模糊，按「顯示」才看得到。"
+  },
+  "tag_only": {
+    "message": "只標記，不隱藏"
+  },
+  "tag_only_description": {
+    "message": "安全的測試模式。本來會被隱藏的貼文只會被標記。"
+  },
+  "tag_only_active": {
+    "message": "測試模式開啟中：貼文只會被標記，不會隱藏。"
+  },
+  "protection_on": {
+    "message": "保護已開啟"
+  },
+  "protection_off": {
+    "message": "保護已關閉"
+  },
+  "hidden_today": {
+    "message": "今天隱藏的貼文"
+  },
+  "tagged_today": {
+    "message": "另外標記了 $VALUE$ 則",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "open_settings": {
+    "message": "設定"
+  },
+  "report_problem": {
+    "message": "回報問題"
+  },
+  "welcome_title": {
+    "message": "你在 Threads 上已受到保護。"
+  },
+  "welcome_lead": {
+    "message": "黏毛滾輪已經在隱藏垃圾與機器人貼文。選擇你要的嚴格程度，之後隨時可以改。"
+  },
+  "welcome_privacy": {
+    "message": "資料不會離開你的瀏覽器。不需要帳號，也沒有追蹤。"
+  },
+  "open_threads": {
+    "message": "開啟 Threads"
+  },
+  "protection_intro": {
+    "message": "選擇等級，再開關個別檢查。"
+  },
+  "detectors_title": {
+    "message": "檢查項目"
+  },
+  "lists_intro": {
+    "message": "符合這些清單的貼文會立刻被隱藏。"
+  },
+  "list_words": {
+    "message": "隱藏含有這些字詞的貼文"
+  },
+  "list_words_placeholder": {
+    "message": "輸入字詞後按 Enter"
+  },
+  "list_sites": {
+    "message": "隱藏連結到這些網站的貼文"
+  },
+  "list_hidden_accounts": {
+    "message": "永遠隱藏這些帳號"
+  },
+  "list_allowed_accounts": {
+    "message": "永遠不隱藏這些帳號"
+  },
+  "add": {
+    "message": "新增"
+  },
+  "remove_item": {
+    "message": "移除 $VALUE$",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "chip_invalid": {
+    "message": "格式不正確，請檢查拼字。"
+  },
+  "profile_intro": {
+    "message": "這些檢查會讀取作者的「關於此個人檔案」或個人頁面。只有開啟時才會執行。"
+  },
+  "list_countries": {
+    "message": "國家"
+  },
+  "list_countries_placeholder": {
+    "message": "輸入國家名稱或代碼"
+  },
+  "countries_effect": {
+    "message": "這些國家的貼文："
+  },
+  "profile_cost": {
+    "message": "帳號檢查每 1.5 到 2 秒查詢一個帳號，結果最多保存 30 天。貼文出現幾秒後可能才會改變。"
+  },
+  "rules_intro": {
+    "message": "自訂你的檢查。每條規則可以隱藏、標記、加分或保護貼文。所有規則的分數會加總。"
+  },
+  "scoring_title": {
+    "message": "分數"
+  },
+  "scoring_intro": {
+    "message": "貼文分數達到設定值時，會被標記或隱藏。留空表示關閉該步驟。"
+  },
+  "scoring_tag_at": {
+    "message": "標記門檻"
+  },
+  "scoring_hide_at": {
+    "message": "隱藏門檻"
+  },
+  "scoring_off": {
+    "message": "關閉"
+  },
+  "rules_empty": {
+    "message": "你還沒有規則。"
+  },
+  "rule_add": {
+    "message": "新增規則"
+  },
+  "rule_name": {
+    "message": "規則名稱"
+  },
+  "rule_name_placeholder": {
+    "message": "替規則命名"
+  },
+  "rule_enabled": {
+    "message": "開啟"
+  },
+  "rule_applies_to": {
+    "message": "檢查"
+  },
+  "rule_match": {
+    "message": "條件"
+  },
+  "match_all": {
+    "message": "以下全部成立"
+  },
+  "match_any": {
+    "message": "以下任一成立"
+  },
+  "condition_field": {
+    "message": "欄位"
+  },
+  "condition_operator": {
+    "message": "比較方式"
+  },
+  "condition_value": {
+    "message": "值"
+  },
+  "condition_remove": {
+    "message": "移除這個條件"
+  },
+  "condition_add": {
+    "message": "新增條件"
+  },
+  "rule_then": {
+    "message": "結果"
+  },
+  "rule_json_only": {
+    "message": "這條規則有巢狀條件，請在「分享與預設組合」的進階編輯器中修改。"
+  },
+  "rule_invalid": {
+    "message": "請填寫每個值。數字欄位要填數字，樣式必須正確。"
+  },
+  "rule_delete": {
+    "message": "刪除"
+  },
+  "rule_save": {
+    "message": "儲存規則"
+  },
+  "yes": {
+    "message": "是"
+  },
+  "no": {
+    "message": "否"
+  },
+  "presets_title": {
+    "message": "預設組合"
+  },
+  "presets_intro": {
+    "message": "把現成的規則加到你的設定裡，其他規則保持不變。"
+  },
+  "preset_apply": {
+    "message": "加到我的設定"
+  },
+  "preset_affiliate_name": {
+    "message": "分潤垃圾"
+  },
+  "preset_affiliate_description": {
+    "message": "隱藏推銷蝦皮、Amazon 等分潤連結的貼文。"
+  },
+  "preset_bait_name": {
+    "message": "騙互動"
+  },
+  "preset_bait_description": {
+    "message": "隱藏「留言+1」「連結在首頁」這類貼文。"
+  },
+  "preset_new_accounts_name": {
+    "message": "新帳號與空帳號"
+  },
+  "preset_new_accounts_description": {
+    "message": "對新帳號、粉絲少、貼文少的帳號加分。兩項標記，三項隱藏。"
+  },
+  "preset_reply_guard_name": {
+    "message": "回覆防護"
+  },
+  "preset_reply_guard_description": {
+    "message": "隱藏複製貼上的回覆，並對在回覆中放連結的陌生人加分。"
+  },
+  "preset_test_mode_name": {
+    "message": "測試模式"
+  },
+  "preset_test_mode_description": {
+    "message": "只標記不隱藏，讓你先檢查規則。"
+  },
+  "export_title": {
+    "message": "匯出"
+  },
+  "export_intro": {
+    "message": "把設定存成檔案，用來備份或分享給朋友。"
+  },
+  "export_name": {
+    "message": "給別人看的名稱"
+  },
+  "export_name_placeholder": {
+    "message": "例如：我的垃圾過濾器"
+  },
+  "export_button": {
+    "message": "下載檔案"
+  },
+  "import_title": {
+    "message": "匯入"
+  },
+  "import_intro": {
+    "message": "開啟朋友分享或你備份的設定檔。"
+  },
+  "import_unnamed": {
+    "message": "未命名的設定"
+  },
+  "import_rule_count": {
+    "message": "$VALUE$ 條規則",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "import_merge": {
+    "message": "加到我的設定"
+  },
+  "import_replace": {
+    "message": "取代我的設定"
+  },
+  "cancel": {
+    "message": "取消"
+  },
+  "import_not_json": {
+    "message": "這不是設定檔。"
+  },
+  "import_replaced": {
+    "message": "已取代你的設定。"
+  },
+  "import_merged": {
+    "message": "規則已加入你的設定。"
+  },
+  "advanced_title": {
+    "message": "進階編輯器"
+  },
+  "advanced_intro": {
+    "message": "以 JSON 編輯設定檔。檔案正確時才能儲存。"
+  },
+  "advanced_save": {
+    "message": "儲存"
   }
 }
