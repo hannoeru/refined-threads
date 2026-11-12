@@ -48,6 +48,16 @@ function fieldsOf(condition: Condition): Field[] {
   return [condition.field]
 }
 
+function neverMatches(condition: Condition): boolean {
+  if ('all' in condition) return condition.all.some(neverMatches)
+  if ('any' in condition) return condition.any.every(neverMatches)
+  if ('not' in condition) return false
+  if ('in' in condition) return condition.in.length === 0
+  if ('contains_any' in condition) return condition.contains_any.every((needle) => needle === '')
+  if ('host_in' in condition) return condition.host_in.length === 0
+  return false
+}
+
 function compileCondition(condition: Condition): Test | null {
   if ('all' in condition || 'any' in condition) {
     const list = 'all' in condition ? condition.all : condition.any
@@ -105,7 +115,7 @@ export function compileRules(settings: Settings): CompiledRules {
   const rules: CompiledRule[] = []
   const fields = new Set<Field>()
   for (const rule of settings.ruleFile.rules) {
-    if (!rule.enabled) continue
+    if (!rule.enabled || neverMatches(rule.when)) continue
     const test = compileCondition(rule.when)
     if (test === null) continue
     for (const field of fieldsOf(rule.when)) fields.add(field)

@@ -12,8 +12,12 @@ import Share from './sections/Share.vue'
 const SECTIONS = ['protection', 'lists', 'profile', 'rules', 'look', 'share'] as const
 type Section = (typeof SECTIONS)[number]
 
-const initial = location.hash.slice(1) as Section
-const current = ref<Section>(SECTIONS.includes(initial) ? initial : 'protection')
+const fromHash = (): Section => {
+  const hash = location.hash.slice(1) as Section
+  return SECTIONS.includes(hash) ? hash : 'protection'
+}
+const current = ref<Section>(fromHash())
+window.addEventListener('hashchange', () => (current.value = fromHash()))
 const go = (section: Section) => {
   current.value = section
   history.replaceState(null, '', `#${section}`)

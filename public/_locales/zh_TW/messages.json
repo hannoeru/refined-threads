@@ -3,7 +3,7 @@
     "message": "黏毛滾輪 for Threads"
   },
   "extDescription": {
-    "message": "自動隱藏 Threads 上的垃圾與機器人貼文。安裝即可使用，資料只存在你的瀏覽器。"
+    "message": "自動隱藏 Threads 上的垃圾與機器人貼文。安裝即可使用，設定只存在你的瀏覽器。"
   },
   "bar_hidden": {
     "message": "已隱藏：$VALUE$",
@@ -380,7 +380,7 @@
     "message": "黏毛滾輪已經在隱藏垃圾與機器人貼文。選擇你要的嚴格程度，之後隨時可以改。"
   },
   "welcome_privacy": {
-    "message": "資料不會離開你的瀏覽器。不需要帳號，也沒有追蹤。"
+    "message": "你的設定只存在你的瀏覽器。不需要帳號，也沒有追蹤。"
   },
   "open_threads": {
     "message": "開啟 Threads"

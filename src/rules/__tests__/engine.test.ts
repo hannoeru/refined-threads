@@ -182,13 +182,24 @@ describe('levels', () => {
 })
 
 describe('lookup needs', () => {
-  it('asks for profile data only when an enabled rule reads it', () => {
-    expect(compileRules(defaultSettings()).needs).toEqual({ about: true, profile: false, copies: true })
+  it('asks for no account lookups with default settings', () => {
+    expect(compileRules(defaultSettings()).needs).toEqual({ about: false, profile: false, copies: true })
+  })
+
+  it('asks for account lookups only when an enabled rule can match', () => {
     const settings = defaultSettings()
-    settings.ruleFile.rules = settings.ruleFile.rules.filter((rule) => rule.id !== 'countries')
-    expect(compileRules(settings).needs.about).toBe(false)
+    settings.ruleFile = writeList(settings.ruleFile, 'countries', ['JP'])
+    expect(compileRules(settings).needs.about).toBe(true)
     settings.ruleFile.rules.find((rule) => rule.id === 'few-posts')!.enabled = true
     expect(compileRules(settings).needs.profile).toBe(true)
+  })
+
+  it('skips rules with an empty list, but keeps not-rules around them', () => {
+    const settings = withRules([
+      { id: 'empty', effect: 'hide', when: { field: 'text', contains_any: [] } },
+      { id: 'not-empty', effect: 'tag', when: { not: { field: 'text', contains_any: [] } } },
+    ])
+    expect(compileRules(settings).rules.map((rule) => rule.id)).toEqual(['not-empty'])
   })
 })
 

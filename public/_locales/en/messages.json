@@ -3,7 +3,7 @@
     "message": "Lint Roller for Threads"
   },
   "extDescription": {
-    "message": "Hides spam and bot posts on Threads. Works on install. Your data stays in your browser."
+    "message": "Hides spam and bot posts on Threads. Works on install. Your settings stay in your browser."
   },
   "bar_hidden": {
     "message": "Hidden: $VALUE$",
@@ -380,7 +380,7 @@
     "message": "Lint Roller already hides spam and bot posts. Pick how strict it should be. You can change this at any time."
   },
   "welcome_privacy": {
-    "message": "Nothing leaves your browser. There is no account and no tracking."
+    "message": "Your settings stay in your browser. There is no account and no tracking."
   },
   "open_threads": {
     "message": "Open Threads"
