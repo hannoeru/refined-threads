@@ -8,7 +8,7 @@ const STYLE = `
 .${BADGE} { display: flex; align-items: center; min-width: 0; overflow: hidden; font-size: 11px; line-height: 14px; font-weight: 400;
   color: ${THREADS_THEME.secondary}; white-space: nowrap; }
 .${BADGE}[hidden] { display: none; }
-.${BADGE}.rt-ai-line { grid-column: 1 / -1; margin: -1px 0 3px; }
+.${BADGE}.rt-ai-line { grid-column: 1 / -1; margin: 0 0 3px; }
 .${BADGE}.rt-ai-inline { display: inline-flex; flex: 0 1 auto; margin-inline-start: 6px; }
 .${BADGE} > span { flex: none; }
 .${BADGE} > span + span::before { content: "·"; margin: 0 4px; }
