@@ -351,10 +351,10 @@
     "message": "測試模式開啟中：貼文只會被標記，不會隱藏。"
   },
   "protection_on": {
-    "message": "保護已開啟"
+    "message": "垃圾過濾已開啟"
   },
   "protection_off": {
-    "message": "保護已關閉"
+    "message": "垃圾過濾已關閉"
   },
   "hidden_today": {
     "message": "今天已隱藏"
@@ -616,5 +616,107 @@
   },
   "advanced_save": {
     "message": "儲存"
+  },
+  "features_title": {
+    "message": "功能"
+  },
+  "features_intro": {
+    "message": "每個功能只改變 Threads 的一件事。開啟你需要的功能，已開啟的 Threads 分頁會立即套用。"
+  },
+  "features_search": {
+    "message": "搜尋功能"
+  },
+  "feature_settings": {
+    "message": "設定"
+  },
+  "features_none": {
+    "message": "沒有符合搜尋的功能。"
+  },
+  "features_back": {
+    "message": "所有功能"
+  },
+  "all_features": {
+    "message": "所有功能"
+  },
+  "spam_filter_settings": {
+    "message": "垃圾過濾設定"
+  },
+  "feature_spam_filter_name": {
+    "message": "垃圾過濾"
+  },
+  "feature_spam_filter_description": {
+    "message": "用等級、清單、帳號檢查和你自己的計分規則，隱藏或標記垃圾與機器人貼文。"
+  },
+  "feature_absolute_timestamps_name": {
+    "message": "實際日期"
+  },
+  "feature_absolute_timestamps_description": {
+    "message": "顯示每則貼文的日期與時間，而不是「5 小時」或「2 天」。"
+  },
+  "feature_absolute_timestamps_option_format": {
+    "message": "顯示"
+  },
+  "feature_absolute_timestamps_option_format_date_time": {
+    "message": "日期和時間"
+  },
+  "feature_absolute_timestamps_option_format_date": {
+    "message": "只有日期"
+  },
+  "feature_absolute_timestamps_option_format_relative_and_date": {
+    "message": "相對時間和日期"
+  },
+  "feature_keyboard_navigation_name": {
+    "message": "鍵盤瀏覽"
+  },
+  "feature_keyboard_navigation_description": {
+    "message": "用 J 和 K 在貼文之間移動，按 O 開啟貼文。"
+  },
+  "feature_keyboard_navigation_shortcut_next": {
+    "message": "下一則貼文"
+  },
+  "feature_keyboard_navigation_shortcut_previous": {
+    "message": "上一則貼文"
+  },
+  "feature_keyboard_navigation_shortcut_open": {
+    "message": "開啟選取的貼文"
+  },
+  "feature_account_info_name": {
+    "message": "帳號資訊"
+  },
+  "feature_account_info_description": {
+    "message": "在每個名稱旁顯示國家、帳號年齡和粉絲數。每 1.5 到 2 秒查詢一個帳號。"
+  },
+  "feature_account_info_option_country": {
+    "message": "國旗"
+  },
+  "feature_account_info_option_age": {
+    "message": "帳號年齡"
+  },
+  "feature_account_info_option_followers": {
+    "message": "粉絲數"
+  },
+  "feature_account_info_age_years": {
+    "message": "加入 $VALUE$ 年",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "feature_account_info_age_months": {
+    "message": "加入 $VALUE$ 個月",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "feature_account_info_followers": {
+    "message": "$VALUE$ 位粉絲",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
   }
 }

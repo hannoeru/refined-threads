@@ -1,11 +1,11 @@
 <script setup vapor lang="ts">
 import { computed } from 'vue'
-import type { Outcome, Rule } from '../../../src/model'
-import { isBuiltIn } from '../../../src/rules/edit'
-import RuleCard from '../../../src/ui/components/RuleCard.vue'
-import { t } from '../../../src/ui/i18n'
-import type { SectionProps } from '../../../src/ui/props'
-import { defaultRow, fromForm } from '../../../src/ui/ruleForm'
+import type { Outcome, Rule } from '../../../model'
+import { isBuiltIn } from '../../../rules/edit'
+import RuleCard from '../../../ui/components/RuleCard.vue'
+import { t } from '../../../ui/i18n'
+import type { SectionProps } from '../../../ui/props'
+import { defaultRow, fromForm } from '../../../ui/ruleForm'
 
 const props = defineProps<SectionProps>()
 

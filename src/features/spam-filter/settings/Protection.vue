@@ -1,12 +1,12 @@
 <script setup vapor lang="ts">
 import { computed } from 'vue'
-import { type Effect, type Level, LEVEL_TOGGLED } from '../../../src/model'
-import { applyLevel, findRule, ruleLabel, updateRule } from '../../../src/rules/edit'
-import EffectPicker from '../../../src/ui/components/EffectPicker.vue'
-import LevelPicker from '../../../src/ui/components/LevelPicker.vue'
-import Toggle from '../../../src/ui/components/Toggle.vue'
-import { t } from '../../../src/ui/i18n'
-import type { SectionProps } from '../../../src/ui/props'
+import { type Effect, type Level, LEVEL_TOGGLED } from '../../../model'
+import { applyLevel, findRule, ruleLabel, updateRule } from '../../../rules/edit'
+import EffectPicker from '../../../ui/components/EffectPicker.vue'
+import LevelPicker from '../../../ui/components/LevelPicker.vue'
+import Toggle from '../../../ui/components/Toggle.vue'
+import { t } from '../../../ui/i18n'
+import type { SectionProps } from '../../../ui/props'
 
 const props = defineProps<SectionProps>()
 

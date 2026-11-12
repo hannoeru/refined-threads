@@ -22,6 +22,7 @@
     "vue": "3.6.0-rc.15"
   },
   "devDependencies": {
+    "@vitejs/plugin-vue": "6.0.10",
     "@wxt-dev/module-vue": "1.0.3",
     "happy-dom": "21.0.4",
     "sharp": "0.35.5",

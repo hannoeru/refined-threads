@@ -17,7 +17,6 @@ type Test = (post: Post, ctx: EvaluateContext) => boolean
 type CompiledRule = Reason & { target: Rule['target']; score: number; test: Test }
 
 export type CompiledRules = {
-  enabled: boolean
   tagOnly: boolean
   scoring: { posts: Outcome; replies: Outcome }
   rules: CompiledRule[]
@@ -122,7 +121,6 @@ export function compileRules(settings: Settings): CompiledRules {
     rules.push({ id: rule.id, name: rule.name, effect: rule.effect, target: rule.target, score: rule.score, test })
   }
   return {
-    enabled: settings.enabled,
     tagOnly: settings.tagOnly,
     scoring: settings.ruleFile.scoring,
     rules,
@@ -137,7 +135,6 @@ export function compileRules(settings: Settings): CompiledRules {
 const NONE: Verdict = { action: 'none', score: 0, reasons: [] }
 
 export function evaluate(post: Post, compiled: CompiledRules, ctx: EvaluateContext): Verdict {
-  if (!compiled.enabled) return NONE
   const target = post.isReply ? 'replies' : 'posts'
   const matched: CompiledRule[] = []
   for (const rule of compiled.rules) {

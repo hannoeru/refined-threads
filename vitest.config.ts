@@ -1,6 +1,8 @@
+import vue from '@vitejs/plugin-vue'
 import { defineConfig } from 'vitest/config'
 import { WxtVitest } from 'wxt/testing/vitest-plugin'
 
 export default defineConfig({
-  plugins: [WxtVitest()],
+  plugins: [WxtVitest(), vue({ features: { vapor: true, optionsAPI: false } })],
+  resolve: { alias: [{ find: /^vue$/, replacement: 'vue/dist/vue.runtime-with-vapor.esm-browser.js' }] },
 })

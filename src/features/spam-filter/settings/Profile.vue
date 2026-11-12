@@ -1,13 +1,13 @@
 <script setup vapor lang="ts">
 import { computed } from 'vue'
-import type { Effect, LeafCondition, Rule } from '../../../src/model'
-import { CountryNames } from '../../../src/profile/normalize'
-import { findRule, readList, updateRule, writeList } from '../../../src/rules/edit'
-import ChipInput from '../../../src/ui/components/ChipInput.vue'
-import EffectPicker from '../../../src/ui/components/EffectPicker.vue'
-import Toggle from '../../../src/ui/components/Toggle.vue'
-import { t, uiLanguage } from '../../../src/ui/i18n'
-import type { SectionProps } from '../../../src/ui/props'
+import type { Effect, LeafCondition, Rule } from '../../../model'
+import { CountryNames } from '../../../profile/normalize'
+import { findRule, readList, updateRule, writeList } from '../../../rules/edit'
+import ChipInput from '../../../ui/components/ChipInput.vue'
+import EffectPicker from '../../../ui/components/EffectPicker.vue'
+import Toggle from '../../../ui/components/Toggle.vue'
+import { t, uiLanguage } from '../../../ui/i18n'
+import type { SectionProps } from '../../../ui/props'
 
 const props = defineProps<SectionProps>()
 

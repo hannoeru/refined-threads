@@ -40,10 +40,6 @@ describe('default settings', () => {
     expect(run(makePost({ isReply: true, text: 'Nice! Check my profile' }), defaultSettings(), { copies: () => 3 }).action).toBe('hide')
     expect(run(makePost({ isReply: false, text: 'Nice! Check my profile' }), defaultSettings(), { copies: () => 3 }).action).toBe('none')
   })
-
-  it('never hide when protection is off', () => {
-    expect(run(makePost({ links: ['https://shopee.tw/x'] }), { ...defaultSettings(), enabled: false }).action).toBe('none')
-  })
 })
 
 describe('list rules', () => {

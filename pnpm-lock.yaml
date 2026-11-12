@@ -15,6 +15,9 @@ importers:
         specifier: 3.6.0-rc.15
         version: 3.6.0-rc.15(typescript@5.9.3)
     devDependencies:
+      '@vitejs/plugin-vue':
+        specifier: 6.0.10
+        version: 6.0.10(vite@8.3.8(@types/node@26.6.6)(jiti@2.7.0))(vue@3.6.0-rc.15(typescript@5.9.3))
       '@wxt-dev/module-vue':
         specifier: 1.0.3
         version: 1.0.3(vite@8.3.8(@types/node@26.6.6)(jiti@2.7.0))(vue@3.6.0-rc.15(typescript@5.9.3))(wxt@0.21.5(rolldown@1.2.19)(typescript@5.9.3)(vite@8.3.8(@types/node@26.6.6)(jiti@2.7.0)))

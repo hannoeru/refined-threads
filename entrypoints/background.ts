@@ -1,5 +1,5 @@
 import { addAccount } from '../src/rules/edit'
-import { handleFromUrl } from '../src/page/handle'
+import { handleFromUrl } from '../src/threads/handle'
 import { loadSettings, saveSettings } from '../src/settings'
 
 const PROFILE_LINKS = ['https://www.threads.com/@*', 'https://threads.com/@*', 'https://www.threads.net/@*', 'https://threads.net/@*']

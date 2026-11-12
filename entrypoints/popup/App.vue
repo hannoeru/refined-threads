@@ -7,6 +7,7 @@ import LevelPicker from '../../src/ui/components/LevelPicker.vue'
 import Toggle from '../../src/ui/components/Toggle.vue'
 import { t } from '../../src/ui/i18n'
 import { ISSUES_URL } from '../../src/ui/links'
+import { useFeatures } from '../../src/ui/useFeatures'
 import { useSettings } from '../../src/ui/useSettings'
 
 const { settings, update } = useSettings()
@@ -23,9 +24,10 @@ const topRules = computed(() =>
 )
 const specks = computed(() => Array.from({ length: Math.min(todayStats.value.hidden + todayStats.value.tagged, 18) }, (_, index) => index))
 
+const features = useFeatures()
 const enabled = computed({
-  get: () => settings.value?.enabled ?? true,
-  set: (value: boolean) => void update((current) => ({ ...current, enabled: value })),
+  get: () => features.states.value?.['spam-filter']?.enabled ?? true,
+  set: (value: boolean) => void features.setEnabled('spam-filter', value),
 })
 const level = computed({
   get: () => settings.value?.level ?? 'balanced',
@@ -33,6 +35,7 @@ const level = computed({
 })
 
 const openSettings = () => void browser.runtime.openOptionsPage()
+const openSpamSettings = () => void browser.tabs.create({ url: browser.runtime.getURL('/options.html#feature/spam-filter') })
 const report = () => void browser.tabs.create({ url: ISSUES_URL })
 </script>
 
@@ -59,8 +62,9 @@ const report = () => void browser.tabs.create({ url: ISSUES_URL })
     </ul>
     <LevelPicker v-model="level" compact />
     <p v-if="settings?.tagOnly" class="tag-only-note">{{ t('tag_only_active') }}</p>
+    <button type="button" class="link-button" @click="openSpamSettings">{{ t('spam_filter_settings') }}</button>
     <footer class="popup-footer">
-      <button type="button" class="button primary" @click="openSettings">{{ t('open_settings') }}</button>
+      <button type="button" class="button primary" @click="openSettings">{{ t('all_features') }}</button>
       <button type="button" class="button" @click="report">{{ t('report_problem') }}</button>
     </footer>
   </main>
@@ -84,5 +88,6 @@ body { width: 340px; }
 .top-rules li { display: flex; justify-content: space-between; }
 .tag-only-note { font-size: 13px; padding: 8px 10px; border-radius: var(--radius-sm); background: rgba(166, 226, 46, 0.18); }
 .popup-footer { display: flex; gap: 8px; }
+.link-button { align-self: flex-start; border: 0; background: none; padding: 0; color: var(--accent); font-weight: 600; }
 .popup-footer .button { flex: 1; }
 </style>

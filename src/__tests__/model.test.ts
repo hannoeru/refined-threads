@@ -5,7 +5,7 @@ import { BUILT_IN_IDS, defaultSettings, RuleFileSchema, SettingsSchema } from '.
 describe('settings model', () => {
   it('defaults to balanced protection that hides, with every built-in rule present', () => {
     const settings = defaultSettings()
-    expect(settings).toMatchObject({ enabled: true, level: 'balanced', tagOnly: false, display: 'collapse' })
+    expect(settings).toMatchObject({ level: 'balanced', tagOnly: false, display: 'collapse' })
     expect(settings.ruleFile.rules.map((rule) => rule.id)).toEqual(BUILT_IN_IDS)
     expect(settings.ruleFile.scoring).toEqual({ posts: { tagAt: 2, hideAt: 3 }, replies: { tagAt: 2, hideAt: 3 } })
   })

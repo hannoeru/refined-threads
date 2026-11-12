@@ -238,7 +238,6 @@ export const RuleFileSchema = v.strictObject({
 export type RuleFile = v.InferOutput<typeof RuleFileSchema>
 
 export const SettingsSchema = v.strictObject({
-  enabled: v.optional(v.boolean(), true),
   level: v.optional(v.picklist(LEVELS), 'balanced'),
   tagOnly: v.optional(v.boolean(), false),
   display: v.optional(v.picklist(DISPLAYS), 'collapse'),

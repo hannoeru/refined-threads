@@ -1,15 +1,6 @@
-import type { Display, Verdict } from '../model'
+import type { Display, Verdict } from '../../model'
 
-export const CONTAINER = '[data-pressable-container="true"]'
-
-export function postCode(container: Element): string | null {
-  for (const link of container.querySelectorAll<HTMLAnchorElement>('a[href*="/post/"]')) {
-    if (!link.querySelector('time')) continue
-    const match = link.getAttribute('href')?.match(/\/post\/([^/?#]+)/)
-    if (match?.[1]) return match[1]
-  }
-  return null
-}
+export { POST_CONTAINER as CONTAINER, postCodeOf as postCode } from '../../threads/dom'
 
 export type ViewText = {
   hidden: (reasons: string) => string

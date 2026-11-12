@@ -1,19 +1,19 @@
 # Refined Threads
 
-A browser extension that hides or tags spam and bot posts on Threads web (`threads.com`, `threads.net`). It works on install with no setup. Users can tune it with simple switches, write their own scoring rules, and share their settings as a JSON file.
+A browser extension that makes Threads web (`threads.com`, `threads.net`) better, one small feature at a time. Each feature can be turned on or off, and each has its own settings page. Anyone can contribute a feature: see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 The name follows [Refined GitHub](https://github.com/refined-github/refined-github), a browser extension that makes GitHub cleaner. Refined Threads is not affiliated with Meta or with Refined GitHub. License: MIT.
 
-## What users get
+## Features
 
-- **Works on install.** The "Balanced" level hides affiliate spam, engagement bait, and copy-paste replies. The welcome page lets the user pick Light, Balanced, or Strict.
-- **Hide or tag.** Every rule can hide a post, tag it, add points, or protect it. A hidden post folds into one thin bar with its reason and a Show button. After Show, "Not spam" allows the author and "Keep hiding" folds it again. A tagged post stays visible with a small bar.
-- **Points.** Points from all matching rules add up. Posts and replies each have a "tag at" and a "hide at" number.
-- **Account checks.** Rules can read the account country, the account age, the follower count, and the post count. The extension looks these up only when an enabled rule needs them.
-- **Words and accounts.** Blocked words, blocked sites, hidden accounts, and allowed accounts. A right-click menu on profile links hides or allows an account.
-- **Share and presets.** Export settings to a JSON file, import a friend's file (add to mine or replace mine), or add a built-in preset. An advanced JSON editor validates the file before it saves.
-- **Test mode.** "Tag only, never hide" turns every hide into a tag.
-- **Languages.** English and Traditional Chinese.
+| Feature | On by default | What it does |
+| --- | --- | --- |
+| Spam filter (`spam-filter`) | Yes | Hides or tags spam and bot posts. Levels (Light, Balanced, Strict), blocked words and sites, hidden and allowed accounts, account checks (country, age, followers, posts), user-defined scoring rules, and shareable settings files with presets. |
+| Real dates (`absolute-timestamps`) | No | Shows the date and time of each post instead of "5h". |
+| Keyboard navigation (`keyboard-navigation`) | No | `j` and `k` move between posts, `o` opens the selected post. |
+| Account info (`account-info`) | No | Shows the country flag, account age, and follower count next to each author name. |
+
+The settings page lists every feature with a switch, a search box, and a settings page per feature. Changes apply to open Threads tabs at once. The popup shows the spam filter's daily count and its level.
 
 ## How it works
 
@@ -23,25 +23,26 @@ flowchart LR
     Hook["page-hook: wraps XHR and fetch,<br/>reads bootstrap JSON,<br/>runs account lookups"]
   end
   subgraph Content["content script (isolated world)"]
-    Catalog["post catalog"]
+    Posts["PostCatalog"]
     Lookups["ProfileLookups:<br/>throttled queue + cache"]
-    Engine["rule engine"]
-    View["collapse / blur / tag bar"]
+    Runtime["FeatureRuntime"]
+    Features["features/*: spam-filter,<br/>absolute-timestamps, ..."]
   end
-  Hook -- "refined-threads:posts" --> Catalog
-  Lookups -- "about / profile request" --> Hook
-  Hook -- "about / profile result" --> Lookups
-  Catalog --> Engine
-  Lookups --> Engine
-  Engine --> View
-  Settings[("storage.sync: settings<br/>storage.local: stats, account cache")] --> Engine
+  Hook -- "refined-threads:posts" --> Posts
+  Lookups <-- "about / profile request and result" --> Hook
+  Store[("storage.sync: features, spam filter settings<br/>storage.local: stats, account cache")] --> Runtime
+  Runtime -- "init(ctx) / abort" --> Features
+  Posts --> Features
+  Lookups --> Features
 ```
 
-- `entrypoints/page-hook.content.ts` runs in the page's MAIN world at `document_start`. It reads posts from the server-rendered `script[type="application/json"]` tags and from `/graphql/query` responses. Threads loads posts through XMLHttpRequest, and the hook also wraps `fetch`. It captures the page's session fields from GraphQL request bodies so it can call the "About this profile" endpoint.
-- `entrypoints/content/index.ts` runs in the isolated world. It keeps a post catalog keyed by post code, evaluates each `[data-pressable-container="true"]` container, and applies the verdict without removing Threads nodes.
-- `src/rules/engine.ts` compiles rules once and evaluates posts as a pure function.
-- `src/profile/lookups.ts` runs one request at a time per kind (1.5 s gap for About, 2 s for profile pages), newest first. It backs off after HTTP 429 (30 s, doubling to 5 min) and caches results for 30 days (About), 7 days (profile), or 1 day (failures).
-- The options page, popup, and welcome page use Vue 3.6 Vapor mode (`<script setup vapor>`, `createVaporApp`).
+- **Features.** Each folder in `src/features/` is one feature. `src/features/registry.ts` finds them with `import.meta.glob`, so adding a folder is enough. A feature is `defineFeature({ id, enabledByDefault, options, include, shortcuts, init })`. Its `init(ctx)` gets an `AbortSignal` that aborts when the user turns it off or changes its options. This follows Refined GitHub's feature model.
+- **Runtime.** `src/features/runtime.ts` reads `sync:features`, starts the enabled features, restarts a feature only when its own options change, and reports a broken feature without stopping the others.
+- **Settings pages.** The options page builds a form from each feature's `options` spec. A feature can add its own `Settings.vue`.
+- **Capture.** `entrypoints/page-hook.content.ts` runs in the page's MAIN world at `document_start`. It reads posts from the server-rendered `script[type="application/json"]` tags and from `/graphql/query` responses. Threads loads posts through XMLHttpRequest, and the hook also wraps `fetch`. It captures the page's session fields from GraphQL request bodies so it can call the "About this profile" endpoint.
+- **Account lookups.** `src/profile/lookups.ts` runs one request at a time per kind (1.5 s gap for About, 2 s for profile pages), newest first. It backs off after HTTP 429 (30 s, doubling to 5 min) and caches results for 30 days (About), 7 days (profile), or 1 day (failures). Lookups run only when an enabled feature or rule needs them.
+- **Spam filter.** `src/rules/engine.ts` compiles rules once and evaluates posts as a pure function. `src/features/spam-filter/` applies the verdicts to `[data-pressable-container="true"]` containers without removing Threads nodes.
+- **UI.** The options page, popup, and welcome page use Vue 3.6 Vapor mode (`<script setup vapor>`, `createVaporApp`).
 
 ### Data sources on Threads
 
@@ -55,9 +56,9 @@ These facts were checked on the real site on 2026-11-12.
 
 The feed data has no follower count, post count, account age, or view count.
 
-## Settings file
+## Spam filter settings file
 
-Export writes this format. Import and the advanced editor accept it.
+The spam filter's Share tab exports this format. Import and the advanced editor accept it.
 
 ```json
 {
@@ -108,7 +109,7 @@ Condition operators: `is`, `in`, `matches` (regular expression, case-insensitive
 
 Fields: `text`, `links`, `mentions`, `language`, `hasAiLabel`, `isPaidPartnership`, `isReply`, `selfReplyLinks` (links in the author's own replies in the same thread), `copies` (accounts that posted the same text), `author.username`, `author.fullName`, `author.bio`, `author.isVerified`, `author.isPrivate`, `author.following`, `author.followedBy`, `author.country` (ISO code), `author.ageMonths`, `author.followers`, `author.posts`, `counts.likes`, `counts.replies`, `counts.reposts`, `counts.quotes`.
 
-Built-in rules have fixed ids (`followed`, `allowed-accounts`, `hidden-accounts`, `blocked-words`, `blocked-sites`, `countries`, `new-accounts`, `few-followers`, `few-posts`, `affiliate-links`, `engagement-bait`, `copy-paste-replies`, `ai-label`, `generated-names`, `strangers-in-replies`). The settings page edits them. Rule files contain no code.
+Built-in spam filter rules have fixed ids (`followed`, `allowed-accounts`, `hidden-accounts`, `blocked-words`, `blocked-sites`, `countries`, `new-accounts`, `few-followers`, `few-posts`, `affiliate-links`, `engagement-bait`, `copy-paste-replies`, `ai-label`, `generated-names`, `strangers-in-replies`). The settings page edits them. Rule files contain no code.
 
 ## Development
 

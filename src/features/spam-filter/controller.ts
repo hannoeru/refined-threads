@@ -1,20 +1,17 @@
-import { POSTS_EVENT } from '../bridge'
-import type { Post, Settings, Stats } from '../model'
-import type { ProfileData } from '../profile/lookups'
-import { addAccount, ruleLabel } from '../rules/edit'
-import { type CompiledRules, compileRules, CopyTracker, evaluate } from '../rules/engine'
+import type { Post, Settings, Stats } from '../../model'
+import { addAccount, ruleLabel } from '../../rules/edit'
+import { type CompiledRules, compileRules, CopyTracker, evaluate } from '../../rules/engine'
+import type { AccountLookups, PostStream } from '../api'
 import { CONTAINER, clearView, postCode, renderView, STYLE, type ViewText } from './view'
 
-export type Lookups = {
-  data: (pk: string) => ProfileData
-  want: (pk: string, username: string, needs: { about: boolean; profile: boolean }) => void
-}
-
-export type ControllerDeps = {
-  win: Window
+export type SpamFilterDeps = {
+  document: Document
+  signal: AbortSignal
   settings: Settings
-  lookups: Lookups
+  posts: PostStream
+  lookups: Pick<AccountLookups, 'data' | 'want'>
   translate: (key: string, substitutions?: string[]) => string
+  addStyle: (css: string) => void
   saveSettings: (settings: Settings) => Promise<void>
   recordStats: (update: (stats: Stats) => Stats) => void
   today: () => string
@@ -22,18 +19,17 @@ export type ControllerDeps = {
 
 const flag = (code: string) => String.fromCodePoint(...[...code].map((letter) => 0x1f1a5 + letter.charCodeAt(0)))
 
-export class PageController {
-  readonly catalog = new Map<string, Post>()
+export class SpamFilter {
   #copies = new CopyTracker()
+  #recorded = new Set<string>()
   #settings: Settings
   #compiled: CompiledRules
   #revealed = new Set<string>()
   #counted = new Set<string>()
   #frame: number | null = null
-  #observer: MutationObserver | null = null
   #regionNames: Intl.DisplayNames | null
 
-  constructor(private readonly deps: ControllerDeps) {
+  constructor(private readonly deps: SpamFilterDeps) {
     this.#settings = deps.settings
     this.#compiled = compileRules(deps.settings)
     const language = deps.translate('@@ui_locale').replace('_', '-') || 'en'
@@ -42,33 +38,31 @@ export class PageController {
     } catch {
       this.#regionNames = null
     }
-    deps.win.addEventListener(POSTS_EVENT, (event) => {
-      let posts: Post[]
-      try {
-        posts = JSON.parse(String((event as CustomEvent).detail))
-      } catch {
-        return
-      }
-      this.addPosts(posts)
-    })
   }
 
   start(): void {
-    const doc = this.deps.win.document
-    const style = doc.createElement('style')
-    style.textContent = STYLE
-    ;(doc.head ?? doc.documentElement).append(style)
-    this.#observer = new MutationObserver(() => this.schedule())
-    this.#observer.observe(doc.documentElement, { childList: true, subtree: true })
-    this.schedule()
-  }
-
-  addPosts(posts: Post[]): void {
-    for (const post of posts) {
-      if (!this.catalog.has(post.code)) this.#copies.record(post)
-      this.catalog.set(post.code, post)
-    }
-    this.schedule()
+    const { document, signal } = this.deps
+    this.deps.addStyle(STYLE)
+    this.deps.posts.subscribe((posts) => {
+      for (const post of posts) {
+        if (this.#recorded.has(post.code)) continue
+        this.#recorded.add(post.code)
+        this.#copies.record(post)
+      }
+      this.schedule()
+    }, signal)
+    const observer = new MutationObserver(() => this.schedule())
+    observer.observe(document.documentElement, { childList: true, subtree: true })
+    signal.addEventListener(
+      'abort',
+      () => {
+        observer.disconnect()
+        if (this.#frame !== null) document.defaultView?.cancelAnimationFrame(this.#frame)
+        for (const container of document.querySelectorAll(CONTAINER)) clearView(container)
+      },
+      { once: true },
+    )
+    this.scan()
   }
 
   setSettings(settings: Settings): void {
@@ -78,25 +72,26 @@ export class PageController {
   }
 
   schedule(): void {
-    if (this.#frame !== null) return
-    this.#frame = this.deps.win.requestAnimationFrame(() => {
+    const win = this.deps.document.defaultView
+    if (this.#frame !== null || !win || this.deps.signal.aborted) return
+    this.#frame = win.requestAnimationFrame(() => {
       this.#frame = null
       this.scan()
     })
   }
 
   scan(): void {
-    for (const container of this.deps.win.document.querySelectorAll<HTMLElement>(CONTAINER)) {
+    if (this.deps.signal.aborted) return
+    for (const container of this.deps.document.querySelectorAll<HTMLElement>(CONTAINER)) {
       const code = postCode(container)
-      const post = code ? this.catalog.get(code) : undefined
-      if (!post) continue
-      this.#process(container, post)
+      const post = code ? this.deps.posts.get(code) : undefined
+      if (post) this.#process(container, post)
     }
   }
 
   #process(container: HTMLElement, stored: Post): void {
     const needs = this.#compiled.needs
-    if (this.#compiled.enabled && (needs.about || needs.profile) && !stored.author.following) {
+    if ((needs.about || needs.profile) && !stored.author.following) {
       this.deps.lookups.want(stored.author.pk, stored.author.username, needs)
     }
     const post: Post = { ...stored, author: { ...stored.author, ...this.deps.lookups.data(stored.author.pk) } }
@@ -106,10 +101,12 @@ export class PageController {
       return
     }
     this.#count(post.code, verdict.action, verdict.reasons.map((reason) => reason.id))
-    const labels = verdict.reasons.map((reason) =>
-      reason.id === 'countries' && post.author.country ? `${flag(post.author.country)} ${this.#regionNames?.of(post.author.country) ?? post.author.country}` : ruleLabel(reason, (key) => this.deps.translate(key)),
-    )
     const t = this.deps.translate
+    const labels = verdict.reasons.map((reason) =>
+      reason.id === 'countries' && post.author.country
+        ? `${flag(post.author.country)} ${this.#regionNames?.of(post.author.country) ?? post.author.country}`
+        : ruleLabel(reason, (key) => t(key)),
+    )
     const text: ViewText = {
       hidden: (reasons) => t('bar_hidden', [reasons]),
       tagged: (reasons) => t('bar_tagged', [reasons]),

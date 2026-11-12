@@ -1,10 +1,10 @@
 <script setup vapor lang="ts">
-import { type ListRuleId, readList, writeList } from '../../../src/rules/edit'
-import { normalizeHost } from '../../../src/rules/hosts'
-import { parseHandle } from '../../../src/page/handle'
-import ChipInput from '../../../src/ui/components/ChipInput.vue'
-import { t } from '../../../src/ui/i18n'
-import type { SectionProps } from '../../../src/ui/props'
+import { type ListRuleId, readList, writeList } from '../../../rules/edit'
+import { normalizeHost } from '../../../rules/hosts'
+import { parseHandle } from '../../../threads/handle'
+import ChipInput from '../../../ui/components/ChipInput.vue'
+import { t } from '../../../ui/i18n'
+import type { SectionProps } from '../../../ui/props'
 
 const props = defineProps<SectionProps>()
 

@@ -351,10 +351,10 @@
     "message": "Test mode is on: posts are tagged, not hidden."
   },
   "protection_on": {
-    "message": "Protection is on"
+    "message": "Spam filter is on"
   },
   "protection_off": {
-    "message": "Protection is off"
+    "message": "Spam filter is off"
   },
   "hidden_today": {
     "message": "hidden today"
@@ -616,5 +616,107 @@
   },
   "advanced_save": {
     "message": "Save"
+  },
+  "features_title": {
+    "message": "Features"
+  },
+  "features_intro": {
+    "message": "Each feature changes one thing on Threads. Turn on the ones you want. Changes apply to open Threads tabs right away."
+  },
+  "features_search": {
+    "message": "Search features"
+  },
+  "feature_settings": {
+    "message": "Settings"
+  },
+  "features_none": {
+    "message": "No feature matches your search."
+  },
+  "features_back": {
+    "message": "All features"
+  },
+  "all_features": {
+    "message": "All features"
+  },
+  "spam_filter_settings": {
+    "message": "Spam filter settings"
+  },
+  "feature_spam_filter_name": {
+    "message": "Spam filter"
+  },
+  "feature_spam_filter_description": {
+    "message": "Hides or tags spam and bot posts with levels, lists, account checks, and your own scoring rules."
+  },
+  "feature_absolute_timestamps_name": {
+    "message": "Real dates"
+  },
+  "feature_absolute_timestamps_description": {
+    "message": "Shows the date and time of each post instead of \"5h\" or \"2d\"."
+  },
+  "feature_absolute_timestamps_option_format": {
+    "message": "Show"
+  },
+  "feature_absolute_timestamps_option_format_date_time": {
+    "message": "Date and time"
+  },
+  "feature_absolute_timestamps_option_format_date": {
+    "message": "Date only"
+  },
+  "feature_absolute_timestamps_option_format_relative_and_date": {
+    "message": "Relative time and date"
+  },
+  "feature_keyboard_navigation_name": {
+    "message": "Keyboard navigation"
+  },
+  "feature_keyboard_navigation_description": {
+    "message": "Move between posts with J and K, and open a post with O."
+  },
+  "feature_keyboard_navigation_shortcut_next": {
+    "message": "Next post"
+  },
+  "feature_keyboard_navigation_shortcut_previous": {
+    "message": "Previous post"
+  },
+  "feature_keyboard_navigation_shortcut_open": {
+    "message": "Open the selected post"
+  },
+  "feature_account_info_name": {
+    "message": "Account info"
+  },
+  "feature_account_info_description": {
+    "message": "Shows the country, account age, and follower count next to each name. Looks up one account every 1.5 to 2 seconds."
+  },
+  "feature_account_info_option_country": {
+    "message": "Country flag"
+  },
+  "feature_account_info_option_age": {
+    "message": "Account age"
+  },
+  "feature_account_info_option_followers": {
+    "message": "Follower count"
+  },
+  "feature_account_info_age_years": {
+    "message": "$VALUE$y on Threads",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "feature_account_info_age_months": {
+    "message": "$VALUE$mo on Threads",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "feature_account_info_followers": {
+    "message": "$VALUE$ followers",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
   }
 }

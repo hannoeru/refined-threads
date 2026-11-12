@@ -11,15 +11,7 @@ describe('sharing settings', () => {
     expect(result.ok).toBe(true)
     if (!result.ok) return
     expect(result.file.name).toBe('My setup')
-    expect(replaceWith(defaultSettings(), result.file)).toEqual(settings)
-  })
-
-  it('does not share or change the on/off switch', () => {
-    const exported = JSON.parse(exportSettings({ ...defaultSettings(), enabled: false }))
-    expect(exported.settings.enabled).toBeUndefined()
-    const result = readSharedFile(exported && JSON.stringify(exported))
-    if (!result.ok) throw new Error('expected a valid file')
-    expect(replaceWith({ ...defaultSettings(), enabled: true }, result.file).enabled).toBe(true)
+    expect(replaceWith(result.file)).toEqual(settings)
   })
 
   it('reports plain errors for files that are not settings', () => {

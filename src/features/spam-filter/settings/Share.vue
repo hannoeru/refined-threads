@@ -1,9 +1,9 @@
 <script setup vapor lang="ts">
 import { computed, ref, shallowRef } from 'vue'
-import { exportSettings, mergeInto, PRESET_FILES, readSharedFile, replaceWith, type SharedFile } from '../../../src/share'
-import Toggle from '../../../src/ui/components/Toggle.vue'
-import { t } from '../../../src/ui/i18n'
-import type { SectionProps } from '../../../src/ui/props'
+import { exportSettings, mergeInto, PRESET_FILES, readSharedFile, replaceWith, type SharedFile } from '../../../share'
+import Toggle from '../../../ui/components/Toggle.vue'
+import { t } from '../../../ui/i18n'
+import type { SectionProps } from '../../../ui/props'
 
 const props = defineProps<SectionProps>()
 
@@ -39,7 +39,7 @@ function open(text: string): void {
 
 async function apply(mode: 'replace' | 'merge', file: SharedFile | null = pending.value): Promise<void> {
   if (!file) return
-  await props.update((current) => (mode === 'replace' ? replaceWith(current, file) : mergeInto(current, file)))
+  await props.update((current) => (mode === 'replace' ? replaceWith(file) : mergeInto(current, file)))
   pending.value = null
   status.value = t(mode === 'replace' ? 'import_replaced' : 'import_merged')
 }

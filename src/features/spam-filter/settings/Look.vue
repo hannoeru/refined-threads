@@ -1,9 +1,9 @@
 <script setup vapor lang="ts">
 import { computed } from 'vue'
-import { type Display, DISPLAYS } from '../../../src/model'
-import Toggle from '../../../src/ui/components/Toggle.vue'
-import { t } from '../../../src/ui/i18n'
-import type { SectionProps } from '../../../src/ui/props'
+import { type Display, DISPLAYS } from '../../../model'
+import Toggle from '../../../ui/components/Toggle.vue'
+import { t } from '../../../ui/i18n'
+import type { SectionProps } from '../../../ui/props'
 
 const props = defineProps<SectionProps>()
 

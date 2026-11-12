@@ -7,13 +7,12 @@ export const SharedFileSchema = v.strictObject({
   format: v.literal(SHARE_FORMAT),
   name: v.optional(v.pipe(v.string(), v.maxLength(80)), ''),
   description: v.optional(v.pipe(v.string(), v.maxLength(500)), ''),
-  settings: v.optional(v.partial(v.omit(SettingsSchema, ['enabled'])), {}),
+  settings: v.optional(v.partial(SettingsSchema), {}),
 })
 export type SharedFile = v.InferOutput<typeof SharedFileSchema>
 
 export function exportSettings(settings: Settings, name = '', description = ''): string {
-  const { enabled: _enabled, ...shared } = settings
-  const file: SharedFile = { format: SHARE_FORMAT, name, description, settings: shared }
+  const file: SharedFile = { format: SHARE_FORMAT, name, description, settings }
   return `${JSON.stringify(file, null, 2)}\n`
 }
 
@@ -34,8 +33,8 @@ export function readSharedFile(text: string): ImportResult {
   }
 }
 
-export function replaceWith(current: Settings, file: SharedFile): Settings {
-  return v.parse(SettingsSchema, { ...file.settings, enabled: current.enabled })
+export function replaceWith(file: SharedFile): Settings {
+  return v.parse(SettingsSchema, file.settings)
 }
 
 export function mergeInto(current: Settings, file: SharedFile): Settings {
