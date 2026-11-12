@@ -684,10 +684,7 @@
     "message": "帳號資訊"
   },
   "feature_account_info_description": {
-    "message": "在每個名稱旁顯示國家、帳號年齡和粉絲數。每 1.5 到 2 秒查詢一個帳號。"
-  },
-  "feature_account_info_option_country": {
-    "message": "國旗"
+    "message": "在名稱旁顯示帳號所在地（來自「關於此個人檔案」）、帳號年齡和粉絲數。每 1.5 到 2 秒查詢一個帳號。"
   },
   "feature_account_info_option_age": {
     "message": "帳號年齡"
@@ -718,5 +715,23 @@
         "content": "$1"
       }
     }
+  },
+  "feature_account_info_option_geo": {
+    "message": "所在地"
+  },
+  "feature_account_info_option_geo_flag": {
+    "message": "國旗"
+  },
+  "feature_account_info_option_geo_flag_name": {
+    "message": "國旗和國家名稱"
+  },
+  "feature_account_info_option_geo_name": {
+    "message": "國家名稱"
+  },
+  "feature_account_info_option_geo_off": {
+    "message": "不顯示"
+  },
+  "feature_account_info_location_hidden": {
+    "message": "已隱藏所在地"
   }
 }

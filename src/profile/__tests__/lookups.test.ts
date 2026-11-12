@@ -39,14 +39,14 @@ describe('ProfileLookups', () => {
     lookups.want('7', 'amy', { about: true, profile: false })
     await settle()
     expect(changed).toEqual(['7'])
-    expect(lookups.data('7')).toEqual({ country: 'JP', ageMonths: 40, followers: null, posts: null })
+    expect(lookups.data('7')).toEqual({ country: 'JP', countryName: '日本', countryHidden: false, ageMonths: 40, followers: null, posts: null })
   })
 
   it('treats a hidden country as unknown', async () => {
     const { lookups } = setup({ about: () => ({ ok: true, country: '日本', countryVisible: false, joined: null }) })
     lookups.want('7', 'amy', { about: true, profile: false })
     await settle()
-    expect(lookups.data('7').country).toBeNull()
+    expect(lookups.data('7')).toMatchObject({ country: null, countryName: null, countryHidden: true })
   })
 
   it('fetches follower and post counts from the profile description', async () => {

@@ -14,6 +14,7 @@ export const MESSAGES: Record<string, string> = {
   feature_account_info_age_years: '$1y on Threads',
   feature_account_info_age_months: '$1mo on Threads',
   feature_account_info_followers: '$1 followers',
+  feature_account_info_location_hidden: 'Location hidden',
 }
 
 export const translate = (key: string, subs: string[] = []) => (MESSAGES[key] ?? '').replace('$1', subs[0] ?? '')
@@ -23,7 +24,7 @@ export function fakeLookups(profile: Partial<ProfileData> = {}) {
   const listeners = new Set<(pk: string) => void>()
   const data: Record<string, Partial<ProfileData>> = {}
   const lookups: AccountLookups = {
-    data: (pk) => ({ country: null, ageMonths: null, followers: null, posts: null, ...profile, ...data[pk] }),
+    data: (pk) => ({ country: null, countryName: null, countryHidden: false, ageMonths: null, followers: null, posts: null, ...profile, ...data[pk] }),
     want: (pk) => void wanted.push(pk),
     subscribe: (listener, signal) => {
       listeners.add(listener)

@@ -94,7 +94,8 @@ export class SpamFilter {
     if ((needs.about || needs.profile) && !stored.author.following) {
       this.deps.lookups.want(stored.author.pk, stored.author.username, needs)
     }
-    const post: Post = { ...stored, author: { ...stored.author, ...this.deps.lookups.data(stored.author.pk) } }
+    const { country, ageMonths, followers, posts } = this.deps.lookups.data(stored.author.pk)
+    const post: Post = { ...stored, author: { ...stored.author, country, ageMonths, followers, posts } }
     const verdict = evaluate(post, this.#compiled, { copies: (item) => this.#copies.count(item) })
     if (verdict.action === 'none') {
       clearView(container)

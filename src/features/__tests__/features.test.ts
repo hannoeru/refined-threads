@@ -94,4 +94,43 @@ describe('account-info', () => {
     runtime.stopAll()
     expect(badge()).toBeNull()
   })
+
+  const badgeFor = (options: Record<string, unknown>, profile: Record<string, unknown>) => {
+    document.body.innerHTML = postContainer('G1')
+    const lookups = fakeLookups()
+    const posts = catalogWith([makePost({ code: 'G1', author: { pk: 'p1', username: 'amy' } })])
+    run('account-info', { 'account-info': { enabled: true, options: { age: false, ...options } } }, posts, lookups)
+    lookups.resolve('p1', profile)
+    const badge = document.querySelector('.rt-account-info') as HTMLElement
+    return { text: badge.textContent, title: badge.title, hidden: badge.hidden }
+  }
+
+  it('shows the flag by default, with the country name in the tooltip', () => {
+    expect(badgeFor({}, { country: 'TW', countryName: '台灣' })).toEqual({ text: '🇹🇼', title: '🇹🇼 Taiwan', hidden: false })
+  })
+
+  it('can show the flag with the name, or the name only', () => {
+    expect(badgeFor({ geo: 'flag-name' }, { country: 'JP' }).text).toBe('🇯🇵 Japan')
+    expect(badgeFor({ geo: 'name' }, { country: 'JP' }).text).toBe('Japan')
+  })
+
+  it('marks accounts that hide their location', () => {
+    expect(badgeFor({}, { countryHidden: true })).toEqual({ text: '🏴', title: '🏴 Location hidden', hidden: false })
+    expect(badgeFor({ geo: 'name' }, { countryHidden: true }).text).toBe('Location hidden')
+  })
+
+  it('shows the name from Threads when it is not a known country', () => {
+    expect(badgeFor({}, { country: null, countryName: 'Atlantis' }).text).toBe('Atlantis')
+  })
+
+  it('shows nothing about location when geo is off, and asks for no About lookup', () => {
+    document.body.innerHTML = postContainer('G2')
+    const lookups = fakeLookups()
+    const wanted: unknown[] = []
+    lookups.lookups.want = (_pk, _username, needs) => void wanted.push(needs)
+    const posts = catalogWith([makePost({ code: 'G2', author: { pk: 'p2', username: 'amy' } })])
+    run('account-info', { 'account-info': { enabled: true, options: { geo: 'off', age: false, followers: true } } }, posts, lookups)
+    expect(wanted).toEqual([{ about: false, profile: true }])
+  })
 })
+

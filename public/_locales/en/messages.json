@@ -684,10 +684,7 @@
     "message": "Account info"
   },
   "feature_account_info_description": {
-    "message": "Shows the country, account age, and follower count next to each name. Looks up one account every 1.5 to 2 seconds."
-  },
-  "feature_account_info_option_country": {
-    "message": "Country flag"
+    "message": "Shows where each account is based (from \"About this profile\"), its age, and its follower count next to the name. Looks up one account every 1.5 to 2 seconds."
   },
   "feature_account_info_option_age": {
     "message": "Account age"
@@ -718,5 +715,23 @@
         "content": "$1"
       }
     }
+  },
+  "feature_account_info_option_geo": {
+    "message": "Location"
+  },
+  "feature_account_info_option_geo_flag": {
+    "message": "Flag"
+  },
+  "feature_account_info_option_geo_flag_name": {
+    "message": "Flag and country name"
+  },
+  "feature_account_info_option_geo_name": {
+    "message": "Country name"
+  },
+  "feature_account_info_option_geo_off": {
+    "message": "Do not show"
+  },
+  "feature_account_info_location_hidden": {
+    "message": "Location hidden"
   }
 }

@@ -8,10 +8,17 @@ import {
 } from '../bridge'
 import { ageInMonths, CountryNames, parseJoined, parseProfileCounts, type YearMonth } from './normalize'
 
-export type ProfileData = { country: string | null; ageMonths: number | null; followers: number | null; posts: number | null }
+export type ProfileData = {
+  country: string | null
+  countryName: string | null
+  countryHidden: boolean
+  ageMonths: number | null
+  followers: number | null
+  posts: number | null
+}
 
 type Entry = {
-  about?: { country: string | null; joined: YearMonth | null; at: number }
+  about?: { country: string | null; countryName?: string | null; countryHidden?: boolean; joined: YearMonth | null; at: number }
   profile?: { followers: number | null; posts: number | null; at: number }
   aboutFailedAt?: number
   profileFailedAt?: number
@@ -82,6 +89,8 @@ export class ProfileLookups {
     const joined = entry?.about?.joined
     return {
       country: entry?.about?.country ?? null,
+      countryName: entry?.about?.countryName ?? null,
+      countryHidden: entry?.about?.countryHidden ?? false,
       ageMonths: joined ? ageInMonths(joined, new Date(this.clock.now())) : null,
       followers: entry?.profile?.followers ?? null,
       posts: entry?.profile?.posts ?? null,
@@ -148,6 +157,8 @@ export class ProfileLookups {
       if (kind === 'about' && 'country' in result) {
         entry.about = {
           country: result.countryVisible && result.country ? this.#names.code(result.country) : null,
+          countryName: result.countryVisible ? result.country : null,
+          countryHidden: !result.countryVisible,
           joined: result.joined ? parseJoined(result.joined, this.languages) : null,
           at: now,
         }

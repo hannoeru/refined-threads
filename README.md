@@ -11,7 +11,7 @@ The name follows [Refined GitHub](https://github.com/refined-github/refined-gith
 | Spam filter (`spam-filter`) | Yes | Hides or tags spam and bot posts. Levels (Light, Balanced, Strict), blocked words and sites, hidden and allowed accounts, account checks (country, age, followers, posts), user-defined scoring rules, and shareable settings files with presets. |
 | Real dates (`absolute-timestamps`) | No | Shows the date and time of each post instead of "5h". |
 | Keyboard navigation (`keyboard-navigation`) | No | `j` and `k` move between posts, `o` opens the selected post. |
-| Account info (`account-info`) | No | Shows the country flag, account age, and follower count next to each author name. |
+| Account info (`account-info`) | No | Shows where each account is based (flag, flag and name, or name; 🏴 when the account hides its location), the account age, and the follower count next to each author name. Location and age need a logged-in Threads session. |
 
 The settings page lists every feature with a switch, a search box, and a settings page per feature. Changes apply to open Threads tabs at once. The popup shows the spam filter's daily count and its level.
 
