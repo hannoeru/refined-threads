@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/hannoeru/refined-threads/actions/workflows/ci.yml/badge.svg)](https://github.com/hannoeru/refined-threads/actions/workflows/ci.yml)
 
-A browser extension that makes Threads web (`threads.com`, `threads.net`) better, one small feature at a time. Each feature can be turned on or off, and each has its own settings page. Anyone can contribute a feature: see [CONTRIBUTING.md](CONTRIBUTING.md).
+A browser extension that adds small features to Threads web (`threads.com`, `threads.net`). You can turn each feature on or off, and each feature has its own settings page. To contribute a feature, read [CONTRIBUTING.md](CONTRIBUTING.md).
 
 The name follows [Refined GitHub](https://github.com/refined-github/refined-github), a browser extension that makes GitHub cleaner. Refined Threads is not affiliated with Meta or with Refined GitHub. License: MIT.
 
@@ -146,7 +146,7 @@ pnpm check          # lint, typecheck, tests, Chrome build, Firefox build
 pnpm zip            # store package for Chrome and Edge
 pnpm zip:firefox    # store package for Firefox Add-ons
 pnpm bench          # spam filter work for DOM noise and arriving posts (timings and full scans)
-pnpm icons          # regenerate public/icon/*.png from assets/icon/option-3.png
+pnpm icons          # regenerate public/icon/*.png from assets/icon/source.png
 ```
 
 To load a build by hand, open `chrome://extensions`, turn on developer mode, and load `.output/chrome-mv3`. In Firefox, open `about:debugging#/runtime/this-firefox` and load `.output/firefox-mv3/manifest.json`.

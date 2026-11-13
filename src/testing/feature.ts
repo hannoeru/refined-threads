@@ -3,7 +3,7 @@ import type { Post } from '../model'
 import type { ProfileData } from '../profile/lookups'
 import { PostCatalog } from '../features/services/posts'
 
-export const MESSAGES: Record<string, string> = {
+const MESSAGES: Record<string, string> = {
   '@@ui_locale': 'en',
   'bar_hidden': 'Hidden: $1',
   'bar_tagged': 'Tagged: $1',

@@ -348,7 +348,7 @@
     "message": "A safe test mode. Every post that would be hidden gets a tag instead."
   },
   "tag_only_active": {
-    "message": "Test mode is on: posts are tagged, not hidden."
+    "message": "Test mode is on. Posts get a tag and stay visible."
   },
   "hidden_today": {
     "message": "hidden today"
@@ -730,12 +730,6 @@
         "content": "$1"
       }
     }
-  },
-  "reason_followed": {
-    "message": "someone you follow"
-  },
-  "reason_allowed_accounts": {
-    "message": "on your allowed list"
   },
   "reason_hidden_accounts": {
     "message": "on your hidden list"

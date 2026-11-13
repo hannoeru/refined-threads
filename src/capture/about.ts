@@ -1,7 +1,7 @@
 import type { AboutResult } from '../bridge'
 import { stripGuard } from './parse'
 
-export const SESSION_KEYS = [
+const SESSION_KEYS = [
   'av',
   '__user',
   '__a',

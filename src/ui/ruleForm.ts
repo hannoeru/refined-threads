@@ -29,7 +29,16 @@ export const FIELD_KINDS: Record<Field, FieldKind> = {
   'counts.quotes': 'number',
 }
 
-export type Operator = 'contains_any' | 'in' | 'matches' | 'host_in' | 'is' | 'gt' | 'lt'
+export const OPERATORS = [
+  'contains_any',
+  'in',
+  'matches',
+  'host_in',
+  'is',
+  'gt',
+  'lt',
+] as const
+export type Operator = (typeof OPERATORS)[number]
 
 export function operatorsFor(field: Field): Operator[] {
   switch (FIELD_KINDS[field]) {
@@ -156,7 +165,7 @@ function numberLeaf({ field, operator, value }: Row): LeafCondition | null {
     : { field, lt: number }
 }
 
-export function rowToLeaf(row: Row): LeafCondition | null {
+function rowToLeaf(row: Row): LeafCondition | null {
   const { field, operator, value } = row
   if (LIST_OPERATORS.includes(operator))
     return listLeaf(row)
@@ -176,11 +185,11 @@ export function rowToLeaf(row: Row): LeafCondition | null {
 
 export function fromForm(form: RuleForm): Condition | null {
   const leaves = form.rows.map(rowToLeaf)
-  if (leaves.length === 0 || leaves.includes(null))
+  if (leaves.length === 0 || !leaves.every((leaf): leaf is LeafCondition => leaf !== null))
     return null
   return form.match === 'all'
-    ? { all: leaves as LeafCondition[] }
-    : { any: leaves as LeafCondition[] }
+    ? { all: leaves }
+    : { any: leaves }
 }
 
 export function defaultRow(field: Field = 'text'): Row {

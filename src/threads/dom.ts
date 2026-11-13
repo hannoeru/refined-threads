@@ -12,7 +12,7 @@ export function postCodeOf(container: Element): string | null {
   return permalinkOf(container)?.getAttribute('href')?.match(/\/post\/([^/?#]+)/)?.[1] ?? null
 }
 
-export function authorLinkOf(container: Element, username: string): HTMLAnchorElement | null {
+function authorLinkOf(container: Element, username: string): HTMLAnchorElement | null {
   for (const link of container.querySelectorAll<HTMLAnchorElement>(`a[href="/@${CSS.escape(username)}"]`)) {
     if (link.textContent?.trim())
       return link

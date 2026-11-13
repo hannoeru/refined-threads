@@ -2,7 +2,7 @@ import type { Feature } from './api'
 import { storage } from '#imports'
 import { resolveOptions } from './api'
 
-export interface StoredFeature { enabled?: boolean, options?: Record<string, unknown> }
+interface StoredFeature { enabled?: boolean, options?: Record<string, unknown> }
 
 export type StoredFeatures = Record<string, StoredFeature>
 

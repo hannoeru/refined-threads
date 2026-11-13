@@ -164,7 +164,7 @@ function collectSelfReplies(threadItems: unknown[], into: Map<string, Set<string
   }
 }
 
-export function extract(root: unknown): Capture {
+function extract(root: unknown): Capture {
   const posts = new Map<string, Post>()
   const users = new Map<string, number>()
   const selfReplyLinks = new Map<string, Set<string>>()

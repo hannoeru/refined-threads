@@ -3,7 +3,7 @@ import { mkdir } from 'node:fs/promises'
 import process from 'node:process'
 import sharp from 'sharp'
 
-const [source = 'assets/icon/option-3.png', outDir = 'public/icon'] = process.argv.slice(2)
+const [source = 'assets/icon/source.png', outDir = 'public/icon'] = process.argv.slice(2)
 const SIZES = [16, 32, 48, 128]
 
 await mkdir(outDir, { recursive: true })

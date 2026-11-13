@@ -348,7 +348,7 @@
     "message": "安全的測試模式。本來會被隱藏的貼文只會被標記。"
   },
   "tag_only_active": {
-    "message": "測試模式開啟中：貼文只會被標記，不會隱藏。"
+    "message": "測試模式開啟中。貼文會加上標記，不會隱藏。"
   },
   "hidden_today": {
     "message": "今天已隱藏"
@@ -730,12 +730,6 @@
         "content": "$1"
       }
     }
-  },
-  "reason_followed": {
-    "message": "你追蹤的人"
-  },
-  "reason_allowed_accounts": {
-    "message": "在你的允許清單"
   },
   "reason_hidden_accounts": {
     "message": "在你的隱藏清單"

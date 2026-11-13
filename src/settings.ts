@@ -3,7 +3,7 @@ import * as v from 'valibot'
 import { storage } from '#imports'
 import { defaultSettings, SettingsSchema } from './model'
 
-export const settingsItem = storage.defineItem<unknown>('sync:settings', { fallback: null })
+const settingsItem = storage.defineItem<unknown>('sync:settings', { fallback: null })
 
 export async function loadSettings(): Promise<Settings> {
   const result = v.safeParse(SettingsSchema, await settingsItem.getValue())

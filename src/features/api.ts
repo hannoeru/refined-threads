@@ -65,7 +65,7 @@ export function defineFeature<Specs extends OptionSpecs = Record<never, never>>(
   return { ...feature, options: feature.options ?? ({} as Specs) }
 }
 
-export function resolveOption(spec: OptionSpec, value: unknown): boolean | number | string {
+function resolveOption(spec: OptionSpec, value: unknown): boolean | number | string {
   switch (spec.type) {
     case 'boolean':
       return typeof value === 'boolean'

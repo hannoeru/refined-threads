@@ -113,7 +113,7 @@ If you cannot write Traditional Chinese, copy the English text and say so in the
 
 Write tests that show what the user sees. `src/features/__tests__/features.test.ts` shows how to run a feature on a small fake Threads page with `postContainer()` from `src/testing/feature.ts`.
 
-The registry test checks every feature automatically: the id matches the folder, the option defaults are valid, and every text key exists in both languages.
+The registry test checks every feature. It fails when the id does not match the folder, when an option default is not valid, or when a text key is missing in one language.
 
 ```sh
 pnpm lint:fix

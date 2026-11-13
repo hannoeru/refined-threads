@@ -117,7 +117,7 @@ export type LeafCondition = v.InferOutput<typeof Leaf>
 
 export type Condition = LeafCondition | { all: Condition[] } | { any: Condition[] } | { not: Condition }
 
-export const ConditionSchema: v.GenericSchema<Condition> = v.union([
+const ConditionSchema: v.GenericSchema<Condition> = v.union([
   Leaf,
   v.strictObject({
     all: v.array(v.lazy(() => ConditionSchema)),
@@ -146,7 +146,7 @@ const Threshold = v.nullable(v.pipe(v.number(), v.minValue(1), v.maxValue(100)))
 const OutcomeSchema = v.strictObject({ tagAt: Threshold, hideAt: Threshold })
 export type Outcome = v.InferOutput<typeof OutcomeSchema>
 
-export const AFFILIATE_HOSTS = [
+const AFFILIATE_HOSTS = [
   'shopee.tw',
   'shopee.com',
   'shopee.sg',
@@ -189,7 +189,7 @@ export const BAIT_PHRASES = [
   '固定ポストから',
 ]
 
-export const BUILT_IN_RULES = [
+const BUILT_IN_RULES = [
   {
     id: 'followed',
     effect: 'allow',

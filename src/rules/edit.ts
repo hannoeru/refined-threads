@@ -1,15 +1,8 @@
 import type { BuiltInRuleId, Condition, Level, Rule, RuleFile } from '../model'
 import * as v from 'valibot'
-import { BUILT_IN_RULE_INPUTS, BUILT_IN_RULES, LEVEL_RULES, LEVEL_TOGGLED, RuleSchema } from '../model'
+import { BUILT_IN_IDS, BUILT_IN_RULE_INPUTS, LEVEL_RULES, LEVEL_TOGGLED, RuleSchema } from '../model'
 
-export const LIST_RULES = [
-  'allowed-accounts',
-  'hidden-accounts',
-  'blocked-words',
-  'blocked-sites',
-  'countries',
-] as const
-export type ListRuleId = (typeof LIST_RULES)[number]
+export type ListRuleId = 'allowed-accounts' | 'hidden-accounts' | 'blocked-words' | 'blocked-sites' | 'countries'
 
 const LIST_KEY: Record<ListRuleId, 'in' | 'contains_any' | 'host_in'> = {
   'allowed-accounts': 'in',
@@ -93,7 +86,7 @@ export function addAccount(file: RuleFile, list: 'hidden-accounts' | 'allowed-ac
   ])
 }
 
-export const isBuiltIn = (id: string): id is BuiltInRuleId => BUILT_IN_RULES.some(rule => rule.id === id)
+export const isBuiltIn = (id: string): id is BuiltInRuleId => BUILT_IN_IDS.includes(id)
 
 export function ruleLabel(rule: { id: string, name: string }, translate: (key: string) => string): string {
   if (rule.name)

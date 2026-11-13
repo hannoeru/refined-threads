@@ -2,9 +2,9 @@ import type { Rule, Settings } from './model'
 import * as v from 'valibot'
 import { BAIT_PHRASES, RuleFileSchema, SettingsSchema } from './model'
 
-export const SHARE_FORMAT = 'refined-threads-settings'
+const SHARE_FORMAT = 'refined-threads-settings'
 
-export const SharedFileSchema = v.strictObject({
+const SharedFileSchema = v.strictObject({
   format: v.literal(SHARE_FORMAT),
   name: v.optional(v.pipe(v.string(), v.maxLength(80)), ''),
   description: v.optional(v.pipe(v.string(), v.maxLength(500)), ''),
