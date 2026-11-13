@@ -25,6 +25,7 @@ export default defineContentScript({
     const lookups: AccountLookups = {
       data: (pk) => profiles.data(pk),
       want: (pk, username, needs) => profiles.want(pk, username, needs),
+      loading: (pk) => profiles.loading(pk),
       subscribe: (listener, signal) => {
         listeners.add(listener)
         signal.addEventListener('abort', () => listeners.delete(listener), { once: true })

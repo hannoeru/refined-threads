@@ -13,6 +13,10 @@ const STYLE = `
 .${BADGE} > span { flex: none; }
 .${BADGE} > span + span::before { content: "·"; margin: 0 4px; }
 .${BADGE} > .rt-ai-hidden { font-style: italic; }
+.${BADGE} > .rt-ai-loading { width: 56px; height: 8px; border-radius: 4px; background: currentColor; opacity: 0.25; animation: rt-ai-pulse 1.2s ease-in-out infinite; }
+.${BADGE} > .rt-ai-loading::before { content: none; }
+@keyframes rt-ai-pulse { 0%, 100% { opacity: 0.12; } 50% { opacity: 0.32; } }
+@media (prefers-reduced-motion: reduce) { .${BADGE} > .rt-ai-loading { animation: none; } }
 .${BADGE} > .rt-ai-follows-you, .${BADGE} > .rt-ai-you-follow { font-weight: 600; }
 `
 
@@ -94,6 +98,7 @@ export default defineFeature({
 
     const refresh = (pk: string) => {
       const list = items(pk)
+      if (lookups.loading(pk)) list.push({ kind: 'loading', text: '', title: t('feature_account_info_loading') })
       for (const badge of badges.get(pk) ?? []) {
         badge.replaceChildren(
           ...list.map((item) => {
@@ -127,7 +132,12 @@ export default defineFeature({
       set.add(badge)
       badges.set(post.author.pk, set)
       refresh(post.author.pk)
-      if (needs.about || needs.profile) ctx.whenVisible(container, () => lookups.want(post.author.pk, post.author.username, needs))
+      if (needs.about || needs.profile) {
+        ctx.whenVisible(container, () => {
+          lookups.want(post.author.pk, post.author.username, needs)
+          refresh(post.author.pk)
+        })
+      }
     }
 
     ctx.observe<HTMLElement>(POST_CONTAINER, attach)

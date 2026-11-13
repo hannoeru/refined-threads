@@ -19,6 +19,7 @@ export const MESSAGES: Record<string, string> = {
   feature_account_info_posts: '$1 posts',
   feature_account_info_based_in: 'Based in $1',
   feature_account_info_location_hidden: 'Location hidden',
+  feature_account_info_loading: 'Loading account info',
   feature_account_info_follows_you: 'Follows you',
   feature_account_info_you_follow: 'Following',
 }
@@ -32,6 +33,7 @@ export function fakeLookups(profile: Partial<ProfileData> = {}) {
   const lookups: AccountLookups = {
     data: (pk) => ({ country: null, countryName: null, countryHidden: false, ageMonths: null, followers: null, posts: null, ...profile, ...data[pk] }),
     want: (pk) => void wanted.push(pk),
+    loading: (pk) => wanted.includes(pk) && !(pk in data),
     subscribe: (listener, signal) => {
       listeners.add(listener)
       signal.addEventListener('abort', () => listeners.delete(listener))

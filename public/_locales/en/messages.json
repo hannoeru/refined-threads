@@ -832,5 +832,8 @@
   },
   "feature_account_info_you_follow": {
     "message": "Following"
+  },
+  "feature_account_info_loading": {
+    "message": "Loading account info"
   }
 }

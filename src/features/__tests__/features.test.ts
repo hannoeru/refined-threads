@@ -111,7 +111,8 @@ describe('account-info', () => {
     expect(badge()?.parentElement?.className).toBe('header')
     expect(badge()?.previousElementSibling?.className).toBe('menu')
     expect(badge()?.classList.contains('rt-ai-line')).toBe(true)
-    expect(badge()?.hidden).toBe(true)
+    expect(items()).toEqual([{ text: '', title: 'Loading account info' }])
+    expect(badge()?.hidden).toBe(false)
     lookups.resolve('p1', { country: 'JP', ageMonths: 30, followers: 1200, posts: 4515 })
     expect(items()).toEqual([
       { text: '🇯🇵', title: 'Based in Japan' },
@@ -151,6 +152,14 @@ describe('account-info', () => {
     const posts = catalogWith([makePost({ code: 'F2', author: { pk: 'p2', username: 'amy', followedBy: true } })])
     run('account-info', { 'account-info': { enabled: true, options: { followsYou: false, flag: false, age: false } } }, posts, fakeLookups())
     expect((document.querySelector('.rt-account-info') as HTMLElement).hidden).toBe(true)
+  })
+
+  it('shows details that are known while the rest is still loading', () => {
+    document.body.innerHTML = postContainer('L1')
+    const posts = catalogWith([makePost({ code: 'L1', author: { pk: 'p3', username: 'amy', followedBy: true } })])
+    run('account-info', { 'account-info': { enabled: true } }, posts, fakeLookups())
+    const badge = document.querySelector('.rt-account-info') as HTMLElement
+    expect([...badge.children].map((item) => item.className)).toEqual(['rt-ai-follows-you', 'rt-ai-loading'])
   })
 
   it('shows each detail only when its switch is on', () => {

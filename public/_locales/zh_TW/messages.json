@@ -832,5 +832,8 @@
   },
   "feature_account_info_you_follow": {
     "message": "已追蹤"
+  },
+  "feature_account_info_loading": {
+    "message": "正在載入帳號資訊"
   }
 }

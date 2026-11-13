@@ -127,4 +127,13 @@ describe('ProfileLookups', () => {
     await settle()
     expect(requests).toEqual(['about-request:6'])
   })
+
+  it('reports an account as loading while it waits or is in flight, and not after it fails', async () => {
+    const { lookups, changed } = setup({ about: () => ({ ok: false, reason: 'http', status: 500, retryAfterMs: null }) })
+    lookups.want('8', 'l', { about: true, profile: false })
+    expect(lookups.loading('8')).toBe(true)
+    await settle()
+    expect(lookups.loading('8')).toBe(false)
+    expect(changed).toEqual(['8'])
+  })
 })

@@ -28,6 +28,7 @@ export type PostStream = {
 export type AccountLookups = {
   data: (pk: string) => ProfileData
   want: (pk: string, username: string, needs: { about: boolean; profile: boolean }) => void
+  loading: (pk: string) => boolean
   subscribe: (listener: (pk: string) => void, signal: AbortSignal) => void
 }
 

@@ -98,6 +98,10 @@ export class ProfileLookups {
     }
   }
 
+  loading(pk: string): boolean {
+    return (['about', 'profile'] as const).some((kind) => this.#queues[kind].has(pk) || this.#pending.has(`${kind}:${pk}`))
+  }
+
   want(pk: string, username: string, needs: { about: boolean; profile: boolean }): void {
     for (const kind of ['about', 'profile'] as const) {
       if (!needs[kind] || this.#fresh(pk, kind)) continue
@@ -184,6 +188,7 @@ export class ProfileLookups {
     if (kind === 'about') entry.aboutFailedAt = now
     else entry.profileFailedAt = now
     this.#scheduleSave()
+    this.onChange(pk)
     return null
   }
 
