@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Build the Chrome extension, create an evidence directory, and print the values a run needs.
+set -euo pipefail
+root=$(git -C "$(dirname "$0")" rev-parse --show-toplevel)
+cd "$root"
+run_id=${1:-$(date +%Y%m%d-%H%M%S)}
+pnpm exec wxt build >/dev/null
+test -f .output/chrome-mv3/manifest.json
+evidence="$root/.agent/verify/$run_id"
+mkdir -p "$evidence"
+echo "RUN_ID=$run_id"
+echo "EXTENSION_DIR=$root/.output/chrome-mv3"
+echo "EXTENSION_ID=$("$root/.pi/skills/verify-refined-threads/bin/extension-id" "$root/.output/chrome-mv3")"
+echo "EVIDENCE=$evidence"
+echo "BUILD=$(git rev-parse --short HEAD)$(git diff --quiet HEAD -- . ':!.pi' || echo '+dirty')"
