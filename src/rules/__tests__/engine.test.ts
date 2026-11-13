@@ -179,7 +179,7 @@ describe('levels', () => {
 
 describe('lookup needs', () => {
   it('asks for no account lookups with default settings', () => {
-    expect(compileRules(defaultSettings()).needs).toEqual({ about: false, profile: false, copies: true })
+    expect(compileRules(defaultSettings()).needs).toEqual({ about: false, followers: false, posts: false, copies: true })
   })
 
   it('asks for account lookups only when an enabled rule can match', () => {
@@ -187,7 +187,7 @@ describe('lookup needs', () => {
     settings.ruleFile = writeList(settings.ruleFile, 'countries', ['JP'])
     expect(compileRules(settings).needs.about).toBe(true)
     settings.ruleFile.rules.find((rule) => rule.id === 'few-posts')!.enabled = true
-    expect(compileRules(settings).needs.profile).toBe(true)
+    expect(compileRules(settings).needs).toMatchObject({ followers: false, posts: true })
   })
 
   it('skips rules with an empty list, but keeps not-rules around them', () => {

@@ -4,12 +4,12 @@ import {
   type Field,
   type Outcome,
   type Post,
-  PROFILE_FIELDS,
   type Reason,
   type Rule,
   type Settings,
   type Verdict,
 } from '../model'
+import type { LookupNeeds } from '../profile/lookups'
 import { hostMatches, linkHost } from './hosts'
 
 type Test = (post: Post, ctx: EvaluateContext) => boolean
@@ -20,7 +20,7 @@ export type CompiledRules = {
   tagOnly: boolean
   scoring: { posts: Outcome; replies: Outcome }
   rules: CompiledRule[]
-  needs: { about: boolean; profile: boolean; copies: boolean }
+  needs: LookupNeeds & { copies: boolean }
 }
 
 export type EvaluateContext = { copies: (post: Post) => number }
@@ -126,7 +126,8 @@ export function compileRules(settings: Settings): CompiledRules {
     rules,
     needs: {
       about: ABOUT_FIELDS.some((field) => fields.has(field)),
-      profile: PROFILE_FIELDS.some((field) => fields.has(field)),
+      followers: fields.has('author.followers'),
+      posts: fields.has('author.posts'),
       copies: fields.has('copies'),
     },
   }

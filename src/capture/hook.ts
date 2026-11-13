@@ -5,14 +5,14 @@ import {
   type AboutResult,
   type LookupFailure,
   POSTS_EVENT,
+  USERS_EVENT,
   PROFILE_REQUEST_EVENT,
   PROFILE_RESULT_EVENT,
   type ProfileRequest,
   type ProfileResult,
 } from '../bridge'
-import type { Post } from '../model'
 import { buildAboutRequest, findVersioningId, parseAboutResponse, retryAfterMs, type Session, sessionFromBody } from './about'
-import { parseBootstrap, parsePayloadText } from './parse'
+import { type Capture, parseBootstrap, parsePayloadText } from './parse'
 import { readDescription } from './profile'
 
 const SKIPPED_QUERIES = new Set(['useBarcelonaBatchedDynamicPostCountsSubscriptionQuery'])
@@ -24,8 +24,9 @@ type Tracked = { url: string; name: string | null }
 const tracked = new WeakMap<XMLHttpRequest, Tracked>()
 
 export function installHook(win: Window & typeof globalThis): void {
-  const emit = (posts: Post[]) => {
+  const emit = ({ posts, users }: Capture) => {
     if (posts.length > 0) win.dispatchEvent(new win.CustomEvent(POSTS_EVENT, { detail: JSON.stringify(posts) }))
+    if (users.length > 0) win.dispatchEvent(new win.CustomEvent(USERS_EVENT, { detail: JSON.stringify(users) }))
   }
   const ingest = (text: string) => {
     try {

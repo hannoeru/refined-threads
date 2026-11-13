@@ -6,6 +6,10 @@ export const THREADS_MATCHES = [
 ]
 
 export const POSTS_EVENT = 'refined-threads:posts'
+export const USERS_EVENT = 'refined-threads:users'
+
+export type SeenUser = { pk: string; followers: number }
+
 export const ABOUT_REQUEST_EVENT = 'refined-threads:about-request'
 export const ABOUT_RESULT_EVENT = 'refined-threads:about-result'
 

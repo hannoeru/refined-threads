@@ -5,8 +5,12 @@ import {
   PROFILE_REQUEST_EVENT,
   PROFILE_RESULT_EVENT,
   type ProfileResult,
+  type SeenUser,
+  USERS_EVENT,
 } from '../bridge'
 import { ageInMonths, CountryNames, parseJoined, parseProfileCounts, type YearMonth } from './normalize'
+
+export type LookupNeeds = { about: boolean; followers: boolean; posts: boolean }
 
 export type ProfileData = {
   country: string | null
@@ -20,6 +24,7 @@ export type ProfileData = {
 type Entry = {
   about?: { country: string | null; countryName?: string | null; countryHidden?: boolean; joined: YearMonth | null; at: number }
   profile?: { followers: number | null; posts: number | null; at: number }
+  seen?: { followers: number; at: number }
   aboutFailedAt?: number
   profileFailedAt?: number
 }
@@ -59,6 +64,7 @@ export class ProfileLookups {
   #pending = new Map<string, (result: AboutResult | ProfileResult | null) => void>()
   #names: CountryNames
   #saveTimer: ReturnType<typeof setTimeout> | null = null
+  #needsPosts = new Set<string>()
 
   constructor(
     private readonly win: Window,
@@ -79,6 +85,26 @@ export class ProfileLookups {
         this.#pending.get(`${kind}:${result.pk}`)?.(result)
       })
     }
+    win.addEventListener(USERS_EVENT, (event) => {
+      let users: SeenUser[]
+      try {
+        users = JSON.parse(String((event as CustomEvent).detail))
+      } catch {
+        return
+      }
+      this.seen(users)
+    })
+  }
+
+  seen(users: SeenUser[]): void {
+    const at = this.clock.now()
+    for (const { pk, followers } of users) {
+      if (!pk || !Number.isFinite(followers)) continue
+      ;(this.#cache[pk] ??= {}).seen = { followers, at }
+      if (!this.#needsPosts.has(pk)) this.#queues.profile.delete(pk)
+      this.onChange(pk)
+    }
+    if (users.length > 0) this.#scheduleSave()
   }
 
   async load(): Promise<void> {
@@ -93,7 +119,7 @@ export class ProfileLookups {
       countryName: entry?.about?.countryName ?? null,
       countryHidden: entry?.about?.countryHidden ?? false,
       ageMonths: joined ? ageInMonths(joined, new Date(this.clock.now())) : null,
-      followers: entry?.profile?.followers ?? null,
+      followers: this.#followers(entry),
       posts: entry?.profile?.posts ?? null,
     }
   }
@@ -102,9 +128,25 @@ export class ProfileLookups {
     return (['about', 'profile'] as const).some((kind) => this.#queues[kind].has(pk) || this.#pending.has(`${kind}:${pk}`))
   }
 
-  want(pk: string, username: string, needs: { about: boolean; profile: boolean }): void {
+  #followers(entry: Entry | undefined): number | null {
+    const { profile, seen } = entry ?? {}
+    if (seen && (profile?.followers == null || seen.at >= profile.at)) return seen.followers
+    return profile?.followers ?? null
+  }
+
+  #seenFresh(pk: string): boolean {
+    const at = this.#cache[pk]?.seen?.at
+    return at !== undefined && this.clock.now() - at < TTL.profile
+  }
+
+  want(pk: string, username: string, needs: LookupNeeds): void {
+    if (needs.posts) this.#needsPosts.add(pk)
+    const wants: Record<Kind, boolean> = {
+      about: needs.about,
+      profile: needs.posts || (needs.followers && !this.#seenFresh(pk)),
+    }
     for (const kind of ['about', 'profile'] as const) {
-      if (!needs[kind] || this.#fresh(pk, kind)) continue
+      if (!wants[kind] || this.#fresh(pk, kind)) continue
       const queue = this.#queues[kind]
       queue.delete(pk)
       queue.set(pk, username)
@@ -130,7 +172,7 @@ export class ProfileLookups {
         await this.#whenVisible()
         const [pk, username] = [...queue.entries()].at(-1)!
         queue.delete(pk)
-        if (this.#fresh(pk, kind)) continue
+        if (this.#fresh(pk, kind) || (kind === 'profile' && !this.#needsPosts.has(pk) && this.#seenFresh(pk))) continue
         const result = await this.#request(kind, pk, username)
         const retryAfter = this.#store(kind, pk, username, result)
         await this.clock.wait(retryAfter ?? GAP[kind])
@@ -171,6 +213,7 @@ export class ProfileLookups {
       }
       if (kind === 'profile' && 'description' in result) {
         entry.profile = { ...(result.description ? parseProfileCounts(result.description) : { followers: null, posts: null }), at: now }
+        this.#needsPosts.delete(pk)
       }
       this.#scheduleSave()
       this.onChange(pk)
@@ -186,7 +229,10 @@ export class ProfileLookups {
       return Math.min(BACKOFF_MAX, Math.max(result.retryAfterMs ?? 0, this.#backoff[kind]))
     }
     if (kind === 'about') entry.aboutFailedAt = now
-    else entry.profileFailedAt = now
+    else {
+      entry.profileFailedAt = now
+      this.#needsPosts.delete(pk)
+    }
     this.#scheduleSave()
     this.onChange(pk)
     return null
@@ -204,7 +250,7 @@ export class ProfileLookups {
       this.#saveTimer = null
       const entries = Object.entries(this.#cache)
       if (entries.length > MAX_ENTRIES) {
-        const stamp = ([, entry]: [string, Entry]) => Math.max(entry.about?.at ?? 0, entry.profile?.at ?? 0, entry.aboutFailedAt ?? 0, entry.profileFailedAt ?? 0)
+        const stamp = ([, entry]: [string, Entry]) => Math.max(entry.about?.at ?? 0, entry.profile?.at ?? 0, entry.seen?.at ?? 0, entry.aboutFailedAt ?? 0, entry.profileFailedAt ?? 0)
         this.#cache = Object.fromEntries(entries.sort((a, b) => stamp(b) - stamp(a)).slice(0, MAX_ENTRIES))
       }
       void this.store.set(this.#cache)

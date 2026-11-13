@@ -74,7 +74,6 @@ export const FIELDS = [
 export type Field = (typeof FIELDS)[number]
 
 export const ABOUT_FIELDS: readonly Field[] = ['author.country', 'author.ageMonths']
-export const PROFILE_FIELDS: readonly Field[] = ['author.followers', 'author.posts']
 
 const MAX_PATTERN = 200
 

@@ -1,5 +1,5 @@
 import type { Post } from '../model'
-import type { ProfileData } from '../profile/lookups'
+import type { LookupNeeds, ProfileData } from '../profile/lookups'
 import type { WhenVisible } from './services/visible'
 
 export type OptionSpec =
@@ -27,7 +27,7 @@ export type PostStream = {
 
 export type AccountLookups = {
   data: (pk: string) => ProfileData
-  want: (pk: string, username: string, needs: { about: boolean; profile: boolean }) => void
+  want: (pk: string, username: string, needs: LookupNeeds) => void
   loading: (pk: string) => boolean
   subscribe: (listener: (pk: string) => void, signal: AbortSignal) => void
 }

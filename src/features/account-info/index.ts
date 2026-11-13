@@ -39,7 +39,7 @@ export default defineFeature({
   init(ctx) {
     const { options, lookups, t } = ctx
     const showsPlace = options.flag || options.countryName
-    const needs = { about: showsPlace || options.age, profile: options.followers || options.posts }
+    const needs = { about: showsPlace || options.age, followers: options.followers, posts: options.posts }
     const language = t('@@ui_locale').replace('_', '-') || undefined
     const compact = new Intl.NumberFormat(language, { notation: 'compact' })
     const regions = new Intl.DisplayNames(language ? [language] : [], { type: 'region' })
@@ -132,7 +132,7 @@ export default defineFeature({
       set.add(badge)
       badges.set(post.author.pk, set)
       refresh(post.author.pk)
-      if (needs.about || needs.profile) {
+      if (needs.about || needs.followers || needs.posts) {
         ctx.whenVisible(container, () => {
           lookups.want(post.author.pk, post.author.username, needs)
           refresh(post.author.pk)

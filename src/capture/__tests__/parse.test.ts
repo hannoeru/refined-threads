@@ -22,7 +22,7 @@ describe('parsePayloadText', () => {
         ],
       ]),
     )}`
-    const [post] = parsePayloadText(body)
+    const [post] = parsePayloadText(body).posts
     expect(post).toMatchObject({
       code: 'A1',
       text: 'see https://example.com/page',
@@ -37,11 +37,11 @@ describe('parsePayloadText', () => {
 
   it('reads newline-delimited JSON documents', () => {
     const body = [feedPayload([[rawPost({ code: 'N1' })]]), feedPayload([[rawPost({ code: 'N2' })]])].map((d) => JSON.stringify(d)).join('\n')
-    expect(parsePayloadText(body).map((post) => post.code).sort()).toEqual(['N1', 'N2'])
+    expect(parsePayloadText(body).posts.map((post) => post.code).sort()).toEqual(['N1', 'N2'])
   })
 
   it('sets the AI label only for a real detection method', () => {
-    const posts = parsePayloadText(JSON.stringify(feedPayload([[rawPost({ code: 'X', detection: 'NONE' })], [rawPost({ code: 'Y', detection: 'C2PA' })]])))
+    const posts = parsePayloadText(JSON.stringify(feedPayload([[rawPost({ code: 'X', detection: 'NONE' })], [rawPost({ code: 'Y', detection: 'C2PA' })]]))).posts
     expect(Object.fromEntries(posts.map((post) => [post.code, post.hasAiLabel]))).toEqual({ X: false, Y: true })
   })
 
@@ -51,20 +51,36 @@ describe('parsePayloadText', () => {
       rawPost({ code: 'SELF', userPk: '1', isReply: true, preview: 'https://shp.ee/abc' }),
       rawPost({ code: 'OTHER', userPk: '2', isReply: true, preview: 'https://amzn.to/zzz' }),
     ]
-    const root = parsePayloadText(JSON.stringify(feedPayload([thread]))).find((post) => post.code === 'ROOT')
+    const root = parsePayloadText(JSON.stringify(feedPayload([thread]))).posts.find((post) => post.code === 'ROOT')
     expect(root?.selfReplyLinks).toEqual(['https://shp.ee/abc'])
   })
 
   it('returns each post once when it appears many times, and handles a missing caption', () => {
     const post = rawPost({ code: 'D', text: null })
-    const posts = parsePayloadText(JSON.stringify({ a: [post, post], b: { nested: post } }))
+    const posts = parsePayloadText(JSON.stringify({ a: [post, post], b: { nested: post } })).posts
     expect(posts).toHaveLength(1)
     expect(posts[0]?.text).toBe('')
   })
 
   it('returns nothing for bodies that are not JSON', () => {
-    expect(parsePayloadText('<html>error</html>')).toEqual([])
-    expect(parsePayloadText('')).toEqual([])
+    expect(parsePayloadText('<html>error</html>')).toEqual({ posts: [], users: [] })
+    expect(parsePayloadText('')).toEqual({ posts: [], users: [] })
+  })
+})
+
+describe('follower counts', () => {
+  it('reads follower_count from user objects in GraphQL responses, once per account', () => {
+    const profile = { data: { user: { pk: '42', id: '42', username: 'amy', follower_count: 1269 } }, also: { user: { id: '42', username: 'amy', follower_count: 1269 } } }
+    expect(parsePayloadText(JSON.stringify(profile)).users).toEqual([{ pk: '42', followers: 1269 }])
+  })
+
+  it('ignores feed users, which have no follower_count', () => {
+    expect(parsePayloadText(JSON.stringify(feedPayload([[rawPost({ code: 'F1' })]]))).users).toEqual([])
+  })
+
+  it('reads follower counts from a profile page bootstrap script', () => {
+    document.body.innerHTML = `<script type="application/json">${JSON.stringify({ user: { pk: '7', username: 'bob', follower_count: 30 } })}</script>`
+    expect(parseBootstrap(document).users).toEqual([{ pk: '7', followers: 30 }])
   })
 })
 
@@ -80,6 +96,6 @@ describe('parseBootstrap', () => {
     document.body.innerHTML = `
       <script type="application/json">${JSON.stringify({ require: [feedPayload([[rawPost({ code: 'B1' })]])] })}</script>
       <script type="application/json">${JSON.stringify({ other: rawPost({ code: 'IGNORED' }) }).replace('logging_info_token', 'x')}</script>`
-    expect(parseBootstrap(document).map((post) => post.code)).toEqual(['B1'])
+    expect(parseBootstrap(document).posts.map((post) => post.code)).toEqual(['B1'])
   })
 })

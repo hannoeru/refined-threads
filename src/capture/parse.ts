@@ -1,3 +1,4 @@
+import type { SeenUser } from '../bridge'
 import type { Post } from '../model'
 
 type Json = Record<string, unknown>
@@ -94,8 +95,17 @@ function postInItem(item: unknown): Json | null {
   return isPostRecord(post) ? post : null
 }
 
-export function extractPosts(root: unknown): Post[] {
+export type Capture = { posts: Post[]; users: SeenUser[] }
+
+function seenUser(node: Json): SeenUser | null {
+  if (typeof node.follower_count !== 'number' || typeof node.username !== 'string') return null
+  const pk = str(node.pk) || str(node.id)
+  return pk ? { pk, followers: node.follower_count } : null
+}
+
+export function extract(root: unknown): Capture {
   const posts = new Map<string, Post>()
+  const users = new Map<string, number>()
   const selfReplyLinks = new Map<string, Set<string>>()
   const add = (record: Json) => {
     const post = toPost(record)
@@ -111,6 +121,8 @@ export function extractPosts(root: unknown): Post[] {
     }
     if (!isObject(node)) continue
     if (isPostRecord(node)) add(node)
+    const user = seenUser(node)
+    if (user) users.set(user.pk, user.followers)
     if (Array.isArray(node.thread_items)) {
       const records = node.thread_items.map(postInItem).filter((record): record is Json => record !== null)
       const [head, ...rest] = records
@@ -133,14 +145,16 @@ export function extractPosts(root: unknown): Post[] {
     const post = posts.get(code)
     if (post) post.selfReplyLinks = [...links]
   }
-  return [...posts.values()]
+  return { posts: [...posts.values()], users: [...users].map(([pk, followers]) => ({ pk, followers })) }
 }
 
-export function parsePayloadText(text: string): Post[] {
+const EMPTY: Capture = { posts: [], users: [] }
+
+export function parsePayloadText(text: string): Capture {
   const body = stripGuard(text).trim()
-  if (!body) return []
+  if (!body) return EMPTY
   try {
-    return extractPosts(JSON.parse(body))
+    return extract(JSON.parse(body))
   } catch {
     const documents: unknown[] = []
     for (const line of body.split('\n')) {
@@ -150,20 +164,20 @@ export function parsePayloadText(text: string): Post[] {
         continue
       }
     }
-    return extractPosts(documents)
+    return extract(documents)
   }
 }
 
-export function parseBootstrap(doc: Document): Post[] {
+export function parseBootstrap(doc: Document): Capture {
   const documents: unknown[] = []
   for (const script of doc.querySelectorAll('script[type="application/json"]')) {
     const text = script.textContent ?? ''
-    if (!text.includes('logging_info_token')) continue
+    if (!text.includes('logging_info_token') && !text.includes('follower_count')) continue
     try {
       documents.push(JSON.parse(text))
     } catch {
       continue
     }
   }
-  return extractPosts(documents)
+  return extract(documents)
 }

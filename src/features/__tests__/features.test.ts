@@ -196,7 +196,7 @@ describe('account-info', () => {
   })
 
   it('asks only for the lookups the switches need', () => {
-    expect(setup({ flag: false, age: false, followers: true }).wanted).toEqual([{ about: false, profile: true }])
-    expect(setup({}).wanted).toEqual([{ about: true, profile: false }])
+    expect(setup({ flag: false, age: false, followers: true }).wanted).toEqual([{ about: false, followers: true, posts: false }])
+    expect(setup({}).wanted).toEqual([{ about: true, followers: false, posts: false }])
   })
 })

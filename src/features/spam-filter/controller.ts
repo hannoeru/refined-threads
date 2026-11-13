@@ -178,7 +178,7 @@ export class SpamFilter {
 
   #process(container: HTMLElement, stored: Post): void {
     const needs = this.#compiled.needs
-    if ((needs.about || needs.profile) && !stored.author.following) {
+    if ((needs.about || needs.followers || needs.posts) && !stored.author.following) {
       this.deps.whenVisible(container, () => this.deps.lookups.want(stored.author.pk, stored.author.username, needs))
     }
     const { country, ageMonths, followers, posts } = this.deps.lookups.data(stored.author.pk)
