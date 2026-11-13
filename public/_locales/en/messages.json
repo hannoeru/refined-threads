@@ -771,7 +771,7 @@
     "message": "stranger with a link"
   },
   "welcome_more": {
-    "message": "Refined Threads can do more: real dates, keyboard navigation, and account details next to names."
+    "message": "Account info and keyboard navigation (j and k) are also on. You can turn on real dates, or turn any feature off."
   },
   "welcome_more_link": {
     "message": "See all features"

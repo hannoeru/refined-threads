@@ -771,7 +771,7 @@
     "message": "附連結的陌生人"
   },
   "welcome_more": {
-    "message": "Refined Threads 還有更多功能：實際日期、鍵盤瀏覽，以及名稱旁的帳號資訊。"
+    "message": "帳號資訊和鍵盤瀏覽（j 和 k）也已開啟。你可以開啟實際日期，或關閉任何功能。"
   },
   "welcome_more_link": {
     "message": "查看所有功能"

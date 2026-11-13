@@ -26,7 +26,7 @@ interface Item { kind: string, text: string, title: string }
 
 export default defineFeature({
   id: 'account-info',
-  enabledByDefault: false,
+  enabledByDefault: true,
   options: {
     followsYou: { type: 'boolean', default: true },
     youFollow: { type: 'boolean', default: false },

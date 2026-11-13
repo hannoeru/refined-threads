@@ -9,7 +9,7 @@ function isTyping(target: EventTarget | null) {
 
 export default defineFeature({
   id: 'keyboard-navigation',
-  enabledByDefault: false,
+  enabledByDefault: true,
   shortcuts: { j: 'next', k: 'previous', o: 'open' },
   init(ctx) {
     ctx.addStyle(`.${CURRENT} { box-shadow: inset 3px 0 0 ${THREADS_THEME.link}; background: ${THREADS_THEME.hover}; scroll-margin: 80px; }`)

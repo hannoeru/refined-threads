@@ -33,7 +33,7 @@ The harness is the `agent_browser` tool with `--extension`. It launches a manage
 
 3. Ready means the popup title is `Refined Threads`. If the open fails with `net::ERR_BLOCKED_BY_CLIENT`, the extension did not load. Close that session and launch again. One retry is normal.
 
-4. Set preconditions **from an extension page**, because `chrome.storage` exists only there. A fresh profile has default settings (spam filter on, everything else off):
+4. Set preconditions **from an extension page**, because `chrome.storage` exists only there. A fresh profile has default settings (spam filter, account info, and keyboard navigation on, real dates off):
 
    ```json
    { "args": ["--session", "<s>", "eval", "chrome.storage.sync.set({ features: { 'absolute-timestamps': { enabled: true, options: { style: 'iso', time: false } } } }).then(() => 'saved')"] }
