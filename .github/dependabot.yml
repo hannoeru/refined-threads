@@ -1,0 +1,31 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 10
+    groups:
+      lint:
+        patterns: [eslint, 'eslint-*', '@antfu/eslint-config']
+      vue:
+        patterns: [vue, '@vitejs/plugin-vue', vue-tsc, '@wxt-dev/module-vue']
+      build-and-test:
+        patterns: [wxt, vitest, happy-dom, typescript, sharp]
+    commit-message:
+      prefix: chore
+      include: scope
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ['*']
+    commit-message:
+      prefix: ci
