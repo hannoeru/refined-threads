@@ -1,0 +1,47 @@
+name: Bug report
+description: Something in Refined Threads does not work as described.
+labels: [bug]
+body:
+  - type: input
+    id: feature
+    attributes:
+      label: Feature
+      description: The feature name from the settings page, for example "Spam filter" or "Account info".
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps
+      description: What you did, starting from opening threads.com.
+      placeholder: |
+        1. Turn on Account info.
+        2. Open https://www.threads.com/
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual result
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and version
+      placeholder: Chrome 140, Firefox 145, Zen 1.24
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Refined Threads version
+      description: Shown on the extensions page of your browser.
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshots or console errors
+      description: Remove usernames and other personal data before you attach a screenshot.

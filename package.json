@@ -4,7 +4,14 @@
   "version": "0.1.0",
   "private": true,
   "packageManager": "pnpm@12.18.0",
+  "description": "A collection of small, switchable features that make Threads web better, including a spam and bot filter.",
   "license": "MIT",
+  "homepage": "https://github.com/hannoeru/refined-threads#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hannoeru/refined-threads.git"
+  },
+  "bugs": "https://github.com/hannoeru/refined-threads/issues",
   "scripts": {
     "dev": "wxt",
     "dev:firefox": "wxt -b firefox",

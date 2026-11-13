@@ -1,0 +1,26 @@
+name: Feature idea
+description: Suggest a new feature, or a change to an existing one.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is hard or annoying on Threads web today?
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Idea
+      description: What should change on the page? A feature changes one thing and can be turned off.
+    validations:
+      required: true
+  - type: checkboxes
+    id: rules
+    attributes:
+      label: Checks
+      options:
+        - label: The feature does not act on my account (like, follow, block, report) without a click from me.
+          required: true
+        - label: I would like to build it myself (see CONTRIBUTING.md).

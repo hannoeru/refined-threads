@@ -116,7 +116,10 @@ Write tests that show what the user sees. `src/features/__tests__/features.test.
 The registry test checks every feature automatically: the id matches the folder, the option defaults are valid, and every text key exists in both languages.
 
 ```sh
+pnpm lint:fix
 pnpm check
 ```
+
+`pnpm check` runs lint, the typecheck, the tests, and both builds, the same as CI.
 
 Then load the extension (`pnpm dev`), turn the feature on in the settings page, and try it on threads.com. Turn it off and check that the page looks as before. In the pull request, add a screenshot and the Threads URLs you tested.

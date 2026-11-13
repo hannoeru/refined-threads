@@ -1,5 +1,7 @@
 # Refined Threads
 
+[![CI](https://github.com/hannoeru/refined-threads/actions/workflows/ci.yml/badge.svg)](https://github.com/hannoeru/refined-threads/actions/workflows/ci.yml)
+
 A browser extension that makes Threads web (`threads.com`, `threads.net`) better, one small feature at a time. Each feature can be turned on or off, and each has its own settings page. Anyone can contribute a feature: see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 The name follows [Refined GitHub](https://github.com/refined-github/refined-github), a browser extension that makes GitHub cleaner. Refined Threads is not affiliated with Meta or with Refined GitHub. License: MIT.
@@ -119,15 +121,28 @@ Fields: `text`, `links`, `mentions`, `language`, `hasAiLabel`, `isPaidPartnershi
 
 Built-in spam filter rules have fixed ids (`followed`, `allowed-accounts`, `hidden-accounts`, `blocked-words`, `blocked-sites`, `countries`, `new-accounts`, `few-followers`, `few-posts`, `affiliate-links`, `engagement-bait`, `copy-paste-replies`, `ai-label`, `generated-names`, `strangers-in-replies`). The settings page edits them. Rule files contain no code.
 
+## Install
+
+Store listings are not ready yet. To use it today:
+
+1. Download the zip for your browser from the latest [release](https://github.com/hannoeru/refined-threads/releases), or build it yourself (see Development).
+2. **Chrome, Edge, Brave, Arc.** Unzip it, open `chrome://extensions`, turn on developer mode, choose "Load unpacked", and select the folder.
+3. **Firefox and Zen.** Open `about:debugging#/runtime/this-firefox`, choose "Load Temporary Add-on", and select the zip. Firefox removes temporary add-ons when it restarts.
+
+## Privacy
+
+Refined Threads has no server and no analytics. It stores settings in your browser and talks only to Threads. See [PRIVACY.md](PRIVACY.md).
+
 ## Development
 
-Requirements: Node 24 and pnpm.
+Requirements: Node 24 and pnpm 12 (`corepack enable` installs the version in `package.json`).
 
 ```sh
 pnpm install
 pnpm dev            # Chrome with hot reload
 pnpm dev:firefox    # Firefox with hot reload
-pnpm check          # typecheck, tests, Chrome build, Firefox build
+pnpm lint           # @antfu/eslint-config (pnpm lint:fix to fix)
+pnpm check          # lint, typecheck, tests, Chrome build, Firefox build
 pnpm zip            # store package for Chrome and Edge
 pnpm zip:firefox    # store package for Firefox Add-ons
 pnpm bench          # spam filter work for DOM noise and arriving posts (timings and full scans)
@@ -136,7 +151,19 @@ pnpm icons          # regenerate public/icon/*.png from assets/icon/option-3.png
 
 To load a build by hand, open `chrome://extensions`, turn on developer mode, and load `.output/chrome-mv3`. In Firefox, open `about:debugging#/runtime/this-firefox` and load `.output/firefox-mv3/manifest.json`.
 
+CI runs `pnpm check` on every push and pull request. Pushing a `v*` tag that matches the `package.json` version creates a draft GitHub release with the Chrome and Firefox zips. Dependabot opens weekly update pull requests for packages and GitHub Actions.
+
+Agents can drive the extension on the real site with the project skill in `.pi/skills/verify-refined-threads/`.
+
+## Contributing
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) to add a feature. Report bugs and ideas with the [issue forms](https://github.com/hannoeru/refined-threads/issues/new/choose), and security problems through [SECURITY.md](SECURITY.md). This project follows the [code of conduct](CODE_OF_CONDUCT.md).
+
 ## Not built yet
 
-- **Store release.** Store listings, screenshots, and a privacy policy for the Chrome Web Store, Edge Add-ons, and Firefox Add-ons.
+- **Store release.** Store listings and screenshots for the Chrome Web Store, Edge Add-ons, and Firefox Add-ons. The privacy policy for the listings is [PRIVACY.md](PRIVACY.md).
 - **Safari.** It needs an Xcode wrapper and an Apple Developer account.
+
+## License
+
+[MIT](LICENSE)
