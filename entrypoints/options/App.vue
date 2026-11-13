@@ -103,10 +103,10 @@ const page = computed(() => (current.value
 <style>
 .options {
   display: grid;
-  grid-template-columns: 220px minmax(0, 680px);
+  grid-template-columns: 220px minmax(0, 760px);
   gap: 32px;
   padding: 32px 24px;
-  max-width: 980px;
+  max-width: 1060px;
   margin: 0 auto;
 }
 .options-nav {
@@ -314,6 +314,7 @@ kbd {
   align-items: flex-start;
 }
 .scoring {
+  align-self: flex-start;
   border-collapse: collapse;
 }
 .scoring th,
@@ -330,7 +331,30 @@ kbd {
   gap: 12px;
 }
 .preset {
-  justify-content: space-between;
+  gap: 8px;
+}
+.preset p {
+  flex: 1;
+}
+.preset .button {
+  margin-top: 4px;
+  white-space: nowrap;
+}
+.file-button {
+  align-self: flex-start;
+  cursor: pointer;
+}
+.file-button:has(:focus-visible) {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 .editor {
   width: 100%;

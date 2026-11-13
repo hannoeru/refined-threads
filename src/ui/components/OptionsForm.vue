@@ -56,4 +56,8 @@ const choice = (key: string, value: string) => t(featureKey(props.feature.id, `o
 .option-label {
   font-weight: 600;
 }
+.option-row > .field:not(.number) {
+  flex: 0 1 280px;
+  min-width: 0;
+}
 </style>

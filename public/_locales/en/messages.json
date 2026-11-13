@@ -835,5 +835,8 @@
   },
   "save_failed": {
     "message": "Your settings could not be saved. Browser sync storage may be full. Remove some words or accounts and try again."
+  },
+  "import_choose": {
+    "message": "Choose a file"
   }
 }

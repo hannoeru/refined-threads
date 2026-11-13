@@ -9,6 +9,8 @@ const { states } = useFeatures()
 const sample = new Date()
 sample.setHours(sample.getHours() - 5, 30)
 
+const custom = computed(() => states.value?.['absolute-timestamps']?.options.style === 'custom')
+
 const preview = computed(() => {
   const options = states.value?.['absolute-timestamps']?.options
   if (!options)
@@ -29,7 +31,7 @@ const preview = computed(() => {
     <span class="muted small">{{ t('feature_absolute_timestamps_preview') }}</span>
     <span class="date-preview-value">{{ preview }}</span>
   </div>
-  <div class="card small muted date-help">
+  <div v-if="custom" class="card small muted date-help">
     <p>{{ t('feature_absolute_timestamps_pattern_help') }}</p>
     <p><code>YYYY-MM-DD HH:mm</code> → 2026-11-13 09:45</p>
     <p><code>ddd, MMM D · h:mm A</code> → Fri, Nov 13 · 9:45 AM</p>
@@ -38,7 +40,7 @@ const preview = computed(() => {
 </template>
 
 <style>
-.date-preview {
+.card.date-preview {
   flex-direction: row;
   align-items: baseline;
   justify-content: space-between;

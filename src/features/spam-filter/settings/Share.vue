@@ -124,7 +124,10 @@ async function saveEditor(): Promise<void> {
       <p class="muted small">
         {{ t('import_intro') }}
       </p>
-      <input type="file" accept="application/json,.json" :aria-label="t('import_title')" @change="load">
+      <label class="button file-button">
+        <input class="visually-hidden" type="file" accept="application/json,.json" @change="load">
+        {{ t('import_choose') }}
+      </label>
       <div v-if="pending" class="import-preview">
         <p><strong>{{ pending.name || t('import_unnamed') }}</strong></p>
         <p v-if="pending.description" class="muted small">

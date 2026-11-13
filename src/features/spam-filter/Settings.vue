@@ -51,9 +51,8 @@ const { settings, error, update } = useSettings()
 <style>
 .subtabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 2px;
-  overflow-x: auto;
-  scrollbar-width: none;
   border-bottom: 1px solid var(--hairline);
   padding-bottom: 8px;
 }
@@ -61,7 +60,7 @@ const { settings, error, update } = useSettings()
   flex: none;
   border: 0;
   background: transparent;
-  padding: 6px 10px;
+  padding: 6px 8px;
   border-radius: var(--radius-sm);
   color: var(--muted);
   font-size: 14px;

@@ -107,7 +107,7 @@ const report = () => void browser.tabs.create({ url: ISSUES_URL })
       <button type="button" class="button primary" @click="openSettings">
         {{ t('open_settings') }}
       </button>
-      <button type="button" class="button" @click="report">
+      <button type="button" class="link-button" @click="report">
         {{ t('report_problem') }}
       </button>
     </footer>
@@ -212,9 +212,14 @@ body {
 }
 .popup-footer {
   display: flex;
-  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 .popup-footer .button {
   flex: 1;
+}
+.popup-footer .link-button {
+  align-self: center;
 }
 </style>
