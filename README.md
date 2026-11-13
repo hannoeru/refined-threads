@@ -153,7 +153,7 @@ To load a build by hand, open `chrome://extensions`, turn on developer mode, and
 
 CI runs `pnpm check` on every push and pull request. Pushing a `v*` tag that matches the `package.json` version creates a draft GitHub release with the Chrome and Firefox zips. Dependabot opens weekly update pull requests for packages and GitHub Actions.
 
-Agents can drive the extension on the real site with the project skill in `.pi/skills/verify-refined-threads/`.
+Agents can drive the extension on the real site with the project skill in `.agents/skills/verify-refined-threads/`.
 
 ## Contributing
 

@@ -18,7 +18,7 @@ The harness is the `agent_browser` tool with `--extension`. It launches a manage
 1. Build and prepare evidence. Run from the repository root:
 
    ```sh
-   .pi/skills/verify-refined-threads/bin/prepare [run-id]
+   .agents/skills/verify-refined-threads/bin/prepare [run-id]
    ```
 
    It prints `RUN_ID`, `EXTENSION_DIR`, `EXTENSION_ID` (normally `jgaoncmdbnopkmiedbpldgoeibefnfad`), `EVIDENCE` (`.agent/verify/<run-id>/`), and `BUILD`. Write `BUILD` into your report.
@@ -111,6 +111,6 @@ Do not use `close --all`, and do not kill browsers by name. The managed profile 
 
 ## Helpers
 
-- `.pi/skills/verify-refined-threads/bin/prepare [run-id]` builds, creates the evidence directory, and prints the run values.
-- `.pi/skills/verify-refined-threads/bin/extension-id [build-dir]` prints the extension ID that Chrome gives the unpacked build. The ID depends on the absolute path.
+- `.agents/skills/verify-refined-threads/bin/prepare [run-id]` builds, creates the evidence directory, and prints the run values.
+- `.agents/skills/verify-refined-threads/bin/extension-id [build-dir]` prints the extension ID that Chrome gives the unpacked build. The ID depends on the absolute path.
 - `pnpm bench` measures spam filter work (timings and full scans) in a simulated page. It is not proof of real-page behavior.
