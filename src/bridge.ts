@@ -8,7 +8,7 @@ export const THREADS_MATCHES = [
 export const POSTS_EVENT = 'refined-threads:posts'
 export const USERS_EVENT = 'refined-threads:users'
 
-export type SeenUser = { pk: string; followers: number }
+export interface SeenUser { pk: string, followers: number }
 
 export const ABOUT_REQUEST_EVENT = 'refined-threads:about-request'
 export const ABOUT_RESULT_EVENT = 'refined-threads:about-result'
@@ -16,7 +16,7 @@ export const ABOUT_RESULT_EVENT = 'refined-threads:about-result'
 export const PROFILE_REQUEST_EVENT = 'refined-threads:profile-request'
 export const PROFILE_RESULT_EVENT = 'refined-threads:profile-result'
 
-export type LookupFailure = {
+export interface LookupFailure {
   pk: string
   ok: false
   reason: 'no-session' | 'http' | 'network' | 'parse'
@@ -24,12 +24,12 @@ export type LookupFailure = {
   retryAfterMs: number | null
 }
 
-export type ProfileRequest = { pk: string; username: string }
+export interface ProfileRequest { pk: string, username: string }
 
-export type ProfileResult = { pk: string; ok: true; description: string | null } | LookupFailure
+export type ProfileResult = { pk: string, ok: true, description: string | null } | LookupFailure
 
-export type AboutRequest = { pk: string }
+export interface AboutRequest { pk: string }
 
-export type AboutResult =
-  | { pk: string; ok: true; country: string | null; countryVisible: boolean; joined: string | null }
-  | LookupFailure
+export type AboutResult
+  = | { pk: string, ok: true, country: string | null, countryVisible: boolean, joined: string | null }
+    | LookupFailure

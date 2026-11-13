@@ -1,8 +1,9 @@
 <script setup vapor lang="ts">
+import type { DateStyle } from './format'
 import { computed } from 'vue'
 import { t, uiLanguage } from '../../ui/i18n'
 import { useFeatures } from '../../ui/useFeatures'
-import { type DateStyle, formatDate } from './format'
+import { formatDate } from './format'
 
 const { states } = useFeatures()
 const sample = new Date()
@@ -10,9 +11,16 @@ sample.setHours(sample.getHours() - 5, 30)
 
 const preview = computed(() => {
   const options = states.value?.['absolute-timestamps']?.options
-  if (!options) return ''
-  const formatted = formatDate(sample, { style: options.style as DateStyle, time: Boolean(options.time), pattern: String(options.pattern) }, uiLanguage())
-  return options.relative ? `5h · ${formatted}` : formatted
+  if (!options)
+    return ''
+  const formatted = formatDate(sample, {
+    style: options.style as DateStyle,
+    time: Boolean(options.time),
+    pattern: String(options.pattern),
+  }, uiLanguage())
+  return options.relative
+    ? `5h · ${formatted}`
+    : formatted
 })
 </script>
 
@@ -30,8 +38,27 @@ const preview = computed(() => {
 </template>
 
 <style>
-.date-preview { flex-direction: row; align-items: baseline; justify-content: space-between; gap: 12px; }
-.date-preview-value { font-weight: 600; font-variant-numeric: tabular-nums; }
-.date-help { gap: 4px; }
-.date-help code { font: 12px ui-monospace, Menlo, monospace; padding: 1px 5px; border-radius: 6px; background: var(--accent-soft); color: var(--ink); }
+.date-preview {
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.date-preview-value {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.date-help {
+  gap: 4px;
+}
+.date-help code {
+  font:
+    12px ui-monospace,
+    Menlo,
+    monospace;
+  padding: 1px 5px;
+  border-radius: 6px;
+  background: var(--accent-soft);
+  color: var(--ink);
+}
 </style>

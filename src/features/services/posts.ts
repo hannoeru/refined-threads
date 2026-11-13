@@ -1,6 +1,6 @@
-import { POSTS_EVENT } from '../../bridge'
 import type { Post } from '../../model'
 import type { PostStream } from '../api'
+import { POSTS_EVENT } from '../../bridge'
 
 export class PostCatalog implements PostStream {
   #posts = new Map<string, Post>()
@@ -11,7 +11,8 @@ export class PostCatalog implements PostStream {
       let posts: Post[]
       try {
         posts = JSON.parse(String((event as CustomEvent).detail))
-      } catch {
+      }
+      catch {
         return
       }
       this.add(posts)
@@ -30,6 +31,10 @@ export class PostCatalog implements PostStream {
   subscribe(listener: (posts: Post[]) => void, signal: AbortSignal): void {
     this.#listeners.add(listener)
     signal.addEventListener('abort', () => this.#listeners.delete(listener), { once: true })
-    if (this.#posts.size > 0) listener([...this.#posts.values()])
+    if (this.#posts.size > 0) {
+      listener([
+        ...this.#posts.values(),
+      ])
+    }
   }
 }

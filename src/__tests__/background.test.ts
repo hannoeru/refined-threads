@@ -1,11 +1,11 @@
-import { fakeBrowser } from 'wxt/testing/fake-browser'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { fakeBrowser } from 'wxt/testing/fake-browser'
 import background from '../../entrypoints/background'
 import { readList } from '../rules/edit'
 import { loadSettings } from '../settings'
 
 describe('background', () => {
-  let clicked: ((info: { menuItemId: string; linkUrl?: string }) => Promise<void>) | null = null
+  let clicked: ((info: { menuItemId: string, linkUrl?: string }) => Promise<void>) | null = null
 
   beforeEach(() => {
     fakeBrowser.reset()
@@ -14,14 +14,16 @@ describe('background', () => {
     fakeBrowser.contextMenus = {
       removeAll: async () => undefined,
       create: () => 0,
-      onClicked: { addListener: (listener: typeof clicked) => void (clicked = listener) },
+      onClicked: {
+        addListener: (listener: typeof clicked) => void (clicked = listener),
+      },
     } as never
     background.main()
   })
 
   it('opens the welcome page after install, but not after an update', async () => {
     const welcome = fakeBrowser.runtime.getURL('/welcome.html')
-    const welcomeTabs = async () => (await fakeBrowser.tabs.query({})).filter((tab) => tab.url === welcome)
+    const welcomeTabs = async () => (await fakeBrowser.tabs.query({})).filter(tab => tab.url === welcome)
     await fakeBrowser.runtime.onInstalled.trigger({ reason: 'update', previousVersion: '0.0.1' })
     expect(await welcomeTabs()).toHaveLength(0)
     await fakeBrowser.runtime.onInstalled.trigger({ reason: 'install' })

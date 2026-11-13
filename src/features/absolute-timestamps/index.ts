@@ -17,12 +17,15 @@ export default defineFeature({
     const { style, time: withTime, relative, pattern } = ctx.options
     ctx.observe<HTMLTimeElement>('a[href*="/post/"] time[datetime]', (time) => {
       const date = new Date(time.dateTime)
-      if (Number.isNaN(date.getTime()) || time.dataset[ORIGINAL] !== undefined) return
+      if (Number.isNaN(date.getTime()) || time.dataset[ORIGINAL] !== undefined)
+        return
       const original = time.textContent ?? ''
       const formatted = formatDate(date, { style, time: withTime, pattern }, locale)
       time.dataset[ORIGINAL] = original
       time.title = formatDate(date, { style: 'long', time: true, pattern }, locale)
-      time.textContent = relative ? `${original} · ${formatted}` : formatted
+      time.textContent = relative
+        ? `${original} · ${formatted}`
+        : formatted
     })
     ctx.signal.addEventListener(
       'abort',

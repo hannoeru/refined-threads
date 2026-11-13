@@ -1,6 +1,6 @@
 import * as v from 'valibot'
 
-export type PostAuthor = {
+export interface PostAuthor {
   pk: string
   username: string
   fullName: string
@@ -15,7 +15,7 @@ export type PostAuthor = {
   posts: number | null
 }
 
-export type Post = {
+export interface Post {
   code: string
   pk: string
   author: PostAuthor
@@ -28,7 +28,7 @@ export type Post = {
   isReply: boolean
   replyToUsername: string | null
   rootAuthorUsername: string | null
-  counts: { likes: number; replies: number; reposts: number; quotes: number }
+  counts: { likes: number, replies: number, reposts: number, quotes: number }
   takenAt: number
   selfReplyLinks: string[]
 }
@@ -80,13 +80,38 @@ const MAX_PATTERN = 200
 const FieldSchema = v.picklist(FIELDS)
 
 const Leaf = v.union([
-  v.strictObject({ field: FieldSchema, is: v.union([v.string(), v.number(), v.boolean()]) }),
-  v.strictObject({ field: FieldSchema, in: v.array(v.string()) }),
-  v.strictObject({ field: FieldSchema, matches: v.pipe(v.string(), v.maxLength(MAX_PATTERN)) }),
-  v.strictObject({ field: FieldSchema, contains_any: v.array(v.string()) }),
-  v.strictObject({ field: FieldSchema, host_in: v.array(v.string()) }),
-  v.strictObject({ field: FieldSchema, gt: v.number() }),
-  v.strictObject({ field: FieldSchema, lt: v.number() }),
+  v.strictObject({
+    field: FieldSchema,
+    is: v.union([
+      v.string(),
+      v.number(),
+      v.boolean(),
+    ]),
+  }),
+  v.strictObject({
+    field: FieldSchema,
+    in: v.array(v.string()),
+  }),
+  v.strictObject({
+    field: FieldSchema,
+    matches: v.pipe(v.string(), v.maxLength(MAX_PATTERN)),
+  }),
+  v.strictObject({
+    field: FieldSchema,
+    contains_any: v.array(v.string()),
+  }),
+  v.strictObject({
+    field: FieldSchema,
+    host_in: v.array(v.string()),
+  }),
+  v.strictObject({
+    field: FieldSchema,
+    gt: v.number(),
+  }),
+  v.strictObject({
+    field: FieldSchema,
+    lt: v.number(),
+  }),
 ])
 export type LeafCondition = v.InferOutput<typeof Leaf>
 
@@ -94,9 +119,15 @@ export type Condition = LeafCondition | { all: Condition[] } | { any: Condition[
 
 export const ConditionSchema: v.GenericSchema<Condition> = v.union([
   Leaf,
-  v.strictObject({ all: v.array(v.lazy(() => ConditionSchema)) }),
-  v.strictObject({ any: v.array(v.lazy(() => ConditionSchema)) }),
-  v.strictObject({ not: v.lazy(() => ConditionSchema) }),
+  v.strictObject({
+    all: v.array(v.lazy(() => ConditionSchema)),
+  }),
+  v.strictObject({
+    any: v.array(v.lazy(() => ConditionSchema)),
+  }),
+  v.strictObject({
+    not: v.lazy(() => ConditionSchema),
+  }),
 ])
 
 export const RuleSchema = v.strictObject({
@@ -112,8 +143,8 @@ export type Rule = v.InferOutput<typeof RuleSchema>
 
 const Threshold = v.nullable(v.pipe(v.number(), v.minValue(1), v.maxValue(100)))
 
-const Outcome = v.strictObject({ tagAt: Threshold, hideAt: Threshold })
-export type Outcome = v.InferOutput<typeof Outcome>
+const OutcomeSchema = v.strictObject({ tagAt: Threshold, hideAt: Threshold })
+export type Outcome = v.InferOutput<typeof OutcomeSchema>
 
 export const AFFILIATE_HOSTS = [
   'shopee.tw',
@@ -159,26 +190,78 @@ export const BAIT_PHRASES = [
 ]
 
 export const BUILT_IN_RULES = [
-  { id: 'followed', effect: 'allow', when: { field: 'author.following', is: true } },
-  { id: 'allowed-accounts', effect: 'allow', when: { field: 'author.username', in: [] } },
-  { id: 'hidden-accounts', effect: 'hide', when: { field: 'author.username', in: [] } },
-  { id: 'blocked-words', effect: 'hide', when: { field: 'text', contains_any: [] } },
+  {
+    id: 'followed',
+    effect: 'allow',
+    when: { field: 'author.following', is: true },
+  },
+  {
+    id: 'allowed-accounts',
+    effect: 'allow',
+    when: { field: 'author.username', in: [] },
+  },
+  {
+    id: 'hidden-accounts',
+    effect: 'hide',
+    when: { field: 'author.username', in: [] },
+  },
+  {
+    id: 'blocked-words',
+    effect: 'hide',
+    when: { field: 'text', contains_any: [] },
+  },
   {
     id: 'blocked-sites',
     effect: 'hide',
-    when: { any: [{ field: 'links', host_in: [] }, { field: 'selfReplyLinks', host_in: [] }] },
+    when: {
+      any: [
+        { field: 'links', host_in: [] },
+        { field: 'selfReplyLinks', host_in: [] },
+      ],
+    },
   },
-  { id: 'countries', effect: 'hide', when: { field: 'author.country', in: [] } },
-  { id: 'new-accounts', enabled: false, effect: 'tag', when: { field: 'author.ageMonths', lt: 6 } },
-  { id: 'few-followers', enabled: false, effect: 'score', score: 1, when: { field: 'author.followers', lt: 10 } },
-  { id: 'few-posts', enabled: false, effect: 'score', score: 1, when: { field: 'author.posts', lt: 5 } },
+  {
+    id: 'countries',
+    effect: 'hide',
+    when: { field: 'author.country', in: [] },
+  },
+  {
+    id: 'new-accounts',
+    enabled: false,
+    effect: 'tag',
+    when: { field: 'author.ageMonths', lt: 6 },
+  },
+  {
+    id: 'few-followers',
+    enabled: false,
+    effect: 'score',
+    score: 1,
+    when: { field: 'author.followers', lt: 10 },
+  },
+  {
+    id: 'few-posts',
+    enabled: false,
+    effect: 'score',
+    score: 1,
+    when: { field: 'author.posts', lt: 5 },
+  },
   {
     id: 'affiliate-links',
     effect: 'score',
     score: 3,
-    when: { any: [{ field: 'links', host_in: AFFILIATE_HOSTS }, { field: 'selfReplyLinks', host_in: AFFILIATE_HOSTS }] },
+    when: {
+      any: [
+        { field: 'links', host_in: AFFILIATE_HOSTS },
+        { field: 'selfReplyLinks', host_in: AFFILIATE_HOSTS },
+      ],
+    },
   },
-  { id: 'engagement-bait', effect: 'score', score: 3, when: { field: 'text', contains_any: BAIT_PHRASES } },
+  {
+    id: 'engagement-bait',
+    effect: 'score',
+    score: 3,
+    when: { field: 'text', contains_any: BAIT_PHRASES },
+  },
   {
     id: 'copy-paste-replies',
     target: 'replies',
@@ -186,7 +269,13 @@ export const BUILT_IN_RULES = [
     score: 3,
     when: { field: 'copies', gt: 2 },
   },
-  { id: 'ai-label', enabled: false, effect: 'score', score: 3, when: { field: 'hasAiLabel', is: true } },
+  {
+    id: 'ai-label',
+    enabled: false,
+    effect: 'score',
+    score: 3,
+    when: { field: 'hasAiLabel', is: true },
+  },
   {
     id: 'generated-names',
     enabled: false,
@@ -194,8 +283,15 @@ export const BUILT_IN_RULES = [
     score: 1,
     when: {
       all: [
-        { any: [{ field: 'author.username', matches: '^[a-z._]+\\d{4,}$' }, { field: 'author.username', matches: '^[a-z0-9]+(?:[._][a-z0-9]+){2,}\\d+$' }] },
-        { not: { field: 'author.isVerified', is: true } },
+        {
+          any: [
+            { field: 'author.username', matches: '^[a-z._]+\\d{4,}$' },
+            { field: 'author.username', matches: '^[a-z0-9]+(?:[._][a-z0-9]+){2,}\\d+$' },
+          ],
+        },
+        {
+          not: { field: 'author.isVerified', is: true },
+        },
       ],
     },
   },
@@ -208,7 +304,12 @@ export const BUILT_IN_RULES = [
     when: {
       all: [
         { field: 'author.followedBy', is: false },
-        { any: [{ field: 'links', gt: 0 }, { field: 'mentions', gt: 0 }] },
+        {
+          any: [
+            { field: 'links', gt: 0 },
+            { field: 'mentions', gt: 0 },
+          ],
+        },
       ],
     },
   },
@@ -216,23 +317,34 @@ export const BUILT_IN_RULES = [
 
 export type BuiltInRuleId = (typeof BUILT_IN_RULES)[number]['id']
 
-export const BUILT_IN_IDS: readonly string[] = BUILT_IN_RULES.map((rule) => rule.id)
+export const BUILT_IN_RULE_INPUTS: readonly v.InferInput<typeof RuleSchema>[] = BUILT_IN_RULES
+
+export const BUILT_IN_IDS: readonly string[] = BUILT_IN_RULES.map(rule => rule.id)
 
 export const LEVEL_RULES: Record<Level, readonly BuiltInRuleId[]> = {
   light: ['affiliate-links'],
   balanced: ['affiliate-links', 'engagement-bait', 'copy-paste-replies'],
-  strict: ['affiliate-links', 'engagement-bait', 'copy-paste-replies', 'ai-label', 'generated-names', 'strangers-in-replies'],
+  strict: [
+    'affiliate-links',
+    'engagement-bait',
+    'copy-paste-replies',
+    'ai-label',
+    'generated-names',
+    'strangers-in-replies',
+  ],
 }
 
-export const LEVEL_TOGGLED: readonly BuiltInRuleId[] = [...new Set(Object.values(LEVEL_RULES).flat())]
+export const LEVEL_TOGGLED: readonly BuiltInRuleId[] = [
+  ...new Set(Object.values(LEVEL_RULES).flat()),
+]
 
 export const RuleFileSchema = v.strictObject({
   version: v.literal(1),
-  scoring: v.optional(v.strictObject({ posts: Outcome, replies: Outcome }), () => ({
+  scoring: v.optional(v.strictObject({ posts: OutcomeSchema, replies: OutcomeSchema }), () => ({
     posts: { tagAt: 2, hideAt: 3 },
     replies: { tagAt: 2, hideAt: 3 },
   })),
-  rules: v.optional(v.array(RuleSchema), () => structuredClone(BUILT_IN_RULES) as unknown as v.InferInput<typeof RuleSchema>[]),
+  rules: v.optional(v.array(RuleSchema), () => BUILT_IN_RULE_INPUTS.map(rule => structuredClone(rule))),
 })
 export type RuleFile = v.InferOutput<typeof RuleFileSchema>
 
@@ -246,8 +358,8 @@ export type Settings = v.InferOutput<typeof SettingsSchema>
 
 export const defaultSettings = (): Settings => v.parse(SettingsSchema, {})
 
-export type Reason = { id: string; name: string; effect: Effect }
+export interface Reason { id: string, name: string, effect: Effect }
 
-export type Verdict = { action: 'none' | 'tag' | 'hide'; score: number; reasons: Reason[] }
+export interface Verdict { action: 'none' | 'tag' | 'hide', score: number, reasons: Reason[] }
 
-export type Stats = { day: string; hidden: number; tagged: number; byRule: Record<string, number> }
+export interface Stats { day: string, hidden: number, tagged: number, byRule: Record<string, number> }

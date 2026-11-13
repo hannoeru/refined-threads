@@ -1,10 +1,11 @@
 <script setup vapor lang="ts">
+import type { Feature, OptionSpec } from '../../features/api'
 import { computed } from 'vue'
-import { featureKey, type Feature, type OptionSpec } from '../../features/api'
+import { featureKey } from '../../features/api'
 import { t } from '../i18n'
 import Toggle from './Toggle.vue'
 
-const props = defineProps<{ feature: Feature; values: Record<string, unknown> }>()
+const props = defineProps<{ feature: Feature, values: Record<string, unknown> }>()
 const emit = defineEmits<{ change: [key: string, value: unknown] }>()
 
 const entries = computed(() => Object.entries(props.feature.options) as [string, OptionSpec][])
@@ -34,15 +35,25 @@ const choice = (key: string, value: string) => t(featureKey(props.feature.id, `o
           :max="spec.max"
           :value="values[key]"
           @change="(event: Event) => emit('change', key, Number((event.target as HTMLInputElement).value))"
-        />
-        <input v-else class="field grow" :value="values[key]" @change="(event: Event) => emit('change', key, (event.target as HTMLInputElement).value)" />
+        >
+        <input v-else class="field grow" :value="values[key]" @change="(event: Event) => emit('change', key, (event.target as HTMLInputElement).value)">
       </label>
     </template>
   </div>
 </template>
 
 <style>
-.options-form { gap: 16px; }
-.option-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
-.option-label { font-weight: 600; }
+.options-form {
+  gap: 16px;
+}
+.option-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.option-label {
+  font-weight: 600;
+}
 </style>

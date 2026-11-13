@@ -3,7 +3,7 @@ import { THREADS_THEME } from '../../threads/dom'
 
 export { POST_CONTAINER as CONTAINER, postCodeOf as postCode } from '../../threads/dom'
 
-export type ViewText = {
+export interface ViewText {
   hidden: (reasons: string) => string
   tagged: (reasons: string) => string
   show: string
@@ -11,7 +11,7 @@ export type ViewText = {
   keepHiding: string
 }
 
-export type ViewState = {
+export interface ViewState {
   verdict: Verdict
   labels: string[]
   display: Display
@@ -19,7 +19,7 @@ export type ViewState = {
   slot: Element | null
 }
 
-export type ViewHandlers = {
+export interface ViewHandlers {
   reveal: () => void
   conceal: () => void
   allow: () => void
@@ -27,7 +27,12 @@ export type ViewHandlers = {
 
 const BAR = 'rt-bar'
 const CHIP = 'rt-chip'
-const STATE_CLASSES = ['rt-collapse', 'rt-blur', 'rt-revealed', 'rt-tagged']
+const STATE_CLASSES = [
+  'rt-collapse',
+  'rt-blur',
+  'rt-revealed',
+  'rt-tagged',
+]
 
 export const STYLE = `
 .rt-collapse > :not(.rt-bar) { display: none !important; }
@@ -55,7 +60,16 @@ export const STYLE = `
 .rt-chip button:focus-visible { outline: 2px solid ${THREADS_THEME.link}; outline-offset: 1px; }
 `
 
-const STOPPED = ['click', 'mousedown', 'mouseup', 'pointerdown', 'pointerup', 'touchstart', 'touchend', 'keydown']
+const STOPPED = [
+  'click',
+  'mousedown',
+  'mouseup',
+  'pointerdown',
+  'pointerup',
+  'touchstart',
+  'touchend',
+  'keydown',
+]
 
 function button(doc: Document, label: string, onClick: () => void): HTMLButtonElement {
   const element = doc.createElement('button')
@@ -77,8 +91,8 @@ export function clearView(container: Element): void {
 
 const rendered = (container: Element) => container.querySelector(`:scope > .${BAR}, .${CHIP}`) !== null
 
-const shield = (element: HTMLElement) => {
-  for (const type of STOPPED) element.addEventListener(type, (event) => event.stopPropagation())
+function shield(element: HTMLElement) {
+  for (const type of STOPPED) element.addEventListener(type, event => event.stopPropagation())
 }
 
 function renderChip(slot: Element, reasons: string, text: ViewText, handlers: ViewHandlers): void {
@@ -99,10 +113,17 @@ function renderChip(slot: Element, reasons: string, text: ViewText, handlers: Vi
 }
 
 export function renderView(container: HTMLElement, state: ViewState, text: ViewText, handlers: ViewHandlers): void {
-  const key = JSON.stringify([state.verdict.action, state.labels, state.display, state.revealed])
-  if (container.dataset.rtKey === key && rendered(container)) return
+  const key = JSON.stringify([
+    state.verdict.action,
+    state.labels,
+    state.display,
+    state.revealed,
+  ])
+  if (container.dataset.rtKey === key && rendered(container))
+    return
   clearView(container)
-  if (state.verdict.action === 'none') return
+  if (state.verdict.action === 'none')
+    return
   container.dataset.rtKey = key
   const reasons = state.labels.join(', ')
   if (state.verdict.action === 'tag' && state.slot) {
@@ -123,11 +144,15 @@ export function renderView(container: HTMLElement, state: ViewState, text: ViewT
     container.classList.add('rt-tagged')
     message.textContent = text.tagged(reasons)
     bar.append(button(doc, text.notSpam, handlers.allow))
-  } else if (!state.revealed) {
-    container.classList.add(state.display === 'blur' ? 'rt-blur' : 'rt-collapse')
+  }
+  else if (!state.revealed) {
+    container.classList.add(state.display === 'blur'
+      ? 'rt-blur'
+      : 'rt-collapse')
     message.textContent = text.hidden(reasons)
     bar.append(button(doc, text.show, handlers.reveal))
-  } else {
+  }
+  else {
     container.classList.add('rt-revealed')
     message.textContent = text.hidden(reasons)
     bar.append(button(doc, text.notSpam, handlers.allow), button(doc, text.keepHiding, handlers.conceal))

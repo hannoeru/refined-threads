@@ -1,8 +1,9 @@
 {
   "name": "refined-threads",
+  "type": "module",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
+  "packageManager": "pnpm@12.18.0",
   "license": "MIT",
   "scripts": {
     "dev": "wxt",
@@ -13,18 +14,25 @@
     "zip:firefox": "wxt zip -b firefox",
     "compile": "vue-tsc --noEmit",
     "test": "vitest run",
-    "check": "pnpm compile && pnpm test && pnpm build && pnpm build:firefox",
+    "check": "pnpm lint && pnpm compile && pnpm test && pnpm build && pnpm build:firefox",
     "postinstall": "wxt prepare",
     "icons": "node scripts/icons.mjs",
-    "bench": "vitest run --config vitest.perf.config.ts"
+    "bench": "vitest run --config vitest.perf.config.ts",
+    "lint": "eslint --cache",
+    "lint:fix": "eslint --cache --fix"
   },
   "dependencies": {
     "valibot": "1.5.0",
     "vue": "3.6.0-rc.15"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "10.0.0",
     "@vitejs/plugin-vue": "6.0.10",
     "@wxt-dev/module-vue": "1.0.3",
+    "eslint": "10.14.0",
+    "eslint-plugin-format": "2.0.1",
+    "eslint-plugin-slop": "0.1.3",
+    "eslint-plugin-sonarjs": "4.2.2",
     "happy-dom": "21.0.4",
     "sharp": "0.35.5",
     "typescript": "5.9.3",

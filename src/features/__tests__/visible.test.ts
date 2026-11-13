@@ -5,24 +5,30 @@ class FakeObserver {
   static last: FakeObserver
   observed = new Set<Element>()
   disconnected = false
-  constructor(readonly callback: (entries: { target: Element; isIntersecting: boolean }[]) => void) {
+  constructor(readonly callback: (entries: { target: Element, isIntersecting: boolean }[]) => void) {
     FakeObserver.last = this
   }
+
   observe(element: Element) {
     this.observed.add(element)
   }
+
   unobserve(element: Element) {
     this.observed.delete(element)
   }
+
   disconnect() {
     this.disconnected = true
   }
+
   show(element: Element, isIntersecting = true) {
-    this.callback([{ target: element, isIntersecting }])
+    this.callback([
+      { target: element, isIntersecting },
+    ])
   }
 }
 
-const fakeWindow = { IntersectionObserver: FakeObserver } as unknown as Window & typeof globalThis
+const fakeWindow = { IntersectionObserver: FakeObserver }
 
 describe('createWhenVisible', () => {
   it('runs the latest callback once the element comes near the screen, and at once after that', () => {

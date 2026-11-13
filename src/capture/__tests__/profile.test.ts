@@ -17,11 +17,17 @@ describe('profile description', () => {
   it('stops reading the stream as soon as the description arrives', async () => {
     let pulls = 0
     const encoder = new TextEncoder()
-    const chunks = [head.slice(0, 40), head.slice(40), '<body>'.repeat(1000), 'never']
+    const chunks = [
+      head.slice(0, 40),
+      head.slice(40),
+      '<body>'.repeat(1000),
+      'never',
+    ]
     const body = new ReadableStream<Uint8Array>({
       pull(controller) {
         const chunk = chunks[pulls++]
-        if (chunk === undefined) controller.close()
+        if (chunk === undefined)
+          controller.close()
         else controller.enqueue(encoder.encode(chunk))
       },
     })

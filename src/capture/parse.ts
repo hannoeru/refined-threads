@@ -5,11 +5,25 @@ type Json = Record<string, unknown>
 
 const isObject = (value: unknown): value is Json => typeof value === 'object' && value !== null && !Array.isArray(value)
 
-const obj = (value: unknown): Json => (isObject(value) ? value : {})
+function obj(value: unknown): Json {
+  return isObject(value)
+    ? value
+    : {}
+}
 
-const str = (value: unknown): string => (typeof value === 'string' ? value : typeof value === 'number' ? String(value) : '')
+function str(value: unknown): string {
+  return typeof value === 'string'
+    ? value
+    : typeof value === 'number'
+      ? String(value)
+      : ''
+}
 
-const num = (value: unknown): number => (typeof value === 'number' && Number.isFinite(value) ? value : 0)
+function num(value: unknown): number {
+  return typeof value === 'number' && Number.isFinite(value)
+    ? value
+    : 0
+}
 
 const REDIRECT_HOSTS = new Set(['l.threads.com', 'l.threads.net', 'l.instagram.com'])
 
@@ -18,9 +32,12 @@ const URL_PATTERN = /https?:\/\/[^\s<>"'）)]+/g
 export function unwrapLink(link: string): string {
   try {
     const url = new URL(link)
-    const target = REDIRECT_HOSTS.has(url.hostname) ? url.searchParams.get('u') : null
+    const target = REDIRECT_HOSTS.has(url.hostname)
+      ? url.searchParams.get('u')
+      : null
     return target ?? link
-  } catch {
+  }
+  catch {
     return link
   }
 }
@@ -38,17 +55,22 @@ function toPost(record: Json): Post {
   const user = obj(record.user)
   const friendship = obj(user.friendship_status)
   const text = str(obj(record.caption).text)
-  const fragments = Array.isArray(obj(info.text_fragments).fragments) ? (obj(info.text_fragments).fragments as unknown[]) : []
+  const fragments = Array.isArray(obj(info.text_fragments).fragments)
+    ? (obj(info.text_fragments).fragments as unknown[])
+    : []
   const links = new Set<string>()
   const mentions = new Set<string>()
   for (const fragment of fragments.map(obj)) {
     const uri = str(obj(fragment.link_fragment).uri)
-    if (uri) links.add(unwrapLink(uri))
+    if (uri)
+      links.add(unwrapLink(uri))
     const mention = str(obj(fragment.mention_fragment).mentioned_username)
-    if (mention) mentions.add(mention.toLowerCase())
+    if (mention)
+      mentions.add(mention.toLowerCase())
   }
   const preview = str(obj(info.link_preview_attachment).url)
-  if (preview) links.add(unwrapLink(preview))
+  if (preview)
+    links.add(unwrapLink(preview))
   for (const match of text.match(URL_PATTERN) ?? []) links.add(unwrapLink(match))
   const detection = str(obj(record.gen_ai_detection_method).detection_method)
   return {
@@ -90,28 +112,26 @@ function toPost(record: Json): Post {
 
 function postInItem(item: unknown): Json | null {
   const value = obj(item)
-  if (isPostRecord(value)) return value
+  if (isPostRecord(value))
+    return value
   const post = obj(value.post)
-  return isPostRecord(post) ? post : null
+  return isPostRecord(post)
+    ? post
+    : null
 }
 
-export type Capture = { posts: Post[]; users: SeenUser[] }
+export interface Capture { posts: Post[], users: SeenUser[] }
 
 function seenUser(node: Json): SeenUser | null {
-  if (typeof node.follower_count !== 'number' || typeof node.username !== 'string') return null
+  if (typeof node.follower_count !== 'number' || typeof node.username !== 'string')
+    return null
   const pk = str(node.pk) || str(node.id)
-  return pk ? { pk, followers: node.follower_count } : null
+  return pk
+    ? { pk, followers: node.follower_count }
+    : null
 }
 
-export function extract(root: unknown): Capture {
-  const posts = new Map<string, Post>()
-  const users = new Map<string, number>()
-  const selfReplyLinks = new Map<string, Set<string>>()
-  const add = (record: Json) => {
-    const post = toPost(record)
-    if (!post.code || posts.has(post.code)) return
-    posts.set(post.code, post)
-  }
+function walk(root: unknown, visit: (node: Json) => void): void {
   const stack: unknown[] = [root]
   while (stack.length > 0) {
     const node = stack.pop()
@@ -119,48 +139,76 @@ export function extract(root: unknown): Capture {
       for (const item of node) stack.push(item)
       continue
     }
-    if (!isObject(node)) continue
-    if (isPostRecord(node)) add(node)
-    const user = seenUser(node)
-    if (user) users.set(user.pk, user.followers)
-    if (Array.isArray(node.thread_items)) {
-      const records = node.thread_items.map(postInItem).filter((record): record is Json => record !== null)
-      const [head, ...rest] = records
-      if (head !== undefined) {
-        const rootCode = str(head.code)
-        const rootAuthor = str(obj(head.user).pk)
-        for (const record of rest) {
-          if (str(obj(record.user).pk) !== rootAuthor) continue
-          const links = selfReplyLinks.get(rootCode) ?? new Set<string>()
-          for (const link of toPost(record).links) links.add(link)
-          selfReplyLinks.set(rootCode, links)
-        }
-      }
-    }
+    if (!isObject(node))
+      continue
+    visit(node)
     for (const value of Object.values(node)) {
-      if (typeof value === 'object' && value !== null) stack.push(value)
+      if (typeof value === 'object' && value !== null)
+        stack.push(value)
     }
   }
+}
+
+function collectSelfReplies(threadItems: unknown[], into: Map<string, Set<string>>): void {
+  const [head, ...rest] = threadItems.map(postInItem).filter((record): record is Json => record !== null)
+  if (head === undefined)
+    return
+  const rootCode = str(head.code)
+  const rootAuthor = str(obj(head.user).pk)
+  for (const record of rest) {
+    if (str(obj(record.user).pk) !== rootAuthor)
+      continue
+    const links = into.get(rootCode) ?? new Set<string>()
+    for (const link of toPost(record).links) links.add(link)
+    into.set(rootCode, links)
+  }
+}
+
+export function extract(root: unknown): Capture {
+  const posts = new Map<string, Post>()
+  const users = new Map<string, number>()
+  const selfReplyLinks = new Map<string, Set<string>>()
+  walk(root, (node) => {
+    if (isPostRecord(node)) {
+      const post = toPost(node)
+      if (post.code && !posts.has(post.code))
+        posts.set(post.code, post)
+    }
+    const user = seenUser(node)
+    if (user)
+      users.set(user.pk, user.followers)
+    if (Array.isArray(node.thread_items))
+      collectSelfReplies(node.thread_items, selfReplyLinks)
+  })
   for (const [code, links] of selfReplyLinks) {
     const post = posts.get(code)
-    if (post) post.selfReplyLinks = [...links]
+    if (post)
+      post.selfReplyLinks = [...links]
   }
-  return { posts: [...posts.values()], users: [...users].map(([pk, followers]) => ({ pk, followers })) }
+  return {
+    posts: [
+      ...posts.values(),
+    ],
+    users: [...users].map(([pk, followers]) => ({ pk, followers })),
+  }
 }
 
 const EMPTY: Capture = { posts: [], users: [] }
 
 export function parsePayloadText(text: string): Capture {
   const body = stripGuard(text).trim()
-  if (!body) return EMPTY
+  if (!body)
+    return EMPTY
   try {
     return extract(JSON.parse(body))
-  } catch {
+  }
+  catch {
     const documents: unknown[] = []
     for (const line of body.split('\n')) {
       try {
         documents.push(JSON.parse(line))
-      } catch {
+      }
+      catch {
         continue
       }
     }
@@ -172,10 +220,12 @@ export function parseBootstrap(doc: Document): Capture {
   const documents: unknown[] = []
   for (const script of doc.querySelectorAll('script[type="application/json"]')) {
     const text = script.textContent ?? ''
-    if (!text.includes('logging_info_token') && !text.includes('follower_count')) continue
+    if (!text.includes('logging_info_token') && !text.includes('follower_count'))
+      continue
     try {
       documents.push(JSON.parse(text))
-    } catch {
+    }
+    catch {
       continue
     }
   }

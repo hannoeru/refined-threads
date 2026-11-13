@@ -1,3 +1,4 @@
+minimumReleaseAgeExcludePrune: true
 minimumReleaseAgeExclude:
   - '@vue/compiler-core@3.6.0-rc.15'
   - '@vue/compiler-dom@3.6.0-rc.15'
@@ -11,3 +12,6 @@ minimumReleaseAgeExclude:
   - '@vue/server-renderer@3.6.0-rc.15'
   - '@vue/shared@3.6.0-rc.15'
   - vue@3.6.0-rc.15
+
+trustPolicy: no-downgrade
+shellEmulator: true

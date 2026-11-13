@@ -1,5 +1,6 @@
+import type { Rule, Settings } from './model'
 import * as v from 'valibot'
-import { BAIT_PHRASES, type Rule, RuleFileSchema, type Settings, SettingsSchema } from './model'
+import { BAIT_PHRASES, RuleFileSchema, SettingsSchema } from './model'
 
 export const SHARE_FORMAT = 'refined-threads-settings'
 
@@ -12,24 +13,34 @@ export const SharedFileSchema = v.strictObject({
 export type SharedFile = v.InferOutput<typeof SharedFileSchema>
 
 export function exportSettings(settings: Settings, name = '', description = ''): string {
-  const file: SharedFile = { format: SHARE_FORMAT, name, description, settings }
+  const file: SharedFile = {
+    format: SHARE_FORMAT,
+    name,
+    description,
+    settings,
+  }
   return `${JSON.stringify(file, null, 2)}\n`
 }
 
-export type ImportResult = { ok: true; file: SharedFile } | { ok: false; errors: string[] }
+export type ImportResult = { ok: true, file: SharedFile } | { ok: false, errors: string[] }
 
 export function readSharedFile(text: string): ImportResult {
   let json: unknown
   try {
     json = JSON.parse(text)
-  } catch {
-    return { ok: false, errors: ['not-json'] }
+  }
+  catch {
+    return {
+      ok: false,
+      errors: ['not-json'],
+    }
   }
   const result = v.safeParse(SharedFileSchema, json)
-  if (result.success) return { ok: true, file: result.output }
+  if (result.success)
+    return { ok: true, file: result.output }
   return {
     ok: false,
-    errors: result.issues.map((issue) => `${v.getDotPath(issue) ?? '(root)'}: ${issue.message}`),
+    errors: result.issues.map(issue => `${v.getDotPath(issue) ?? '(root)'}: ${issue.message}`),
   }
 }
 
@@ -39,18 +50,25 @@ export function replaceWith(file: SharedFile): Settings {
 
 export function mergeInto(current: Settings, file: SharedFile): Settings {
   const incoming = file.settings.ruleFile?.rules ?? []
-  const byId = new Map<string, Rule>(current.ruleFile.rules.map((rule) => [rule.id, rule]))
+  const byId = new Map<string, Rule>(current.ruleFile.rules.map(rule => [rule.id, rule]))
   for (const rule of incoming) byId.set(rule.id, rule)
   return v.parse(SettingsSchema, {
     ...current,
     tagOnly: file.settings.tagOnly ?? current.tagOnly,
-    ruleFile: { ...current.ruleFile, rules: [...byId.values()] },
+    ruleFile: {
+      ...current.ruleFile,
+      rules: [
+        ...byId.values(),
+      ],
+    },
   })
 }
 
-const rules = (list: v.InferInput<typeof RuleFileSchema>['rules']): SharedFile['settings'] => ({
-  ruleFile: v.parse(RuleFileSchema, { version: 1, rules: list }),
-})
+function rules(list: v.InferInput<typeof RuleFileSchema>['rules']): SharedFile['settings'] {
+  return {
+    ruleFile: v.parse(RuleFileSchema, { version: 1, rules: list }),
+  }
+}
 
 export const PRESET_FILES: readonly (SharedFile & { id: string })[] = [
   {
@@ -64,8 +82,30 @@ export const PRESET_FILES: readonly (SharedFile & { id: string })[] = [
         effect: 'hide',
         when: {
           any: [
-            { field: 'links', host_in: ['shopee.tw', 'shp.ee', 'amzn.to', 'a.co', 'a.r10.to', 'momo.dm', 's.click.aliexpress.com'] },
-            { field: 'selfReplyLinks', host_in: ['shopee.tw', 'shp.ee', 'amzn.to', 'a.co', 'a.r10.to', 'momo.dm', 's.click.aliexpress.com'] },
+            {
+              field: 'links',
+              host_in: [
+                'shopee.tw',
+                'shp.ee',
+                'amzn.to',
+                'a.co',
+                'a.r10.to',
+                'momo.dm',
+                's.click.aliexpress.com',
+              ],
+            },
+            {
+              field: 'selfReplyLinks',
+              host_in: [
+                'shopee.tw',
+                'shp.ee',
+                'amzn.to',
+                'a.co',
+                'a.r10.to',
+                'momo.dm',
+                's.click.aliexpress.com',
+              ],
+            },
           ],
         },
       },
@@ -76,7 +116,13 @@ export const PRESET_FILES: readonly (SharedFile & { id: string })[] = [
     format: SHARE_FORMAT,
     name: 'preset_bait_name',
     description: 'preset_bait_description',
-    settings: rules([{ id: 'engagement-bait', effect: 'hide', when: { field: 'text', contains_any: BAIT_PHRASES } }]),
+    settings: rules([
+      {
+        id: 'engagement-bait',
+        effect: 'hide',
+        when: { field: 'text', contains_any: BAIT_PHRASES },
+      },
+    ]),
   },
   {
     id: 'new-and-empty',
@@ -84,9 +130,24 @@ export const PRESET_FILES: readonly (SharedFile & { id: string })[] = [
     name: 'preset_new_accounts_name',
     description: 'preset_new_accounts_description',
     settings: rules([
-      { id: 'new-accounts', effect: 'score', score: 1, when: { field: 'author.ageMonths', lt: 6 } },
-      { id: 'few-followers', effect: 'score', score: 1, when: { field: 'author.followers', lt: 10 } },
-      { id: 'few-posts', effect: 'score', score: 1, when: { field: 'author.posts', lt: 5 } },
+      {
+        id: 'new-accounts',
+        effect: 'score',
+        score: 1,
+        when: { field: 'author.ageMonths', lt: 6 },
+      },
+      {
+        id: 'few-followers',
+        effect: 'score',
+        score: 1,
+        when: { field: 'author.followers', lt: 10 },
+      },
+      {
+        id: 'few-posts',
+        effect: 'score',
+        score: 1,
+        when: { field: 'author.posts', lt: 5 },
+      },
     ]),
   },
   {
@@ -95,13 +156,28 @@ export const PRESET_FILES: readonly (SharedFile & { id: string })[] = [
     name: 'preset_reply_guard_name',
     description: 'preset_reply_guard_description',
     settings: rules([
-      { id: 'copy-paste-replies', target: 'replies', effect: 'hide', when: { field: 'copies', gt: 2 } },
+      {
+        id: 'copy-paste-replies',
+        target: 'replies',
+        effect: 'hide',
+        when: { field: 'copies', gt: 2 },
+      },
       {
         id: 'strangers-in-replies',
         target: 'replies',
         effect: 'score',
         score: 1,
-        when: { all: [{ field: 'author.followedBy', is: false }, { any: [{ field: 'links', gt: 0 }, { field: 'mentions', gt: 0 }] }] },
+        when: {
+          all: [
+            { field: 'author.followedBy', is: false },
+            {
+              any: [
+                { field: 'links', gt: 0 },
+                { field: 'mentions', gt: 0 },
+              ],
+            },
+          ],
+        },
       },
     ]),
   },

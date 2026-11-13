@@ -8,7 +8,8 @@ export default defineFeature({
   enabledByDefault: true,
   async init(ctx) {
     const settings = await loadSettings()
-    if (ctx.signal.aborted) return
+    if (ctx.signal.aborted)
+      return
     const filter = new SpamFilter({
       document: ctx.document,
       signal: ctx.signal,
@@ -23,7 +24,7 @@ export default defineFeature({
       recordStats: createStatsRecorder(),
       today,
     })
-    const unwatch = watchSettings((next) => filter.setSettings(next))
+    const unwatch = watchSettings(next => filter.setSettings(next))
     ctx.signal.addEventListener('abort', unwatch, { once: true })
     filter.start()
   },

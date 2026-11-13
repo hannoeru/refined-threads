@@ -1,12 +1,14 @@
 import type { Post, Settings, Stats } from '../../model'
-import { addAccount, isBuiltIn, ruleLabel } from '../../rules/edit'
-import { nameSlotOf } from '../../threads/dom'
-import { type CompiledRules, compileRules, CopyTracker, evaluate, normalizeCopyText } from '../../rules/engine'
+import type { CompiledRules } from '../../rules/engine'
 import type { AccountLookups, PostStream } from '../api'
 import type { WhenVisible } from '../services/visible'
-import { CONTAINER, clearView, postCode, renderView, STYLE, type ViewText } from './view'
+import type { ViewText } from './view'
+import { addAccount, isBuiltIn, ruleLabel } from '../../rules/edit'
+import { compileRules, CopyTracker, evaluate, normalizeCopyText } from '../../rules/engine'
+import { nameSlotOf } from '../../threads/dom'
+import { clearView, CONTAINER, postCode, renderView, STYLE } from './view'
 
-export type SpamFilterDeps = {
+export interface SpamFilterDeps {
   document: Document
   signal: AbortSignal
   settings: Settings
@@ -23,7 +25,7 @@ export type SpamFilterDeps = {
 
 const MAX_TEXTS = 5000
 
-const flag = (code: string) => String.fromCodePoint(...[...code].map((letter) => 0x1f1a5 + letter.charCodeAt(0)))
+const flag = (code: string) => String.fromCodePoint(...[...code].map(letter => 0x1F1A5 + letter.charCodeAt(0)))
 
 export class SpamFilter {
   #copies = new CopyTracker()
@@ -47,7 +49,8 @@ export class SpamFilter {
     const language = deps.translate('@@ui_locale').replace('_', '-') || 'en'
     try {
       this.#regionNames = new Intl.DisplayNames([language], { type: 'region' })
-    } catch {
+    }
+    catch {
       this.#regionNames = null
     }
   }
@@ -55,19 +58,21 @@ export class SpamFilter {
   start(): void {
     const { document, signal } = this.deps
     this.deps.addStyle(STYLE)
-    this.deps.posts.subscribe((posts) => this.#postsArrived(posts), signal)
+    this.deps.posts.subscribe(posts => this.#postsArrived(posts), signal)
     this.deps.lookups.subscribe(() => this.#scheduleAll(), signal)
-    this.deps.observe<HTMLElement>(CONTAINER, (container) => this.#queue(container))
+    this.deps.observe<HTMLElement>(CONTAINER, container => this.#queue(container))
     this.deps.observe<HTMLElement>('a[href*="/post/"] time', (time) => {
       const container = time.closest<HTMLElement>(CONTAINER)
-      if (!container) return
+      if (!container)
+        return
       this.#codes.delete(container)
       this.#queue(container)
     })
     signal.addEventListener(
       'abort',
       () => {
-        if (this.#timer !== null) clearTimeout(this.#timer)
+        if (this.#timer !== null)
+          clearTimeout(this.#timer)
         for (const container of document.querySelectorAll(CONTAINER)) clearView(container)
       },
       { once: true },
@@ -82,7 +87,8 @@ export class SpamFilter {
   }
 
   scan(): void {
-    if (this.deps.signal.aborted) return
+    if (this.deps.signal.aborted)
+      return
     this.#pending.clear()
     this.#all = false
     for (const container of this.deps.document.querySelectorAll<HTMLElement>(CONTAINER)) this.#check(container)
@@ -93,7 +99,8 @@ export class SpamFilter {
       if (!this.#recorded.has(post.code)) {
         this.#recorded.add(post.code)
         this.#rememberText(post)
-        if (this.#copies.record(post) > 1) this.#queueSameText(post)
+        if (this.#copies.record(post) > 1)
+          this.#queueSameText(post)
       }
       for (const container of this.#waiting.get(post.code) ?? []) this.#pending.add(container)
       this.#waiting.delete(post.code)
@@ -103,21 +110,25 @@ export class SpamFilter {
 
   #rememberText(post: Post): void {
     const key = normalizeCopyText(post.text)
-    if (key.length < 12) return
+    if (key.length < 12)
+      return
     const codes = this.#sameText.get(key)
     if (codes) {
       codes.add(post.code)
       return
     }
-    if (this.#sameText.size >= MAX_TEXTS) this.#sameText.delete(this.#sameText.keys().next().value!)
+    if (this.#sameText.size >= MAX_TEXTS)
+      this.#sameText.delete(this.#sameText.keys().next().value!)
     this.#sameText.set(key, new Set([post.code]))
   }
 
   #queueSameText(post: Post): void {
-    if (!this.#compiled.needs.copies) return
+    if (!this.#compiled.needs.copies)
+      return
     for (const code of this.#sameText.get(normalizeCopyText(post.text)) ?? []) {
       for (const container of this.#shown.get(code) ?? []) {
-        if (container.isConnected) this.#pending.add(container)
+        if (container.isConnected)
+          this.#pending.add(container)
         else this.#shown.get(code)?.delete(container)
       }
     }
@@ -134,7 +145,8 @@ export class SpamFilter {
   }
 
   #schedule(): void {
-    if (this.#timer !== null || this.deps.signal.aborted) return
+    if (this.#timer !== null || this.deps.signal.aborted)
+      return
     this.#timer = setTimeout(() => {
       this.#timer = null
       this.#flush()
@@ -142,27 +154,34 @@ export class SpamFilter {
   }
 
   #flush(): void {
-    if (this.deps.signal.aborted) return
+    if (this.deps.signal.aborted)
+      return
     if (this.#all) {
       this.scan()
       return
     }
     const pending = [...this.#pending]
     this.#pending.clear()
-    for (const container of pending) if (container.isConnected) this.#check(container)
+    for (const container of pending) {
+      if (container.isConnected)
+        this.#check(container)
+    }
   }
 
   #codeOf(container: HTMLElement): string | null {
     const cached = this.#codes.get(container)
-    if (cached !== undefined) return cached
+    if (cached !== undefined)
+      return cached
     const code = postCode(container)
-    if (code) this.#codes.set(container, code)
+    if (code)
+      this.#codes.set(container, code)
     return code
   }
 
   #check(container: HTMLElement): void {
     const code = this.#codeOf(container)
-    if (!code) return
+    if (!code)
+      return
     const post = this.deps.posts.get(code)
     if (post) {
       const shown = this.#shown.get(code) ?? new Set()
@@ -182,22 +201,33 @@ export class SpamFilter {
       this.deps.whenVisible(container, () => this.deps.lookups.want(stored.author.pk, stored.author.username, needs))
     }
     const { country, ageMonths, followers, posts } = this.deps.lookups.data(stored.author.pk)
-    const post: Post = { ...stored, author: { ...stored.author, country, ageMonths, followers, posts } }
-    const verdict = evaluate(post, this.#compiled, { copies: (item) => this.#copies.count(item) })
+    const post: Post = {
+      ...stored,
+      author: {
+        ...stored.author,
+        country,
+        ageMonths,
+        followers,
+        posts,
+      },
+    }
+    const verdict = evaluate(post, this.#compiled, {
+      copies: item => this.#copies.count(item),
+    })
     if (verdict.action === 'none') {
       clearView(container)
       return
     }
-    this.#count(post.code, verdict.action, verdict.reasons.map((reason) => reason.id))
+    this.#count(post.code, verdict.action, verdict.reasons.map(reason => reason.id))
     const t = this.deps.translate
-    const labels = verdict.reasons.map((reason) =>
+    const labels = verdict.reasons.map(reason =>
       reason.id === 'countries' && post.author.country
         ? `${flag(post.author.country)} ${this.#regionNames?.of(post.author.country) ?? post.author.country}`
-        : reason.name || (isBuiltIn(reason.id) && t(`reason_${reason.id.replaceAll('-', '_')}`)) || ruleLabel(reason, (key) => t(key)),
+        : reason.name || (isBuiltIn(reason.id) && t(`reason_${reason.id.replaceAll('-', '_')}`)) || ruleLabel(reason, key => t(key)),
     )
     const text: ViewText = {
-      hidden: (reasons) => t('bar_hidden', [reasons]),
-      tagged: (reasons) => t('bar_tagged', [reasons]),
+      hidden: reasons => t('bar_hidden', [reasons]),
+      tagged: reasons => t('bar_tagged', [reasons]),
       show: t('bar_show'),
       notSpam: t('bar_not_spam'),
       keepHiding: t('bar_keep_hiding'),
@@ -221,30 +251,46 @@ export class SpamFilter {
   }
 
   #toggle(code: string, revealed: boolean): void {
-    if (revealed) this.#revealed.add(code)
+    if (revealed)
+      this.#revealed.add(code)
     else this.#revealed.delete(code)
     this.scan()
   }
 
   async #allow(username: string): Promise<void> {
-    const settings = { ...this.#settings, ruleFile: addAccount(this.#settings.ruleFile, 'allowed-accounts', username) }
+    const settings = {
+      ...this.#settings,
+      ruleFile: addAccount(this.#settings.ruleFile, 'allowed-accounts', username),
+    }
     this.setSettings(settings)
     this.scan()
     await this.deps.saveSettings(settings)
   }
 
   #count(code: string, action: 'hide' | 'tag', ruleIds: string[]): void {
-    if (this.#counted.has(code)) return
+    if (this.#counted.has(code))
+      return
     this.#counted.add(code)
     const day = this.deps.today()
     this.deps.recordStats((stats) => {
-      const current = stats.day === day ? stats : { day, hidden: 0, tagged: 0, byRule: {} }
+      const current = stats.day === day
+        ? stats
+        : {
+            day,
+            hidden: 0,
+            tagged: 0,
+            byRule: {},
+          }
       const byRule = { ...current.byRule }
       for (const id of ruleIds) byRule[id] = (byRule[id] ?? 0) + 1
       return {
         day,
-        hidden: current.hidden + (action === 'hide' ? 1 : 0),
-        tagged: current.tagged + (action === 'tag' ? 1 : 0),
+        hidden: current.hidden + (action === 'hide'
+          ? 1
+          : 0),
+        tagged: current.tagged + (action === 'tag'
+          ? 1
+          : 0),
         byRule,
       }
     })

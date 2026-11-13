@@ -1,7 +1,7 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { createVaporApp } from 'vue'
 // @vitest-environment happy-dom
 import { fakeBrowser } from 'wxt/testing/fake-browser'
-import { createVaporApp, h } from 'vue'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineFeature } from '../../features/api'
 import OptionsForm from '../components/OptionsForm.vue'
 
@@ -10,8 +10,17 @@ const feature = defineFeature({
   enabledByDefault: true,
   options: {
     flag: { type: 'boolean', default: false },
-    mode: { type: 'select', default: 'a', choices: ['a', 'b'] },
-    size: { type: 'number', default: 2, min: 1, max: 9 },
+    mode: {
+      type: 'select',
+      default: 'a',
+      choices: ['a', 'b'],
+    },
+    size: {
+      type: 'number',
+      default: 2,
+      min: 1,
+      max: 9,
+    },
   },
   init: () => undefined,
 })
@@ -22,7 +31,7 @@ beforeEach(() => {
   document.body.innerHTML = '<div id="app"></div>'
 })
 
-describe('OptionsForm', () => {
+describe('optionsForm', () => {
   it('reports each changed option with its key and typed value', () => {
     const changes: [string, unknown][] = []
     createVaporApp(OptionsForm, {

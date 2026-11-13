@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { ageInMonths, CountryNames, parseCount, parseJoined, parseProfileCounts } from '../normalize'
 
-describe('CountryNames', () => {
+describe('countryNames', () => {
   const names = new CountryNames(['ja', 'zh-TW', 'zh-CN', 'ko', 'en'])
 
   it('maps localized country names from About this profile to ISO codes', () => {

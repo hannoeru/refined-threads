@@ -1,6 +1,6 @@
 import type { Settings } from '../model'
 
-export type SectionProps = {
+export interface SectionProps {
   settings: Settings
   update: (change: (current: Settings) => Settings) => Promise<void>
 }

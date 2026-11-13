@@ -20,9 +20,9 @@ const STYLE = `
 .${BADGE} > .rt-ai-follows-you, .${BADGE} > .rt-ai-you-follow { font-weight: 600; }
 `
 
-const flag = (code: string) => String.fromCodePoint(...[...code].map((letter) => 0x1f1a5 + letter.charCodeAt(0)))
+const flag = (code: string) => String.fromCodePoint(...[...code].map(letter => 0x1F1A5 + letter.charCodeAt(0)))
 
-type Item = { kind: string; text: string; title: string }
+interface Item { kind: string, text: string, title: string }
 
 export default defineFeature({
   id: 'account-info',
@@ -42,24 +42,45 @@ export default defineFeature({
     const needs = { about: showsPlace || options.age, followers: options.followers, posts: options.posts }
     const language = t('@@ui_locale').replace('_', '-') || undefined
     const compact = new Intl.NumberFormat(language, { notation: 'compact' })
-    const regions = new Intl.DisplayNames(language ? [language] : [], { type: 'region' })
+    const regions = new Intl.DisplayNames(language
+      ? [language]
+      : [], { type: 'region' })
     const badges = new Map<string, Set<HTMLElement>>()
-    const relations = new Map<string, { followedBy: boolean; following: boolean }>()
+    const relations = new Map<string, { followedBy: boolean, following: boolean }>()
 
     ctx.addStyle(STYLE)
 
     const place = (data: ProfileData): Item[] => {
-      if (!showsPlace) return []
+      if (!showsPlace)
+        return []
       if (data.countryHidden) {
         const hidden = t('feature_account_info_location_hidden')
-        return [{ kind: 'hidden', text: options.countryName ? `🏴 ${hidden}` : '🏴', title: hidden }]
+        return [
+          {
+            kind: 'hidden',
+            text: options.countryName
+              ? `🏴 ${hidden}`
+              : '🏴',
+            title: hidden,
+          },
+        ]
       }
-      const name = data.country ? (regions.of(data.country) ?? data.country) : data.countryName
-      if (!name) return []
+      const name = data.country
+        ? (regions.of(data.country) ?? data.country)
+        : data.countryName
+      if (!name)
+        return []
       const title = t('feature_account_info_based_in', [name])
       const items: Item[] = []
-      if (options.flag && data.country) items.push({ kind: 'flag', text: flag(data.country), title })
-      if (options.countryName || items.length === 0) items.push({ kind: 'country', text: name, title })
+      if (options.flag && data.country) {
+        items.push({
+          kind: 'flag',
+          text: flag(data.country),
+          title,
+        })
+      }
+      if (options.countryName || items.length === 0)
+        items.push({ kind: 'country', text: name, title })
       return items
     }
 
@@ -79,18 +100,35 @@ export default defineFeature({
 
     const items = (pk: string): Item[] => {
       const data = lookups.data(pk)
-      const result = [...relation(pk), ...place(data)]
+      const result = [
+        ...relation(pk),
+        ...place(data),
+      ]
       if (options.age && data.ageMonths !== null) {
         const years = Math.floor(data.ageMonths / 12)
-        const text = years >= 1 ? t('feature_account_info_age_years', [String(years)]) : t('feature_account_info_age_months', [String(data.ageMonths)])
-        result.push({ kind: 'age', text, title: t('feature_account_info_age_title', [text]) })
+        const text = years >= 1
+          ? t('feature_account_info_age_years', [
+              String(years),
+            ])
+          : t('feature_account_info_age_months', [
+              String(data.ageMonths),
+            ])
+        result.push({
+          kind: 'age',
+          text,
+          title: t('feature_account_info_age_title', [text]),
+        })
       }
       if (options.followers && data.followers !== null) {
-        const text = t('feature_account_info_followers', [compact.format(data.followers)])
+        const text = t('feature_account_info_followers', [
+          compact.format(data.followers),
+        ])
         result.push({ kind: 'followers', text, title: text })
       }
       if (options.posts && data.posts !== null) {
-        const text = t('feature_account_info_posts', [compact.format(data.posts)])
+        const text = t('feature_account_info_posts', [
+          compact.format(data.posts),
+        ])
         result.push({ kind: 'posts', text, title: text })
       }
       return result
@@ -98,7 +136,13 @@ export default defineFeature({
 
     const refresh = (pk: string) => {
       const list = items(pk)
-      if (lookups.loading(pk)) list.push({ kind: 'loading', text: '', title: t('feature_account_info_loading') })
+      if (lookups.loading(pk)) {
+        list.push({
+          kind: 'loading',
+          text: '',
+          title: t('feature_account_info_loading'),
+        })
+      }
       for (const badge of badges.get(pk) ?? []) {
         badge.replaceChildren(
           ...list.map((item) => {
@@ -109,23 +153,31 @@ export default defineFeature({
             return span
           }),
         )
-        badge.setAttribute('aria-label', list.map((item) => item.title).join(', '))
+        badge.setAttribute('aria-label', list.map(item => item.title).join(', '))
         badge.hidden = list.length === 0
       }
     }
 
     const attach = (container: HTMLElement) => {
       const code = postCodeOf(container)
-      const post = code ? ctx.posts.get(code) : undefined
-      if (!post) return
-      if (container.querySelector(`.${BADGE}`)) return
+      const post = code
+        ? ctx.posts.get(code)
+        : undefined
+      if (!post)
+        return
+      if (container.querySelector(`.${BADGE}`))
+        return
       const header = authorHeaderOf(container, post.author.username)
-      const slot = header ? null : nameSlotOf(container, post.author.username)
-      if (!header && !slot) return
+      const slot = header
+        ? null
+        : nameSlotOf(container, post.author.username)
+      if (!header && !slot)
+        return
       const badge = ctx.document.createElement('span')
       badge.className = `${BADGE} ${header ? 'rt-ai-line' : 'rt-ai-inline'}`
       badge.setAttribute('role', 'note')
-      if (header) header.append(badge)
+      if (header)
+        header.append(badge)
       else slot!.after(badge)
       relations.set(post.author.pk, { followedBy: post.author.followedBy, following: post.author.following })
       const set = badges.get(post.author.pk) ?? new Set()
@@ -143,6 +195,6 @@ export default defineFeature({
     ctx.observe<HTMLElement>(POST_CONTAINER, attach)
     ctx.posts.subscribe(() => ctx.document.querySelectorAll<HTMLElement>(POST_CONTAINER).forEach(attach), ctx.signal)
     lookups.subscribe(refresh, ctx.signal)
-    ctx.signal.addEventListener('abort', () => ctx.document.querySelectorAll(`.${BADGE}`).forEach((badge) => badge.remove()), { once: true })
+    ctx.signal.addEventListener('abort', () => ctx.document.querySelectorAll(`.${BADGE}`).forEach(badge => badge.remove()), { once: true })
   },
 })

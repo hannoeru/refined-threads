@@ -37,6 +37,12 @@ export function makePost(input: PostInput = {}): Post {
       posts: null,
       ...author,
     },
-    counts: { likes: 0, replies: 0, reposts: 0, quotes: 0, ...counts },
+    counts: {
+      likes: 0,
+      replies: 0,
+      reposts: 0,
+      quotes: 0,
+      ...counts,
+    },
   }
 }

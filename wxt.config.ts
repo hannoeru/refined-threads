@@ -5,7 +5,11 @@ export default defineConfig({
   srcDir: '.',
   modules: ['@wxt-dev/module-vue'],
   manifestVersion: 3,
-  vue: { vite: { features: { vapor: true, optionsAPI: false } } },
+  vue: {
+    vite: {
+      features: { vapor: true, optionsAPI: false },
+    },
+  },
   manifest: {
     name: '__MSG_extName__',
     description: '__MSG_extDescription__',
@@ -16,7 +20,9 @@ export default defineConfig({
       gecko: {
         id: 'refined-threads@hanlee.co',
         strict_min_version: '128.0',
-        data_collection_permissions: { required: ['none'] },
+        data_collection_permissions: {
+          required: ['none'],
+        },
       },
     },
   },

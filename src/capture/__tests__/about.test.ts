@@ -2,20 +2,35 @@
 import { describe, expect, it } from 'vitest'
 import { buildAboutRequest, findVersioningId, parseAboutResponse, retryAfterMs, sessionFromBody } from '../about'
 
-const about = (country: string | null, visible: boolean, joined = '2023年7月 · 1億人以上') =>
-  `for (;;);${JSON.stringify({
+function about(country: string | null, visible: boolean, joined = '2023年7月 · 1億人以上') {
+  return `for (;;);${JSON.stringify({
     payload: {
       layout: {
         bloks_payload: {
           data: [
-            { data: { key: 'THREADS_ABOUT_THIS_PROFILE:about_this_profile_country_visibility', initial: visible } },
-            ...(country === null ? [] : [{ data: { key: 'THREADS_ABOUT_THIS_PROFILE:about_this_profile_country', initial: country } }]),
+            {
+              data: { key: 'THREADS_ABOUT_THIS_PROFILE:about_this_profile_country_visibility', initial: visible },
+            },
+            ...(country === null
+              ? []
+              : [
+                  {
+                    data: { key: 'THREADS_ABOUT_THIS_PROFILE:about_this_profile_country', initial: country },
+                  },
+                ]),
           ],
-          tree: [{ $: '#FF000000' }, { ')': '名前' }, { '&': 'Amy 2024 (@amy2024' }, { ')': '参加日' }, { ')': joined }],
+          tree: [
+            { $: '#FF000000' },
+            { ')': '名前' },
+            { '&': 'Amy 2024 (@amy2024' },
+            { ')': '参加日' },
+            { ')': joined },
+          ],
         },
       },
     },
   })}`
+}
 
 describe('country lookup', () => {
   it('captures the session fields from a GraphQL request body, and only when it has fb_dtsg', () => {
@@ -48,7 +63,13 @@ describe('country lookup', () => {
       joined: '2023年7月 · 1億人以上',
     })
     expect(parseAboutResponse('1', about(null, false, 'July 2023'))).toMatchObject({ country: null, countryVisible: false, joined: 'July 2023' })
-    expect(parseAboutResponse('1', '<!DOCTYPE html>')).toEqual({ pk: '1', ok: false, reason: 'parse', status: 200, retryAfterMs: null })
+    expect(parseAboutResponse('1', '<!DOCTYPE html>')).toEqual({
+      pk: '1',
+      ok: false,
+      reason: 'parse',
+      status: 200,
+      retryAfterMs: null,
+    })
   })
 
   it('reads Retry-After in seconds', () => {

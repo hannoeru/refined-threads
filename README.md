@@ -6,12 +6,12 @@ The name follows [Refined GitHub](https://github.com/refined-github/refined-gith
 
 ## Features
 
-| Feature | On by default | What it does |
-| --- | --- | --- |
-| Spam filter (`spam-filter`) | Yes | Hides or tags spam and bot posts. Levels (Light, Balanced, Strict), blocked words and sites, hidden and allowed accounts, account checks (country, age, followers, posts), user-defined scoring rules, and shareable settings files with presets. |
-| Real dates (`absolute-timestamps`) | No | Shows the date of each post instead of "5h". Users choose the format (medium, short, long, ISO, US, European, or a custom pattern such as `ddd, MMM D · HH:mm`), whether to show the time, and whether to keep "5h" in front. The settings page shows a live preview. |
-| Keyboard navigation (`keyboard-navigation`) | No | `j` and `k` move between posts, `o` opens the selected post. |
-| Account info (`account-info`) | No | Shows a small line of details under each author's name. Each detail has its own switch: whether the author follows you, whether you follow them, country flag, country name (🏴 when the account hides its location), how long the account has been on Threads, follower count, and post count. Location, age, and the follow details need a logged-in Threads session. Threads does not publish how many accounts someone follows, so there is no following count. |
+| Feature                                     | On by default | What it does                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ------------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Spam filter (`spam-filter`)                 | Yes           | Hides or tags spam and bot posts. Levels (Light, Balanced, Strict), blocked words and sites, hidden and allowed accounts, account checks (country, age, followers, posts), user-defined scoring rules, and shareable settings files with presets.                                                                                                                                                                                                                   |
+| Real dates (`absolute-timestamps`)          | No            | Shows the date of each post instead of "5h". Users choose the format (medium, short, long, ISO, US, European, or a custom pattern such as `ddd, MMM D · HH:mm`), whether to show the time, and whether to keep "5h" in front. The settings page shows a live preview.                                                                                                                                                                                               |
+| Keyboard navigation (`keyboard-navigation`) | No            | `j` and `k` move between posts, `o` opens the selected post.                                                                                                                                                                                                                                                                                                                                                                                                        |
+| Account info (`account-info`)               | No            | Shows a small line of details under each author's name. Each detail has its own switch: whether the author follows you, whether you follow them, country flag, country name (🏴 when the account hides its location), how long the account has been on Threads, follower count, and post count. Location, age, and the follow details need a logged-in Threads session. Threads does not publish how many accounts someone follows, so there is no following count. |
 
 The settings page lists every feature with a switch, a search box, and a settings page per feature. The popup has a switch for every feature, plus the spam filter's daily count and level. Changes apply to open Threads tabs at once.
 
@@ -56,11 +56,11 @@ flowchart LR
 
 These facts were checked on the real site on 2026-11-12.
 
-| Data | Source | Notes |
-| --- | --- | --- |
-| Post text, links, mentions, AI label, reply info, counts, author handle, verified, follow state | Bootstrap JSON and GraphQL responses (`BarcelonaFeedPaginationDirectQuery`, `BarcelonaCustomFeedRefetchableQuery`, `BarcelonaSearchResultsRefetchableQuery`, `BarcelonaActivityFeedV2ListPaginationQuery`) | Posts are found by shape (`code`, `pk`, `user`), not by query name, because Meta rotates query IDs. |
-| Account country and join date | `POST /async/wbloks/fetch/?appid=com.bloks.www.text_post_app.about_this_profile_async_action` | Needs the page session fields and the `WebBloksVersioningID` value. The country name and join date are localized (for example "日本", "2023年7月"). `Intl.DisplayNames` maps names to ISO codes. |
-| Follower and post count | `<meta name="description">` of `https://www.threads.com/@handle` | For example "フォロワー100人・スレッド4,515 件". The extension streams the page and stops at the meta tag, about 110 KB of a 680 KB page. |
+| Data                                                                                            | Source                                                                                                                                                                                                     | Notes                                                                                                                                                                                            |
+| ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Post text, links, mentions, AI label, reply info, counts, author handle, verified, follow state | Bootstrap JSON and GraphQL responses (`BarcelonaFeedPaginationDirectQuery`, `BarcelonaCustomFeedRefetchableQuery`, `BarcelonaSearchResultsRefetchableQuery`, `BarcelonaActivityFeedV2ListPaginationQuery`) | Posts are found by shape (`code`, `pk`, `user`), not by query name, because Meta rotates query IDs.                                                                                              |
+| Account country and join date                                                                   | `POST /async/wbloks/fetch/?appid=com.bloks.www.text_post_app.about_this_profile_async_action`                                                                                                              | Needs the page session fields and the `WebBloksVersioningID` value. The country name and join date are localized (for example "日本", "2023年7月"). `Intl.DisplayNames` maps names to ISO codes. |
+| Follower and post count                                                                         | `<meta name="description">` of `https://www.threads.com/@handle`                                                                                                                                           | For example "フォロワー100人・スレッド4,515 件". The extension streams the page and stops at the meta tag, about 110 KB of a 680 KB page.                                                        |
 
 The feed data has no follower count, post count, account age, or view count.
 
@@ -106,12 +106,12 @@ The spam filter's Share tab exports this format. Import and the advanced editor 
 
 Rule fields:
 
-| Key | Values |
-| --- | --- |
-| `id` | Lower-case letters, digits, and `-`. Import merges rules by `id`. |
+| Key      | Values                                                                                      |
+| -------- | ------------------------------------------------------------------------------------------- |
+| `id`     | Lower-case letters, digits, and `-`. Import merges rules by `id`.                           |
 | `effect` | `hide`, `tag`, `score` (adds `score` points, -100 to 100), `allow` (never act on the post). |
-| `target` | `all`, `posts`, `replies`. |
-| `when` | A condition. Combine with `all`, `any`, and `not`. |
+| `target` | `all`, `posts`, `replies`.                                                                  |
+| `when`   | A condition. Combine with `all`, `any`, and `not`.                                          |
 
 Condition operators: `is`, `in`, `matches` (regular expression, case-insensitive, at most 200 characters), `contains_any`, `host_in` (link host or its subdomains), `gt`, `lt`. On list fields, `gt` and `lt` compare the list length.
 

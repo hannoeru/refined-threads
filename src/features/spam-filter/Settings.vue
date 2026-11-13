@@ -9,7 +9,14 @@ import Protection from './settings/Protection.vue'
 import Rules from './settings/Rules.vue'
 import Share from './settings/Share.vue'
 
-const TABS = ['protection', 'lists', 'profile', 'rules', 'look', 'share'] as const
+const TABS = [
+  'protection',
+  'lists',
+  'profile',
+  'rules',
+  'look',
+  'share',
+] as const
 const tab = ref<(typeof TABS)[number]>('protection')
 const { settings, update } = useSettings()
 </script>
@@ -39,8 +46,32 @@ const { settings, update } = useSettings()
 </template>
 
 <style>
-.subtabs { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--hairline); padding-bottom: 8px; }
-.subtab { flex: none; border: 0; background: transparent; padding: 6px 10px; border-radius: var(--radius-sm); color: var(--muted); font-size: 14px; font-weight: 600; white-space: nowrap; }
-.subtab:hover { background: var(--accent-soft); color: var(--ink); }
-.subtab[aria-selected='true'] { background: var(--accent-soft); color: var(--ink); font-weight: 700; }
+.subtabs {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--hairline);
+  padding-bottom: 8px;
+}
+.subtab {
+  flex: none;
+  border: 0;
+  background: transparent;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.subtab:hover {
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+.subtab[aria-selected='true'] {
+  background: var(--accent-soft);
+  color: var(--ink);
+  font-weight: 700;
+}
 </style>

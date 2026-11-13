@@ -29,7 +29,10 @@ describe('rule file editing', () => {
   })
 
   it('restores a deleted built-in rule when its list is edited', () => {
-    const without = { ...file(), rules: file().rules.filter((rule) => rule.id !== 'countries') }
+    const without = {
+      ...file(),
+      rules: file().rules.filter(rule => rule.id !== 'countries'),
+    }
     expect(readList(writeList(without, 'countries', ['JP']), 'countries')).toEqual(['JP'])
   })
 
@@ -38,7 +41,9 @@ describe('rule file editing', () => {
   })
 
   it('labels built-in rules by translation and custom rules by name', () => {
-    const t = (key: string) => (key === 'rule_blocked_words' ? 'Blocked words' : '')
+    const t = (key: string) => (key === 'rule_blocked_words'
+      ? 'Blocked words'
+      : '')
     expect(ruleLabel({ id: 'blocked-words', name: '' }, t)).toBe('Blocked words')
     expect(ruleLabel({ id: 'mine', name: 'My rule' }, t)).toBe('My rule')
     expect(ruleLabel({ id: 'mine', name: '' }, t)).toBe('mine')

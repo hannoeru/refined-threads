@@ -34,15 +34,24 @@ export default defineFeature({
   id: 'highlight-followed',
   enabledByDefault: false,
   options: {
-    color: { type: 'select', default: 'lime', choices: ['lime', 'purple'] },
+    color: {
+      type: 'select',
+      default: 'lime',
+      choices: ['lime', 'purple']
+    },
   },
   init(ctx) {
-    const color = ctx.options.color === 'lime' ? '#a6e22e' : '#b48cf0'
+    const color = ctx.options.color === 'lime'
+      ? '#a6e22e'
+      : '#b48cf0'
     ctx.addStyle(`.rt-followed { text-decoration: underline 2px ${color}; }`)
     const mark = (container: HTMLElement) => {
       const code = postCodeOf(container)
-      const post = code ? ctx.posts.get(code) : undefined
-      if (post?.author.following) authorLinkOf(container, post.author.username)?.classList.add('rt-followed')
+      const post = code
+        ? ctx.posts.get(code)
+        : undefined
+      if (post?.author.following)
+        authorLinkOf(container, post.author.username)?.classList.add('rt-followed')
     }
     ctx.observe<HTMLElement>(POST_CONTAINER, mark)
     ctx.posts.subscribe(() => ctx.document.querySelectorAll<HTMLElement>(POST_CONTAINER).forEach(mark), ctx.signal)
@@ -55,16 +64,16 @@ export default defineFeature({
 
 `init(ctx)` runs when the feature turns on, and again when its options change. `ctx` gives you:
 
-| Member | Use |
-| --- | --- |
-| `ctx.signal` | An `AbortSignal`. It aborts when the user turns the feature off or changes its options. Pass it to every listener (`{ signal: ctx.signal }`) and undo your DOM changes in `ctx.signal.addEventListener('abort', …)`. |
-| `ctx.options` | The option values, typed from your `options` spec and already validated. |
-| `ctx.observe(selector, callback)` | Calls `callback` once for each element that matches, now and when Threads adds more. It stops on abort. |
-| `ctx.addStyle(css)` | Adds a style sheet. It is removed on abort. |
-| `ctx.posts` | Post data captured from Threads: `get(code)` and `subscribe(listener, signal)`. A `Post` has the author, text, links, counts, and more (see `src/model.ts`). |
-| `ctx.lookups` | Account country, age, followers, and post count. `want(pk, username, needs)` queues a lookup. `data(pk)` reads the cache. `subscribe(listener, signal)` tells you when data arrives. |
-| `ctx.t(key, substitutions)` | Translated text from `public/_locales`. |
-| `ctx.document` | The Threads page document. |
+| Member                            | Use                                                                                                                                                                                                                  |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ctx.signal`                      | An `AbortSignal`. It aborts when the user turns the feature off or changes its options. Pass it to every listener (`{ signal: ctx.signal }`) and undo your DOM changes in `ctx.signal.addEventListener('abort', …)`. |
+| `ctx.options`                     | The option values, typed from your `options` spec and already validated.                                                                                                                                             |
+| `ctx.observe(selector, callback)` | Calls `callback` once for each element that matches, now and when Threads adds more. It stops on abort.                                                                                                              |
+| `ctx.addStyle(css)`               | Adds a style sheet. It is removed on abort.                                                                                                                                                                          |
+| `ctx.posts`                       | Post data captured from Threads: `get(code)` and `subscribe(listener, signal)`. A `Post` has the author, text, links, counts, and more (see `src/model.ts`).                                                         |
+| `ctx.lookups`                     | Account country, age, followers, and post count. `want(pk, username, needs)` queues a lookup. `data(pk)` reads the cache. `subscribe(listener, signal)` tells you when data arrives.                                 |
+| `ctx.t(key, substitutions)`       | Translated text from `public/_locales`.                                                                                                                                                                              |
+| `ctx.document`                    | The Threads page document.                                                                                                                                                                                           |
 
 Helpers for the Threads page live in `src/threads/dom.ts`: `POST_CONTAINER`, `postCodeOf`, `permalinkOf`, and `authorLinkOf`. Threads uses generated class names, so never select by class. Use the selectors in this file, `href` patterns, `time[datetime]`, roles, or `aria-*` attributes. If you need a new selector, add it to `src/threads/dom.ts` so every feature shares the fix when Threads changes.
 
@@ -77,12 +86,12 @@ Optional fields:
 
 Simple options need no UI code. The settings page builds a form from your `options` spec:
 
-| Type | Spec |
-| --- | --- |
-| Switch | `{ type: 'boolean', default: false }` |
-| List | `{ type: 'select', default: 'a', choices: ['a', 'b'] }` |
-| Number | `{ type: 'number', default: 10, min: 1, max: 100 }` |
-| Text | `{ type: 'text', default: '', maxLength: 200 }` |
+| Type   | Spec                                                    |
+| ------ | ------------------------------------------------------- |
+| Switch | `{ type: 'boolean', default: false }`                   |
+| List   | `{ type: 'select', default: 'a', choices: ['a', 'b'] }` |
+| Number | `{ type: 'number', default: 10, min: 1, max: 100 }`     |
+| Text   | `{ type: 'text', default: '', maxLength: 200 }`         |
 
 For a richer page, add `Settings.vue` next to `index.ts`. It must use `<script setup vapor lang="ts">`. The settings page shows it below the generated form. See `src/features/spam-filter/Settings.vue`.
 
@@ -90,13 +99,13 @@ For a richer page, add `Settings.vue` next to `index.ts`. It must use `<script s
 
 Add these keys to both `public/_locales/en/messages.json` and `public/_locales/zh_TW/messages.json`. In key names, the `-` in the feature id becomes `_`.
 
-| Key | Text |
-| --- | --- |
-| `feature_<id>_name` | The name in the features list. |
-| `feature_<id>_description` | One or two plain sentences that say what changes. |
-| `feature_<id>_option_<key>` | The label of each option. |
-| `feature_<id>_option_<key>_<choice>` | The label of each `select` choice. |
-| `feature_<id>_shortcut_<action>` | The label of each shortcut. |
+| Key                                  | Text                                              |
+| ------------------------------------ | ------------------------------------------------- |
+| `feature_<id>_name`                  | The name in the features list.                    |
+| `feature_<id>_description`           | One or two plain sentences that say what changes. |
+| `feature_<id>_option_<key>`          | The label of each option.                         |
+| `feature_<id>_option_<key>_<choice>` | The label of each `select` choice.                |
+| `feature_<id>_shortcut_<action>`     | The label of each shortcut.                       |
 
 If you cannot write Traditional Chinese, copy the English text and say so in the pull request.
 

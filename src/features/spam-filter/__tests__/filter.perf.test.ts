@@ -13,11 +13,14 @@ const RUNS = 7
 const posts = Array.from({ length: POSTS }, (_, index) =>
   makePost({
     code: `P${index}`,
-    text: index % 5 === 0 ? 'link in bio for the deal' : `ordinary post number ${index}`,
-    links: index % 7 === 0 ? ['https://shopee.tw/x'] : [],
+    text: index % 5 === 0
+      ? 'link in bio for the deal'
+      : `ordinary post number ${index}`,
+    links: index % 7 === 0
+      ? ['https://shopee.tw/x']
+      : [],
     author: { pk: `u${index}`, username: `user${index}` },
-  }),
-)
+  }))
 
 function start(initialPosts: typeof posts) {
   const controller = new AbortController()
@@ -43,20 +46,27 @@ function start(initialPosts: typeof posts) {
     scan()
   }
   filter.start()
-  return { controller, catalog, scans: () => scans }
+  return {
+    controller,
+    catalog,
+    scans: () => scans,
+  }
 }
 
-async function measure(name: string, scenario: () => Promise<{ ms: number; scans: number }>) {
+async function measure(name: string, scenario: () => Promise<{ ms: number, scans: number }>) {
   const times: number[] = []
   let scans = 0
   for (let run = 0; run < RUNS; run++) {
-    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+    vi.useFakeTimers({
+      toFake: ['setTimeout', 'clearTimeout'],
+    })
     const result = await scenario()
     times.push(result.ms)
     scans = result.scans
     vi.useRealTimers()
   }
   times.sort((a, b) => a - b)
+  // eslint-disable-next-line no-console -- this benchmark reports its measurements on standard output
   console.log(`${name}: median ${times[Math.floor(RUNS / 2)]!.toFixed(1)} ms, ${scans} full scans`)
 }
 
@@ -65,11 +75,13 @@ afterEach(() => vi.useRealTimers())
 describe('spam filter performance', () => {
   it('measures the work for unrelated DOM changes and for arriving posts', async () => {
     await measure('100 unrelated DOM changes inside 150 posts', async () => {
-      document.body.innerHTML = posts.map((post) => postContainer(post.code, post.author.username)).join('')
+      document.body.innerHTML = posts.map(post => postContainer(post.code, post.author.username)).join('')
       const { controller, scans } = start(posts)
       await vi.advanceTimersByTimeAsync(20)
       const before = scans()
-      const bodies = [...document.querySelectorAll('p')]
+      const bodies = [
+        ...document.querySelectorAll('p'),
+      ]
       const startedAt = performance.now()
       for (let index = 0; index < 100; index++) {
         bodies[index % bodies.length]!.append(document.createElement('span'))
@@ -81,21 +93,25 @@ describe('spam filter performance', () => {
     })
 
     for (const filterOn of [false, true]) {
-    await measure(`150 posts arriving in 10 batches${filterOn ? '' : ' (floor: filter off)'}`, async () => {
-      document.body.innerHTML = ''
-      const { controller, catalog, scans } = start([])
-      if (!filterOn) controller.abort()
-      const startedAt = performance.now()
-      for (let batch = 0; batch < 10; batch++) {
-        const slice = posts.slice(batch * 15, batch * 15 + 15)
-        document.body.insertAdjacentHTML('beforeend', slice.map((post) => postContainer(post.code, post.author.username)).join(''))
-        catalog.add(slice)
-        await vi.advanceTimersByTimeAsync(20)
-      }
-      const ms = performance.now() - startedAt
-      controller.abort()
-      return { ms, scans: scans() }
-    })
+      await measure(`150 posts arriving in 10 batches${filterOn ? '' : ' (floor: filter off)'}`, async () => {
+        document.body.innerHTML = ''
+        const { controller, catalog, scans } = start([])
+        if (!filterOn)
+          controller.abort()
+        const startedAt = performance.now()
+        for (let batch = 0; batch < 10; batch++) {
+          const slice = posts.slice(batch * 15, batch * 15 + 15)
+          document.body.insertAdjacentHTML('beforeend', slice.map(post => postContainer(post.code, post.author.username)).join(''))
+          catalog.add(slice)
+          await vi.advanceTimersByTimeAsync(20)
+        }
+        const ms = performance.now() - startedAt
+        controller.abort()
+        return {
+          ms,
+          scans: scans(),
+        }
+      })
     }
   }, 120_000)
 })

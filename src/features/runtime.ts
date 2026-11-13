@@ -1,9 +1,10 @@
 import type { AccountLookups, Feature, FeatureContext, PostStream } from './api'
-import { observe } from './services/observe'
 import type { WhenVisible } from './services/visible'
-import { resolveState, type StoredFeatures } from './state'
+import type { StoredFeatures } from './state'
+import { observe } from './services/observe'
+import { resolveState } from './state'
 
-export type RuntimeServices = {
+export interface RuntimeServices {
   document: Document
   posts: PostStream
   lookups: AccountLookups
@@ -13,7 +14,7 @@ export type RuntimeServices = {
   report: (featureId: string, error: unknown) => void
 }
 
-type Running = { key: string; controller: AbortController }
+interface Running { key: string, controller: AbortController }
 
 export class FeatureRuntime {
   #running = new Map<string, Running>()
@@ -30,12 +31,16 @@ export class FeatureRuntime {
     for (const feature of this.features) {
       const state = resolveState(feature, stored)
       const active = state.enabled && (feature.include?.(url) ?? true)
-      const key = active ? JSON.stringify(state.options) : ''
+      const key = active
+        ? JSON.stringify(state.options)
+        : ''
       const current = this.#running.get(feature.id)
-      if (current?.key === key) continue
+      if (current?.key === key)
+        continue
       current?.controller.abort()
       this.#running.delete(feature.id)
-      if (active) this.#start(feature, state.options, key)
+      if (active)
+        this.#start(feature, state.options, key)
     }
   }
 
@@ -44,7 +49,9 @@ export class FeatureRuntime {
   }
 
   running(): string[] {
-    return [...this.#running.keys()]
+    return [
+      ...this.#running.keys(),
+    ]
   }
 
   stopAll(): void {
@@ -75,8 +82,9 @@ export class FeatureRuntime {
       },
     }
     try {
-      void Promise.resolve(feature.init(ctx as never)).catch((error) => this.services.report(feature.id, error))
-    } catch (error) {
+      void Promise.resolve(feature.init(ctx as never)).catch(error => this.services.report(feature.id, error))
+    }
+    catch (error) {
       this.services.report(feature.id, error)
     }
   }

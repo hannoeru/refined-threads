@@ -2,7 +2,8 @@ export const POST_CONTAINER = '[data-pressable-container="true"]'
 
 export function permalinkOf(container: Element): HTMLAnchorElement | null {
   for (const link of container.querySelectorAll<HTMLAnchorElement>('a[href*="/post/"]')) {
-    if (link.querySelector('time')) return link
+    if (link.querySelector('time'))
+      return link
   }
   return null
 }
@@ -13,18 +14,21 @@ export function postCodeOf(container: Element): string | null {
 
 export function authorLinkOf(container: Element, username: string): HTMLAnchorElement | null {
   for (const link of container.querySelectorAll<HTMLAnchorElement>(`a[href="/@${CSS.escape(username)}"]`)) {
-    if (link.textContent?.trim()) return link
+    if (link.textContent?.trim())
+      return link
   }
   return null
 }
 
 export function nameSlotOf(container: Element, username: string): Element | null {
   const link = authorLinkOf(container, username)
-  if (!link) return null
+  if (!link)
+    return null
   const permalink = permalinkOf(container)
   let slot: Element = link
   while (slot.parentElement && slot.parentElement !== container) {
-    if (permalink && slot.parentElement.contains(permalink)) return slot
+    if (permalink && slot.parentElement.contains(permalink))
+      return slot
     slot = slot.parentElement
   }
   return link
@@ -33,8 +37,11 @@ export function nameSlotOf(container: Element, username: string): Element | null
 export function authorHeaderOf(container: Element, username: string): Element | null {
   const slot = nameSlotOf(container, username)
   const header = slot?.parentElement?.parentElement
-  if (!slot || !header || slot.parentElement === container || header === container || !container.contains(header)) return null
-  return header.ownerDocument.defaultView?.getComputedStyle(header).display === 'grid' ? header : null
+  if (!slot || !header || slot.parentElement === container || header === container || !container.contains(header))
+    return null
+  return header.ownerDocument.defaultView?.getComputedStyle(header).display === 'grid'
+    ? header
+    : null
 }
 
 export const THREADS_THEME = {

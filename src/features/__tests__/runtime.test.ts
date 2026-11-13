@@ -3,8 +3,8 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { fakeLookups, translate } from '../../testing/feature'
 import { defineFeature } from '../api'
 import { FeatureRuntime } from '../runtime'
-import { alwaysVisible } from '../services/visible'
 import { PostCatalog } from '../services/posts'
+import { alwaysVisible } from '../services/visible'
 
 function setup() {
   const log: string[] = []
@@ -12,14 +12,20 @@ function setup() {
   const counter = defineFeature({
     id: 'counter',
     enabledByDefault: true,
-    options: { label: { type: 'text', default: 'a' } },
+    options: {
+      label: { type: 'text', default: 'a' },
+    },
     init(ctx) {
       log.push(`start:${ctx.options.label}`)
       ctx.addStyle('.x{}')
       ctx.signal.addEventListener('abort', () => log.push('stop'))
     },
   })
-  const off = defineFeature({ id: 'off', enabledByDefault: false, init: () => void log.push('off-start') })
+  const off = defineFeature({
+    id: 'off',
+    enabledByDefault: false,
+    init: () => void log.push('off-start'),
+  })
   const broken = defineFeature({
     id: 'broken',
     enabledByDefault: true,
@@ -30,7 +36,7 @@ function setup() {
   const profileOnly = defineFeature({
     id: 'profile-only',
     enabledByDefault: true,
-    include: (url) => url.pathname.startsWith('/@'),
+    include: url => url.pathname.startsWith('/@'),
     init: () => void log.push('profile-start'),
   })
   let url = new URL('https://www.threads.com/')
@@ -41,16 +47,21 @@ function setup() {
     t: translate,
     url: () => url,
     whenVisible: () => alwaysVisible,
-    report: (id) => void errors.push(id),
+    report: id => void errors.push(id),
   })
-  return { runtime, log, errors, go: (next: string) => (url = new URL(next)) }
+  return {
+    runtime,
+    log,
+    errors,
+    go: (next: string) => (url = new URL(next)),
+  }
 }
 
 beforeEach(() => {
   document.head.innerHTML = ''
 })
 
-describe('FeatureRuntime', () => {
+describe('featureRuntime', () => {
   it('starts features that are on by default and reports a broken feature without stopping the others', () => {
     const { runtime, log, errors } = setup()
     runtime.apply({})
@@ -62,7 +73,9 @@ describe('FeatureRuntime', () => {
   it('stops a feature and removes its styles when the user turns it off', () => {
     const { runtime, log } = setup()
     runtime.apply({})
-    runtime.apply({ counter: { enabled: false } })
+    runtime.apply({
+      counter: { enabled: false },
+    })
     expect(log).toEqual(['start:a', 'stop'])
     expect(document.querySelectorAll('style[data-refined-threads="counter"]')).toHaveLength(0)
   })
@@ -70,8 +83,14 @@ describe('FeatureRuntime', () => {
   it('restarts a feature only when its own options change', () => {
     const { runtime, log } = setup()
     runtime.apply({})
-    runtime.apply({ off: { enabled: false } })
-    runtime.apply({ counter: { options: { label: 'b' } } })
+    runtime.apply({
+      off: { enabled: false },
+    })
+    runtime.apply({
+      counter: {
+        options: { label: 'b' },
+      },
+    })
     expect(log).toEqual(['start:a', 'stop', 'start:b'])
   })
 

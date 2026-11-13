@@ -1,56 +1,70 @@
+import type { AboutRequest, AboutResult, LookupFailure, ProfileRequest, ProfileResult } from '../bridge'
+import type { Session } from './about'
+import type { Capture } from './parse'
 import {
   ABOUT_REQUEST_EVENT,
   ABOUT_RESULT_EVENT,
-  type AboutRequest,
-  type AboutResult,
-  type LookupFailure,
+
   POSTS_EVENT,
-  USERS_EVENT,
   PROFILE_REQUEST_EVENT,
   PROFILE_RESULT_EVENT,
-  type ProfileRequest,
-  type ProfileResult,
+  USERS_EVENT,
+
 } from '../bridge'
-import { buildAboutRequest, findVersioningId, parseAboutResponse, retryAfterMs, type Session, sessionFromBody } from './about'
-import { type Capture, parseBootstrap, parsePayloadText } from './parse'
+import { buildAboutRequest, findVersioningId, parseAboutResponse, retryAfterMs, sessionFromBody } from './about'
+import { parseBootstrap, parsePayloadText } from './parse'
 import { readDescription } from './profile'
 
 const SKIPPED_QUERIES = new Set(['useBarcelonaBatchedDynamicPostCountsSubscriptionQuery'])
 
 const isGraphql = (url: string) => url.includes('/graphql')
 
-type Tracked = { url: string; name: string | null }
+interface Tracked { url: string, name: string | null }
 
 const tracked = new WeakMap<XMLHttpRequest, Tracked>()
 
 export function installHook(win: Window & typeof globalThis): void {
   const emit = ({ posts, users }: Capture) => {
-    if (posts.length > 0) win.dispatchEvent(new win.CustomEvent(POSTS_EVENT, { detail: JSON.stringify(posts) }))
-    if (users.length > 0) win.dispatchEvent(new win.CustomEvent(USERS_EVENT, { detail: JSON.stringify(users) }))
+    if (posts.length > 0) {
+      win.dispatchEvent(new win.CustomEvent(POSTS_EVENT, {
+        detail: JSON.stringify(posts),
+      }))
+    }
+    if (users.length > 0) {
+      win.dispatchEvent(new win.CustomEvent(USERS_EVENT, {
+        detail: JSON.stringify(users),
+      }))
+    }
   }
   const ingest = (text: string) => {
     try {
       emit(parsePayloadText(text))
-    } catch {
-      return
+    }
+    catch {
+
     }
   }
 
   let session: Session | null = null
   const captureSession = (body: unknown) => {
-    if (typeof body !== 'string') return
+    if (typeof body !== 'string')
+      return
     session = sessionFromBody(body) ?? session
   }
 
   const proto = win.XMLHttpRequest.prototype
   const { open, setRequestHeader, send } = proto
   proto.open = function (this: XMLHttpRequest, ...args: Parameters<XMLHttpRequest['open']>) {
-    tracked.set(this, { url: String(args[1]), name: null })
+    tracked.set(this, {
+      url: String(args[1]),
+      name: null,
+    })
     return open.apply(this, args)
   } as XMLHttpRequest['open']
   proto.setRequestHeader = function (this: XMLHttpRequest, name: string, value: string) {
     const state = tracked.get(this)
-    if (state && name.toLowerCase() === 'x-fb-friendly-name') state.name = value
+    if (state && name.toLowerCase() === 'x-fb-friendly-name')
+      state.name = value
     return setRequestHeader.call(this, name, value)
   }
   proto.send = function (this: XMLHttpRequest, body?: Document | XMLHttpRequestBodyInit | null) {
@@ -59,7 +73,8 @@ export function installHook(win: Window & typeof globalThis): void {
       captureSession(body)
       if (!SKIPPED_QUERIES.has(state.name ?? '')) {
         this.addEventListener('load', () => {
-          if (this.responseType === '' || this.responseType === 'text') ingest(this.responseText)
+          if (this.responseType === '' || this.responseType === 'text')
+            ingest(this.responseText)
         })
       }
     }
@@ -69,7 +84,11 @@ export function installHook(win: Window & typeof globalThis): void {
   const fetch = win.fetch
   win.fetch = async function (input: RequestInfo | URL, init?: RequestInit) {
     const response = await fetch.call(win, input, init)
-    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+    const url = typeof input === 'string'
+      ? input
+      : input instanceof URL
+        ? input.href
+        : input.url
     if (isGraphql(url)) {
       captureSession(init?.body)
       response
@@ -86,12 +105,15 @@ export function installHook(win: Window & typeof globalThis): void {
     ok: false,
     reason,
     status: response?.status ?? null,
-    retryAfterMs: response ? retryAfterMs(response.headers.get('Retry-After')) : null,
+    retryAfterMs: response
+      ? retryAfterMs(response.headers.get('Retry-After'))
+      : null,
   })
 
   const about = async ({ pk }: AboutRequest): Promise<AboutResult> => {
     const versioningId = findVersioningId(win.document)
-    if (session === null || versioningId === null) return failure(pk, 'no-session')
+    if (session === null || versioningId === null)
+      return failure(pk, 'no-session')
     const request = buildAboutRequest(win.location.origin, session, versioningId, pk)
     const response = await fetch.call(win, request.url, {
       method: 'POST',
@@ -99,12 +121,16 @@ export function installHook(win: Window & typeof globalThis): void {
       body: request.body,
       credentials: 'include',
     })
-    return response.ok ? parseAboutResponse(pk, await response.text()) : failure(pk, 'http', response)
+    return response.ok
+      ? parseAboutResponse(pk, await response.text())
+      : failure(pk, 'http', response)
   }
 
   const profile = async ({ pk, username }: ProfileRequest): Promise<ProfileResult> => {
     const response = await fetch.call(win, new URL(`/@${encodeURIComponent(username)}`, win.location.origin), { credentials: 'include' })
-    return response.ok ? { pk, ok: true, description: await readDescription(response) } : failure(pk, 'http', response)
+    return response.ok
+      ? { pk, ok: true, description: await readDescription(response) }
+      : failure(pk, 'http', response)
   }
 
   const serve = <Request extends { pk: string }, Result>(
@@ -116,12 +142,15 @@ export function installHook(win: Window & typeof globalThis): void {
       let request: Request
       try {
         request = JSON.parse(String((event as CustomEvent).detail))
-      } catch {
+      }
+      catch {
         return
       }
       void handle(request)
         .catch(() => failure(request.pk, 'network'))
-        .then((result) => win.dispatchEvent(new win.CustomEvent(resultEvent, { detail: JSON.stringify(result) })))
+        .then(result => win.dispatchEvent(new win.CustomEvent(resultEvent, {
+          detail: JSON.stringify(result),
+        })))
     })
   serve(ABOUT_REQUEST_EVENT, ABOUT_RESULT_EVENT, about)
   serve(PROFILE_REQUEST_EVENT, PROFILE_RESULT_EVENT, profile)
@@ -129,10 +158,12 @@ export function installHook(win: Window & typeof globalThis): void {
   const bootstrap = () => {
     try {
       emit(parseBootstrap(win.document))
-    } catch {
-      return
+    }
+    catch {
+
     }
   }
-  if (win.document.readyState === 'loading') win.document.addEventListener('DOMContentLoaded', bootstrap, { once: true })
+  if (win.document.readyState === 'loading')
+    win.document.addEventListener('DOMContentLoaded', bootstrap, { once: true })
   else bootstrap()
 }
