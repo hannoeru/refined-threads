@@ -154,6 +154,17 @@ describe('follower counts', () => {
   })
 })
 
+describe('links in post text', () => {
+  it('ends a raw link at Chinese or Japanese punctuation, so the affiliate rule sees the site', () => {
+    const body = JSON.stringify(feedPayload([
+      [
+        rawPost({ code: 'C1', text: '超便宜快買 https://shopee.tw。下一句（https://shopee.tw/a/b）' }),
+      ],
+    ]))
+    expect(parsePayloadText(body).posts[0]?.links).toEqual(['https://shopee.tw', 'https://shopee.tw/a/b'])
+  })
+})
+
 describe('unwrapLink', () => {
   it('unwraps Threads redirect links and keeps other links', () => {
     expect(unwrapLink('https://l.threads.net/?u=https%3A%2F%2Fa.co%2Fb')).toBe('https://a.co/b')

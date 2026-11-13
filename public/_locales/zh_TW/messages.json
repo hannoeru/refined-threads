@@ -829,5 +829,11 @@
   },
   "feature_account_info_loading": {
     "message": "正在載入帳號資訊"
+  },
+  "save_invalid": {
+    "message": "這個值不被接受，所以沒有儲存。"
+  },
+  "save_failed": {
+    "message": "無法儲存設定。瀏覽器的同步儲存空間可能已滿。請移除一些字詞或帳號後再試一次。"
   }
 }

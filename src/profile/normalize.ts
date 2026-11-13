@@ -96,6 +96,9 @@ const MULTIPLIERS: Record<string, number> = {
   k: 1e3,
   m: 1e6,
   b: 1e9,
+  mil: 1e3,
+  mi: 1e6,
+  mio: 1e6,
   千: 1e3,
   万: 1e4,
   萬: 1e4,
@@ -107,10 +110,10 @@ const MULTIPLIERS: Record<string, number> = {
 }
 
 export function parseCount(segment: string): number | null {
-  const match = segment.match(/(\d[\d.,\s]*)([kmb千万萬億亿천만억])?/iu)
+  const match = segment.match(/(\d[\d.,\s]*)(?:(mil|mio|mi|[kmb])(?!\p{L})|([千万萬億亿천만억]))?/iu)
   if (!match?.[1])
     return null
-  const suffix = match[2]?.toLowerCase()
+  const suffix = (match[2] ?? match[3])?.toLowerCase()
   const digits = match[1].trim()
   if (suffix) {
     const value = Number(digits.replace(/\s/g, '').replace(',', '.'))

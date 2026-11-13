@@ -4,7 +4,7 @@ import type { AccountLookups, PostStream } from '../api'
 import type { WhenVisible } from '../services/visible'
 import type { ViewText } from './view'
 import { addAccount, isBuiltIn, ruleLabel } from '../../rules/edit'
-import { compileRules, CopyTracker, evaluate, normalizeCopyText } from '../../rules/engine'
+import { compileRules, CopyTracker, evaluate, isAllowed, normalizeCopyText } from '../../rules/engine'
 import { nameSlotOf } from '../../threads/dom'
 import { clearView, CONTAINER, postCode, renderView, STYLE } from './view'
 
@@ -104,6 +104,11 @@ export class SpamFilter {
       }
       for (const container of this.#waiting.get(post.code) ?? []) this.#pending.add(container)
       this.#waiting.delete(post.code)
+      for (const container of this.#shown.get(post.code) ?? []) {
+        if (container.isConnected)
+          this.#pending.add(container)
+        else this.#shown.get(post.code)?.delete(container)
+      }
     }
     this.#schedule()
   }
@@ -196,10 +201,6 @@ export class SpamFilter {
   }
 
   #process(container: HTMLElement, stored: Post): void {
-    const needs = this.#compiled.needs
-    if ((needs.about || needs.followers || needs.posts) && !stored.author.following) {
-      this.deps.whenVisible(container, () => this.deps.lookups.want(stored.author.pk, stored.author.username, needs))
-    }
     const { country, ageMonths, followers, posts } = this.deps.lookups.data(stored.author.pk)
     const post: Post = {
       ...stored,
@@ -211,9 +212,15 @@ export class SpamFilter {
         posts,
       },
     }
-    const verdict = evaluate(post, this.#compiled, {
-      copies: item => this.#copies.count(item),
-    })
+    const ctx = {
+      copies: (item: Post) => this.#copies.count(item),
+    }
+    const needs = this.#compiled.needs
+    if ((needs.about || needs.followers || needs.posts) && !isAllowed(post, this.#compiled, ctx)) {
+      const { signal } = this.deps
+      this.deps.whenVisible(container, () => this.deps.lookups.want(stored.author.pk, stored.author.username, needs, signal))
+    }
+    const verdict = evaluate(post, this.#compiled, ctx)
     if (verdict.action === 'none') {
       clearView(container)
       return

@@ -3,7 +3,7 @@ import type { ProfileData } from '../../../profile/lookups'
 // @vitest-environment happy-dom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { defaultSettings } from '../../../model'
-import { readList, writeList } from '../../../rules/edit'
+import { readList, updateRule, writeList } from '../../../rules/edit'
 import { catalogWith, fakeLookups, postContainer, translate } from '../../../testing/feature'
 import { makePost } from '../../../testing/post'
 import { observe } from '../../services/observe'
@@ -90,6 +90,61 @@ describe('spamFilter updates', () => {
     ])
     await vi.advanceTimersByTimeAsync(20)
     expect(bar('W1')).not.toBeNull()
+  })
+
+  it('re-checks a post on the page when Threads sends new data for it', async () => {
+    vi.useFakeTimers({
+      toFake: ['setTimeout', 'clearTimeout'],
+    })
+    document.body.innerHTML = postContainer('U1')
+    const { catalog } = setup([
+      makePost({
+        code: 'U1',
+        author: { username: 'amy', pk: 'p-amy' },
+      }),
+    ])
+    expect(bar('U1')).toBeNull()
+    catalog.add([
+      affiliate('U1'),
+    ])
+    await vi.advanceTimersByTimeAsync(20)
+    expect(bar('U1')).not.toBeNull()
+  })
+
+  it('keeps a post hidden for a self-reply link when Threads sends the post again without its replies', async () => {
+    vi.useFakeTimers({
+      toFake: ['setTimeout', 'clearTimeout'],
+    })
+    document.body.innerHTML = postContainer('R1')
+    const post = makePost({
+      code: 'R1',
+      author: { username: 'amy', pk: 'p-amy' },
+    })
+    const { catalog } = setup([
+      {
+        ...post,
+        selfReplyLinks: ['https://shopee.tw/item/1'],
+      },
+    ])
+    expect(bar('R1')).not.toBeNull()
+    catalog.add([post])
+    await vi.advanceTimersByTimeAsync(20)
+    expect(catalog.get('R1')?.selfReplyLinks).toEqual(['https://shopee.tw/item/1'])
+    expect(bar('R1')).not.toBeNull()
+  })
+
+  it('looks up a followed account only when no allow rule covers it', () => {
+    const followed = makePost({
+      code: 'L1',
+      author: { pk: 'p-followed', username: 'amy', following: true },
+    })
+    const settings = defaultSettings()
+    settings.ruleFile = writeList(settings.ruleFile, 'countries', ['JP'])
+    document.body.innerHTML = postContainer('L1')
+    expect(setup([followed], settings).wanted).toEqual([])
+    settings.ruleFile = updateRule(settings.ruleFile, 'followed', { enabled: false })
+    document.body.innerHTML = postContainer('L1')
+    expect(setup([followed], settings).wanted).toEqual(['p-followed'])
   })
 
   it('re-checks posts when account lookups finish', async () => {

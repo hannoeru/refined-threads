@@ -165,8 +165,14 @@ export default defineFeature({
         : undefined
       if (!post)
         return
-      if (container.querySelector(`.${BADGE}`))
+      const { pk, followedBy, following } = post.author
+      const known = relations.get(pk)
+      relations.set(pk, { followedBy, following })
+      if (container.querySelector(`.${BADGE}`)) {
+        if (known && (known.followedBy !== followedBy || known.following !== following))
+          refresh(pk)
         return
+      }
       const header = authorHeaderOf(container, post.author.username)
       const slot = header
         ? null
@@ -179,14 +185,13 @@ export default defineFeature({
       if (header)
         header.append(badge)
       else slot!.after(badge)
-      relations.set(post.author.pk, { followedBy: post.author.followedBy, following: post.author.following })
       const set = badges.get(post.author.pk) ?? new Set()
       set.add(badge)
       badges.set(post.author.pk, set)
       refresh(post.author.pk)
       if (needs.about || needs.followers || needs.posts) {
         ctx.whenVisible(container, () => {
-          lookups.want(post.author.pk, post.author.username, needs)
+          lookups.want(post.author.pk, post.author.username, needs, ctx.signal)
           refresh(post.author.pk)
         })
       }

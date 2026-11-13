@@ -434,3 +434,63 @@ describe('copyTracker', () => {
     }))).toBe(0)
   })
 })
+
+describe('patterns from shared settings files', () => {
+  it('evaluates a pattern with nested repetition in linear time', () => {
+    const settings = withRules([
+      {
+        effect: 'hide',
+        when: { field: 'text', matches: '^(a|a)+$' },
+      },
+    ])
+    const started = performance.now()
+    expect(run(makePost({ text: `${'a'.repeat(5000)}b` }), settings).action).toBe('none')
+    expect(performance.now() - started).toBeLessThan(500)
+    expect(run(makePost({ text: 'aaaa' }), settings).action).toBe('hide')
+  })
+
+  it('ignores a pattern that RE2 does not support', () => {
+    const settings = withRules([
+      {
+        effect: 'hide',
+        when: { field: 'text', matches: '(a)\\1' },
+      },
+    ])
+    expect(run(makePost({ text: 'aa' }), settings).action).toBe('none')
+  })
+})
+
+describe('site rules', () => {
+  it('matches a site written with www.', () => {
+    const settings = withRules([
+      {
+        effect: 'hide',
+        when: {
+          field: 'links',
+          host_in: ['WWW.Spam-Shop.com'],
+        },
+      },
+    ])
+    expect(run(makePost({
+      links: ['https://www.spam-shop.com/x'],
+    }), settings).action).toBe('hide')
+    expect(run(makePost({
+      links: ['https://spam-shop.com/x'],
+    }), settings).action).toBe('hide')
+  })
+
+  it('matches a link whose host ends in a sentence dot', () => {
+    const settings = withRules([
+      {
+        effect: 'hide',
+        when: {
+          field: 'links',
+          host_in: ['shopee.tw'],
+        },
+      },
+    ])
+    expect(run(makePost({
+      links: ['https://shopee.tw.'],
+    }), settings).action).toBe('hide')
+  })
+})

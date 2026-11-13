@@ -27,7 +27,7 @@ export interface PostStream {
 
 export interface AccountLookups {
   data: (pk: string) => ProfileData
-  want: (pk: string, username: string, needs: LookupNeeds) => void
+  want: (pk: string, username: string, needs: LookupNeeds, signal: AbortSignal) => void
   loading: (pk: string) => boolean
   subscribe: (listener: (pk: string) => void, signal: AbortSignal) => void
 }

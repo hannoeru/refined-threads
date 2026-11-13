@@ -63,13 +63,27 @@ export class FeatureRuntime {
     const controller = new AbortController()
     const { signal } = controller
     this.#running.set(feature.id, { key, controller })
-    const { document } = this.services
+    const { document, posts, lookups } = this.services
+    const guard = <Args extends unknown[]>(listener: (...args: Args) => void) => (...args: Args) => {
+      try {
+        listener(...args)
+      }
+      catch (error) {
+        this.services.report(feature.id, error)
+      }
+    }
     const ctx: FeatureContext<Record<string, unknown>> = {
       signal,
       options,
       document,
-      posts: this.services.posts,
-      lookups: this.services.lookups,
+      posts: {
+        get: code => posts.get(code),
+        subscribe: (listener, signal) => posts.subscribe(guard(listener), signal),
+      },
+      lookups: {
+        ...lookups,
+        subscribe: (listener, signal) => lookups.subscribe(guard(listener), signal),
+      },
       t: this.services.t,
       observe: (selector, callback) => observe(document, selector, callback, signal),
       whenVisible: this.services.whenVisible(signal),

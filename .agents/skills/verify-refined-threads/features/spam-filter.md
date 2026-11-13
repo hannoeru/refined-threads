@@ -24,13 +24,13 @@ Preconditions:
 
 - Doctor passes on `https://www.threads.com/`.
 - These test rules were written from an extension page, because the logged-out feed rarely has real spam:
-  `chrome.storage.sync.set({ settings: { ruleFile: { version: 1, rules: [ { id: 'liked', name: 'Liked post', effect: 'tag', when: { field: 'counts.likes', gt: 5 } }, { id: 'busy', name: 'Busy thread', effect: 'hide', when: { field: 'counts.replies', gt: 30 } } ] } } })`
+  `chrome.storage.sync.set({ settings: 1, settings_0: JSON.stringify({ ruleFile: { version: 1, rules: [ { id: 'liked', name: 'Liked post', effect: 'tag', when: { field: 'counts.likes', gt: 5 } }, { id: 'busy', name: 'Busy thread', effect: 'hide', when: { field: 'counts.replies', gt: 30 } } ] } }) })`
   Note that a `rules` array replaces the built-in rules for this run.
 
 - **Hide and tag.** Load the feed. Run `["--session","<s>","open","https://www.threads.com/"]`, then `["--session","<s>","wait","--fn","document.querySelectorAll('.rt-chip, .rt-bar').length >= 2"]`. Bars read `Hidden · …` and chips read `Liked post×`.
 - **Show.** Choose Show. Run `["--session","<s>","find","role","button","click","--name","Show"]`. The URL stays on `/`, the container class becomes `rt-revealed`, and the bar offers `Not spam` and `Keep hiding`.
 - **Keep hiding.** Run `["--session","<s>","find","role","button","click","--name","Keep hiding"]`. The container is `rt-collapse` again.
-- **Not spam.** Choose Show, then Not spam. The bar disappears. Open `chrome-extension://<id>/options.html#feature/spam-filter`, then the "Words and accounts" tab. The "Never hide these accounts" list has the author. Or eval `chrome.storage.sync.get('settings')` and read the `allowed-accounts` rule.
+- **Not spam.** Choose Show, then Not spam. The bar disappears. Open `chrome-extension://<id>/options.html#feature/spam-filter`, then the "Words and accounts" tab. The "Never hide these accounts" list has the author. Or eval `chrome.storage.sync.get(null)`, join the `settings_<n>` parts in order, parse the JSON, and read the `allowed-accounts` rule.
 - **Live settings.** In a second tab, use the settings page to add a visible author under "Always hide these accounts" (fill the textbox, press Enter). Switch back with `tab t1` and `get url`. That author's post now has a `.rt-bar`.
 - **Stats.** Open `popup.html`. The number shows hidden posts for today, and the top reasons list the rule names.
 - **Proof.** Screenshot the feed after Escape, and save the bar and chip text from `eval` as JSON.

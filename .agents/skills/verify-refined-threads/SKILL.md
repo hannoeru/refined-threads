@@ -9,7 +9,7 @@ Refined Threads is a Manifest V3 extension (WXT, Vue Vapor). Users touch three s
 
 - **threads.com page.** Content scripts add bars, chips, badges, and date text to posts.
 - **Extension pages.** `options.html` (settings), `popup.html`, `welcome.html`.
-- **Storage.** `chrome.storage.sync` keys `features` and `settings`, and `chrome.storage.local` keys `stats` and `profiles`.
+- **Storage.** `chrome.storage.sync` keys `features`, `settings` (the number of parts), and `settings_0`, `settings_1`, and so on (parts of the spam filter settings JSON, joined in order), and `chrome.storage.local` keys `stats` and `profiles`.
 
 The harness is the `agent_browser` tool with `--extension`. It launches a managed Chrome with a new, empty profile, so every run is isolated and logged out of Threads. Never drive the user's own browser (Zen, Chrome) for verification. A Firefox build exists (`pnpm build:firefox`), but this skill does not drive it.
 

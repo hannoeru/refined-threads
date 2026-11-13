@@ -115,9 +115,9 @@ describe('account-info', () => {
     const lookups = fakeLookups()
     const wanted: unknown[] = []
     const want = lookups.lookups.want
-    lookups.lookups.want = (pk, username, needs) => {
+    lookups.lookups.want = (pk, username, needs, signal) => {
       wanted.push(needs)
-      want(pk, username, needs)
+      want(pk, username, needs, signal)
     }
     const posts = catalogWith([
       makePost({
@@ -283,6 +283,53 @@ describe('account-info', () => {
     const { lookups, items } = setup({ age: false })
     lookups.resolve('p1', { country: null, countryName: 'Atlantis' })
     expect(items().map(item => item.text)).toEqual(['Atlantis'])
+  })
+
+  it('updates the follow details when Threads sends a newer relationship', () => {
+    document.body.innerHTML = postContainer('F2')
+    const posts = catalogWith([
+      makePost({
+        code: 'F2',
+        author: { pk: 'p1', username: 'amy', followedBy: false },
+      }),
+    ])
+    run('account-info', {
+      'account-info': {
+        enabled: true,
+        options: { flag: false, age: false },
+      },
+    }, posts)
+    const badge = () => document.querySelector('.rt-account-info') as HTMLElement
+    expect(badge().hidden).toBe(true)
+    posts.add([
+      makePost({
+        code: 'F2',
+        author: { pk: 'p1', username: 'amy', followedBy: true },
+      }),
+    ])
+    expect([
+      ...badge().children,
+    ].map(item => item.textContent)).toEqual(['Follows you'])
+  })
+
+  it('ties its account lookups to its own signal, which stops when the user turns it off', () => {
+    document.body.innerHTML = postContainer('S1')
+    const lookups = fakeLookups()
+    const signals: AbortSignal[] = []
+    lookups.lookups.want = (_pk, _username, _needs, signal) => void signals.push(signal)
+    const runtime = run('account-info', {
+      'account-info': { enabled: true },
+    }, catalogWith([
+      makePost({
+        code: 'S1',
+        author: { pk: 'p1', username: 'amy' },
+      }),
+    ]), lookups)
+    expect(signals.map(signal => signal.aborted)).toEqual([false])
+    runtime.apply({
+      'account-info': { enabled: false },
+    })
+    expect(signals.map(signal => signal.aborted)).toEqual([true])
   })
 
   it('asks only for the lookups the switches need', () => {

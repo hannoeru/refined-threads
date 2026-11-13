@@ -4,7 +4,8 @@ import {
   ABOUT_FIELDS,
 
 } from '../model'
-import { hostMatches, linkHost } from './hosts'
+import { hostMatches, linkHost, normalizeHost } from './hosts'
+import { compilePattern } from './pattern'
 
 type Test = (post: Post, ctx: EvaluateContext) => boolean
 
@@ -96,15 +97,6 @@ function combine(conditions: Condition[], join: (tests: Test[]) => Test): Test |
   return join(tests)
 }
 
-function compilePattern(source: string): RegExp | null {
-  try {
-    return new RegExp(source, 'iu')
-  }
-  catch {
-    return null
-  }
-}
-
 function compileLeaf(condition: LeafCondition): Test | null {
   const read = (post: Post, ctx: EvaluateContext) => fieldValue(post, condition.field, ctx)
   const matchText = (match: (item: string) => boolean): Test => (post, ctx) => strings(read(post, ctx)).some(match)
@@ -116,7 +108,7 @@ function compileLeaf(condition: LeafCondition): Test | null {
   }
   if ('matches' in condition) {
     const pattern = compilePattern(condition.matches)
-    return pattern && matchText(item => pattern.test(item))
+    return pattern && matchText(pattern)
   }
   if ('contains_any' in condition) {
     const needles = condition.contains_any.map(needle => needle.toLowerCase()).filter(Boolean)
@@ -126,7 +118,7 @@ function compileLeaf(condition: LeafCondition): Test | null {
     })
   }
   if ('host_in' in condition) {
-    const targets = condition.host_in.map(host => host.toLowerCase())
+    const targets = condition.host_in.map(normalizeHost)
     return matchText((link) => {
       const host = linkHost(link)
       return host !== null && targets.some(target => hostMatches(host, target))
@@ -184,11 +176,17 @@ function decide(matched: CompiledRule[], score: number, outcome: Outcome, tagOnl
   return tag ? 'tag' : 'none'
 }
 
+const appliesTo = (rule: CompiledRule, post: Post) => rule.target === 'all' || rule.target === (post.isReply ? 'replies' : 'posts')
+
+export function isAllowed(post: Post, compiled: CompiledRules, ctx: EvaluateContext): boolean {
+  return compiled.rules.some(rule => rule.effect === 'allow' && appliesTo(rule, post) && rule.test(post, ctx))
+}
+
 export function evaluate(post: Post, compiled: CompiledRules, ctx: EvaluateContext): Verdict {
   const target = post.isReply ? 'replies' : 'posts'
   const matched: CompiledRule[] = []
   for (const rule of compiled.rules) {
-    if ((rule.target !== 'all' && rule.target !== target) || !rule.test(post, ctx))
+    if (!appliesTo(rule, post) || !rule.test(post, ctx))
       continue
     if (rule.effect === 'allow')
       return NONE

@@ -34,9 +34,44 @@ interface Entry {
 
 export type Cache = Record<string, Entry>
 
+function newer<T extends { at: number }>(a: T | undefined, b: T | undefined): T | undefined {
+  return !a || (b && b.at >= a.at)
+    ? b
+    : a
+}
+function latest(a: number | undefined, b: number | undefined): number | undefined {
+  return a === undefined || (b !== undefined && b > a)
+    ? b
+    : a
+}
+
+function mergeEntry(a: Entry, b: Entry): Entry {
+  const entry: Entry = {
+    about: newer(a.about, b.about),
+    profile: newer(a.profile, b.profile),
+    seen: newer(a.seen, b.seen),
+    aboutFailedAt: latest(a.aboutFailedAt, b.aboutFailedAt),
+    profileFailedAt: latest(a.profileFailedAt, b.profileFailedAt),
+  }
+  return Object.fromEntries(Object.entries(entry).filter(([, value]) => value !== undefined))
+}
+
+function mergeCaches(base: Cache, extra: Cache): Cache {
+  const merged = { ...base }
+  for (const [pk, entry] of Object.entries(extra)) {
+    const current = merged[pk]
+    merged[pk] = current
+      ? mergeEntry(current, entry)
+      : entry
+  }
+  return merged
+}
+
 export interface CacheStore { get: () => Promise<Cache>, set: (cache: Cache) => Promise<void> }
 
 type Kind = 'about' | 'profile'
+
+interface Request { username: string, consumers: Set<AbortSignal> }
 
 interface Clock { now: () => number, wait: (ms: number) => Promise<void> }
 
@@ -51,6 +86,7 @@ const MAX_QUEUE = 200
 const MAX_ENTRIES = 5000
 const SAVE_DELAY = 2000
 const NO_SESSION_RETRY = 5000
+const KINDS = ['about', 'profile'] as const
 
 const EVENTS: Record<Kind, { request: string, result: string }> = {
   about: { request: ABOUT_REQUEST_EVENT, result: ABOUT_RESULT_EVENT },
@@ -64,13 +100,15 @@ const realClock: Clock = {
 
 export class ProfileLookups {
   #cache: Cache = {}
-  #queues: Record<Kind, Map<string, string>> = {
+  #queues: Record<Kind, Map<string, Request>> = {
     about: new Map(),
     profile: new Map(),
   }
 
   #running: Record<Kind, boolean> = { about: false, profile: false }
   #backoff: Record<Kind, number> = { about: 0, profile: 0 }
+  #sessionRetry: Record<Kind, number> = { about: 0, profile: 0 }
+  #tracked = new WeakSet<AbortSignal>()
   #pending = new Map<string, (result: AboutResult | ProfileResult | null) => void>()
   #names: CountryNames
   #saveTimer: ReturnType<typeof setTimeout> | null = null
@@ -124,10 +162,7 @@ export class ProfileLookups {
   }
 
   async load(): Promise<void> {
-    this.#cache = {
-      ...(await this.store.get()),
-      ...this.#cache,
-    }
+    this.#cache = mergeCaches(await this.store.get(), this.#cache)
   }
 
   data(pk: string): ProfileData {
@@ -146,7 +181,7 @@ export class ProfileLookups {
   }
 
   loading(pk: string): boolean {
-    return (['about', 'profile'] as const).some(kind => this.#queues[kind].has(pk) || this.#pending.has(`${kind}:${pk}`))
+    return KINDS.some(kind => !this.#sessionRetry[kind] && (this.#queues[kind].has(pk) || this.#pending.has(`${kind}:${pk}`)))
   }
 
   #followers(entry: Entry | undefined): number | null {
@@ -161,23 +196,56 @@ export class ProfileLookups {
     return at !== undefined && this.clock.now() - at < TTL.profile
   }
 
-  want(pk: string, username: string, needs: LookupNeeds): void {
+  want(pk: string, username: string, needs: LookupNeeds, signal: AbortSignal): void {
+    if (signal.aborted)
+      return
+    this.#track(signal)
     if (needs.posts)
       this.#needsPosts.add(pk)
     const wants: Record<Kind, boolean> = {
       about: needs.about,
       profile: needs.posts || (needs.followers && !this.#seenFresh(pk)),
     }
-    for (const kind of ['about', 'profile'] as const) {
+    for (const kind of KINDS) {
       if (!wants[kind] || this.#fresh(pk, kind))
         continue
       const queue = this.#queues[kind]
+      const consumers = queue.get(pk)?.consumers ?? new Set()
+      consumers.add(signal)
       queue.delete(pk)
-      queue.set(pk, username)
-      if (queue.size > MAX_QUEUE)
-        queue.delete(queue.keys().next().value!)
+      queue.set(pk, { username, consumers })
+      if (queue.size > MAX_QUEUE) {
+        const oldest = queue.keys().next().value!
+        this.#unqueue(kind, oldest)
+        this.onChange(oldest)
+      }
       void this.#pump(kind)
     }
+  }
+
+  #track(signal: AbortSignal): void {
+    if (this.#tracked.has(signal))
+      return
+    this.#tracked.add(signal)
+    signal.addEventListener('abort', () => {
+      const dropped = new Set<string>()
+      for (const kind of KINDS) {
+        for (const [pk, request] of this.#queues[kind]) {
+          request.consumers.delete(signal)
+          if (request.consumers.size === 0) {
+            this.#unqueue(kind, pk)
+            dropped.add(pk)
+          }
+        }
+      }
+      dropped.forEach(pk => this.onChange(pk))
+    }, { once: true })
+  }
+
+  #unqueue(kind: Kind, pk: string): void {
+    this.#queues[kind].delete(pk)
+    if (kind === 'profile')
+      this.#needsPosts.delete(pk)
   }
 
   #fresh(pk: string, kind: Kind): boolean {
@@ -198,14 +266,15 @@ export class ProfileLookups {
       const queue = this.#queues[kind]
       while (queue.size > 0) {
         await this.#whenVisible()
-        const [pk, username] = [
-          ...queue.entries(),
-        ].at(-1)!
+        const next = [...queue].at(-1)
+        if (!next)
+          continue
+        const [pk, request] = next
         queue.delete(pk)
         if (this.#fresh(pk, kind) || (kind === 'profile' && !this.#needsPosts.has(pk) && this.#seenFresh(pk)))
           continue
-        const result = await this.#request(kind, pk, username)
-        const retryAfter = this.#store(kind, pk, username, result)
+        const result = await this.#request(kind, pk, request.username)
+        const retryAfter = this.#store(kind, pk, request, result)
         await this.clock.wait(retryAfter ?? GAP[kind])
       }
     }
@@ -232,29 +301,44 @@ export class ProfileLookups {
     })
   }
 
-  #store(kind: Kind, pk: string, username: string, result: AboutResult | ProfileResult | null): number | null {
+  #store(kind: Kind, pk: string, request: Request, result: AboutResult | ProfileResult | null): number | null {
+    const noSession = result?.ok === false && result.reason === 'no-session'
+    if (result && !noSession && this.#sessionRetry[kind]) {
+      this.#sessionRetry[kind] = 0
+      this.#queues[kind].forEach((_, queued) => this.onChange(queued))
+    }
     if (result?.ok) {
       this.#storeSuccess(kind, pk, result)
       return null
     }
-    if (result?.reason === 'no-session') {
-      this.#requeue(kind, pk, username)
-      return NO_SESSION_RETRY
+    if (noSession) {
+      this.#requeue(kind, pk, request)
+      const first = !this.#sessionRetry[kind]
+      this.#sessionRetry[kind] = first
+        ? NO_SESSION_RETRY
+        : Math.min(BACKOFF_MAX, this.#sessionRetry[kind] * 2)
+      if (first)
+        this.#queues[kind].forEach((_, queued) => this.onChange(queued))
+      return this.#sessionRetry[kind]
     }
     if (result?.status === 429) {
       this.#backoff[kind] = Math.min(BACKOFF_MAX, this.#backoff[kind]
         ? this.#backoff[kind] * 2
         : BACKOFF_START)
-      this.#requeue(kind, pk, username)
+      this.#requeue(kind, pk, request)
       return Math.min(BACKOFF_MAX, Math.max(result.retryAfterMs ?? 0, this.#backoff[kind]))
     }
     this.#storeFailure(kind, pk)
     return null
   }
 
-  #requeue(kind: Kind, pk: string, username: string): void {
-    if (!this.#queues[kind].has(pk))
-      this.#queues[kind].set(pk, username)
+  #requeue(kind: Kind, pk: string, request: Request): void {
+    for (const signal of request.consumers) {
+      if (signal.aborted)
+        request.consumers.delete(signal)
+    }
+    if (request.consumers.size > 0 && !this.#queues[kind].has(pk))
+      this.#queues[kind].set(pk, request)
   }
 
   #storeSuccess(kind: Kind, pk: string, result: AboutResult | ProfileResult): void {
@@ -309,8 +393,9 @@ export class ProfileLookups {
   #scheduleSave(): void {
     if (this.#saveTimer !== null)
       return
-    this.#saveTimer = setTimeout(() => {
+    this.#saveTimer = setTimeout(async () => {
       this.#saveTimer = null
+      this.#cache = mergeCaches(await this.store.get(), this.#cache)
       const entries = Object.entries(this.#cache)
       if (entries.length > MAX_ENTRIES) {
         const stamp = ([, entry]: [string, Entry]) => Math.max(entry.about?.at ?? 0, entry.profile?.at ?? 0, entry.seen?.at ?? 0, entry.aboutFailedAt ?? 0, entry.profileFailedAt ?? 0)

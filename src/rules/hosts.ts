@@ -1,6 +1,6 @@
 export function linkHost(link: string): string | null {
   try {
-    return new URL(link).hostname.toLowerCase().replace(/^www\./, '')
+    return new URL(link).hostname.toLowerCase().replace(/^www\./, '').replace(/\.$/, '')
   }
   catch {
     return null

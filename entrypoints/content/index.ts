@@ -28,7 +28,7 @@ export default defineContentScript({
     )
     const lookups: AccountLookups = {
       data: pk => profiles.data(pk),
-      want: (pk, username, needs) => profiles.want(pk, username, needs),
+      want: (pk, username, needs, signal) => profiles.want(pk, username, needs, signal),
       loading: pk => profiles.loading(pk),
       subscribe: (listener, signal) => {
         listeners.add(listener)

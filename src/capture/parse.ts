@@ -27,7 +27,7 @@ function num(value: unknown): number {
 
 const REDIRECT_HOSTS = new Set(['l.threads.com', 'l.threads.net', 'l.instagram.com'])
 
-const URL_PATTERN = /https?:\/\/[^\s<>"'）)]+/g
+const URL_PATTERN = /https?:\/\/[^\s<>"')\u3001-\u303F\uFF01-\uFF0F\uFF1A-\uFF20\uFF3B-\uFF40\uFF5B-\uFF65]+/g
 
 export function unwrapLink(link: string): string {
   try {

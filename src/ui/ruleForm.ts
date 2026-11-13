@@ -1,4 +1,5 @@
 import type { Condition, Field, LeafCondition } from '../model'
+import { compilePattern } from '../rules/pattern'
 
 export type FieldKind = 'text' | 'list' | 'flag' | 'number'
 
@@ -133,14 +134,7 @@ export function toForm(condition: Condition): RuleForm | null {
   return null
 }
 
-function isValidPattern(value: string): boolean {
-  try {
-    return new RegExp(value, 'iu') instanceof RegExp
-  }
-  catch {
-    return false
-  }
-}
+const isValidPattern = (value: string): boolean => compilePattern(value) !== null
 
 function listLeaf({ field, operator, value }: Row): LeafCondition | null {
   const items = value.split(/[,、，\n]/).map(item => item.trim()).filter(Boolean)

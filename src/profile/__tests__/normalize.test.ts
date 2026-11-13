@@ -46,6 +46,19 @@ describe('profile counts', () => {
     expect(parseProfileCounts('See the latest conversations')).toEqual({ followers: null, posts: null })
   })
 
+  it('does not read the first letter of the next word as k, m, or b', () => {
+    expect(parseProfileCounts('1.234 người theo dõi • 56 bài viết')).toEqual({ followers: 1234, posts: 56 })
+    expect(parseProfileCounts('100 követő • 7 szál')).toEqual({ followers: 100, posts: 7 })
+    expect(parseProfileCounts('12 mutuals • 3 threads')).toEqual({ followers: 12, posts: 3 })
+  })
+
+  it('reads mil as thousands and mi or Mio. as millions', () => {
+    expect(parseProfileCounts('1,2 mil seguidores • 30 hilos')).toEqual({ followers: 1200, posts: 30 })
+    expect(parseProfileCounts('3 mil seguidores • 12 threads')).toEqual({ followers: 3000, posts: 12 })
+    expect(parseCount('1,5 mi seguidores')).toBe(1_500_000)
+    expect(parseCount('2,1 Mio. Follower')).toBe(2_100_000)
+  })
+
   it('reads compact and grouped numbers', () => {
     expect(parseCount('1,5 M Follower')).toBe(1_500_000)
     expect(parseCount('12.345 Follower')).toBe(12345)

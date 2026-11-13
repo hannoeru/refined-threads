@@ -20,8 +20,23 @@ export class PostCatalog implements PostStream {
   }
 
   add(posts: Post[]): void {
-    for (const post of posts) this.#posts.set(post.code, post)
-    for (const listener of this.#listeners) listener(posts)
+    const merged = posts.map((post) => {
+      const known = this.#posts.get(post.code)?.selfReplyLinks ?? []
+      const next = known.length > 0
+        ? {
+            ...post,
+            selfReplyLinks: [
+              ...new Set([
+                ...known,
+                ...post.selfReplyLinks,
+              ]),
+            ],
+          }
+        : post
+      this.#posts.set(post.code, next)
+      return next
+    })
+    for (const listener of this.#listeners) listener(merged)
   }
 
   get(code: string): Post | undefined {

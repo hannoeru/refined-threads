@@ -18,7 +18,7 @@ const TABS = [
   'share',
 ] as const
 const tab = ref<(typeof TABS)[number]>('protection')
-const { settings, update } = useSettings()
+const { settings, error, update } = useSettings()
 </script>
 
 <template>
@@ -35,6 +35,9 @@ const { settings, update } = useSettings()
       {{ t(`section_${item}`) }}
     </button>
   </div>
+  <p v-if="error" class="save-error" role="alert">
+    {{ t(error) }}
+  </p>
   <template v-if="settings">
     <Protection v-if="tab === 'protection'" :settings="settings" :update="update" />
     <Lists v-else-if="tab === 'lists'" :settings="settings" :update="update" />
@@ -68,6 +71,11 @@ const { settings, update } = useSettings()
 .subtab:hover {
   background: var(--accent-soft);
   color: var(--ink);
+}
+.save-error {
+  margin: 12px 0 0;
+  color: var(--danger);
+  font-size: 13px;
 }
 .subtab[aria-selected='true'] {
   background: var(--accent-soft);

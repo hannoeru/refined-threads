@@ -59,8 +59,6 @@ function setThreshold(kind: 'posts' | 'replies', key: keyof Outcome, raw: string
   const value = raw === ''
     ? null
     : Number(raw)
-  if (value !== null && (!Number.isFinite(value) || value < 1))
-    return
   void props.update(current => ({
     ...current,
     ruleFile: {
@@ -107,6 +105,7 @@ function setThreshold(kind: 'posts' | 'replies', key: keyof Outcome, raw: string
                 class="field number"
                 type="number"
                 min="1"
+                max="100"
                 :placeholder="t('scoring_off')"
                 :value="settings.ruleFile.scoring[kind][key] ?? ''"
                 :aria-label="`${t(`target_${kind}`)} ${t(key === 'tagAt' ? 'scoring_tag_at' : 'scoring_hide_at')}`"

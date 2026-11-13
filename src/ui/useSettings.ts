@@ -1,21 +1,46 @@
 import type { Settings } from '../model'
+import * as v from 'valibot'
 import { onScopeDispose, shallowRef } from 'vue'
+import { SettingsSchema } from '../model'
 import { loadSettings, saveSettings, watchSettings } from '../settings'
+
+export type SaveError = 'save_invalid' | 'save_failed'
 
 export function useSettings() {
   const settings = shallowRef<Settings | null>(null)
+  const error = shallowRef<SaveError | null>(null)
   void loadSettings().then((loaded) => {
     settings.value ??= loaded
   })
   onScopeDispose(watchSettings(next => (settings.value = next)))
 
-  async function update(change: (current: Settings) => Settings): Promise<void> {
-    if (!settings.value)
+  let saving = Promise.resolve()
+
+  async function apply(change: (current: Settings) => Settings): Promise<void> {
+    const current = settings.value
+    if (!current)
       return
-    const next = change(settings.value)
-    settings.value = next
-    await saveSettings(next)
+    const result = v.safeParse(SettingsSchema, change(current))
+    if (!result.success) {
+      error.value = 'save_invalid'
+      settings.value = { ...current }
+      return
+    }
+    try {
+      await saveSettings(result.output)
+      settings.value = result.output
+      error.value = null
+    }
+    catch {
+      error.value = 'save_failed'
+      settings.value = { ...current }
+    }
   }
 
-  return { settings, update }
+  function update(change: (current: Settings) => Settings): Promise<void> {
+    saving = saving.then(() => apply(change))
+    return saving
+  }
+
+  return { settings, error, update }
 }
