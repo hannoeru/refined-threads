@@ -82,7 +82,7 @@ pnpm check          # lint, typecheck, tests, Chrome build, Firefox build
 `package.json` lists the other scripts. To load a build by hand, load `.output/chrome-mv3` as an unpacked extension, or `.output/firefox-mv3/manifest.json` as a temporary add-on in Firefox.
 
 - [docs/architecture.md](docs/architecture.md) explains how the extension captures posts, looks up accounts, and runs features.
-- [RELEASING.md](RELEASING.md) covers tags, releases, and the Chrome Web Store workflow.
+- [RELEASING.md](RELEASING.md) covers tags, releases, and the store workflow.
 - `.agents/skills/` holds skills that let coding agents test the extension on threads.com and keep the store listing current.
 
 CI runs `pnpm check` on every push and pull request. Dependabot opens weekly update pull requests.

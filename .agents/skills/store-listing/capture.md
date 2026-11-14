@@ -40,5 +40,6 @@ Save each image into `store/chrome/` under the name in the first column.
 | `screenshots/5-popup.png` | Open `file://<repo>/store/chrome/src/popup-shot.html` at 1280×800. |
 | `screenshots/0-feed.png` | Open `file://<repo>/store/chrome/src/feed-shot.html` at 1280×800. Check that the feed column fits inside the viewport. |
 | `promo-tile-440x280.png` | Open `file://<repo>/store/chrome/src/promo-tile.html` at 440×280. |
+| `../edge/logo-300x300.png` | No browser. Run `sips -z 300 300 assets/icon/source.png --out store/edge/logo-300x300.png`. |
 
 The screenshots show what each page looks like with real settings. They do not use the Threads site, which shows a login dialog and real people's posts when logged out.

@@ -19,4 +19,4 @@ A Manifest V3 browser extension for Threads web, built with WXT, Vue 3.6 Vapor, 
 
 ## Releases
 
-`RELEASING.md` covers tags, the draft GitHub release, and the Chrome Web Store workflow.
+`RELEASING.md` covers tags, the draft GitHub release, and the store workflow for Chrome, Firefox, and Edge.

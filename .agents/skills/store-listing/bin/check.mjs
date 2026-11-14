@@ -18,6 +18,7 @@ const IMAGES = {
   'screenshots/4-welcome.png': { size: [1280, 800], sources: ['entrypoints/welcome/App.vue', 'src/ui/base.css', 'src/ui/components/LevelPicker.vue'] },
   'screenshots/5-popup.png': { size: [1280, 800], sources: ['store/chrome/src/popup-shot.html', 'entrypoints/popup/App.vue', 'src/ui/base.css', 'src/ui/components/LevelPicker.vue', 'src/ui/components/Toggle.vue'] },
   'promo-tile-440x280.png': { size: [440, 280], sources: ['store/chrome/src/promo-tile.html', 'public/icon/128.png'] },
+  '../edge/logo-300x300.png': { size: [300, 300], sources: ['assets/icon/source.png'] },
 }
 
 const problems = []
@@ -65,6 +66,10 @@ for (const [heading, messages] of [['### Description (English)', en], ['### Desc
   }
 }
 
+const summary = readFileSync(join(root, 'store/firefox/listing.md'), 'utf8').split('**Summary**')[1]?.split('```')[1]?.trim() ?? ''
+if (summary.length === 0 || [...summary].length > 250)
+  problems.push(`store/firefox/listing.md: the summary has ${[...summary].length} characters, it needs 1 to 250`)
+
 const feed = read('store/chrome/src/feed-shot.html').toString()
 const reasons = new Set(Object.entries(en).filter(([key]) => key.startsWith('reason_')).map(([, value]) => value.message))
 const hiddenPrefix = en.bar_hidden.message.replace('$VALUE$', '')
@@ -83,4 +88,4 @@ if (problems.length > 0) {
   console.log(problems.map(problem => `✗ ${problem}`).join('\n'))
   process.exit(1)
 }
-console.log('✓ store/chrome matches the code')
+console.log('✓ store/ matches the code')

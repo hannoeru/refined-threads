@@ -5,6 +5,9 @@ export default defineConfig({
   srcDir: '.',
   modules: ['@wxt-dev/module-vue'],
   manifestVersion: 3,
+  zip: {
+    excludeSources: ['store/**', '.agents/**'],
+  },
   vue: {
     vite: {
       features: { vapor: true, optionsAPI: false },
