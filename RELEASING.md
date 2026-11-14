@@ -72,11 +72,11 @@ PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format='value(projectN
 
 7. Add four repository variables, in **Settings > Secrets and variables > Actions > Variables**. None of them is a secret.
 
-   | Variable | Value |
-   | --- | --- |
-   | `CHROME_EXTENSION_ID` | The 32-letter item ID from the Developer Dashboard |
-   | `CHROME_PUBLISHER_ID` | The ID in the dashboard URL, `chrome.google.com/webstore/devconsole/<publisher-id>` |
-   | `CHROME_SERVICE_ACCOUNT` | `chrome-web-store@<project-id>.iam.gserviceaccount.com` |
+   | Variable                         | Value                                                                                               |
+   | -------------------------------- | --------------------------------------------------------------------------------------------------- |
+   | `CHROME_EXTENSION_ID`            | The 32-letter item ID from the Developer Dashboard                                                  |
+   | `CHROME_PUBLISHER_ID`            | The ID in the dashboard URL, `chrome.google.com/webstore/devconsole/<publisher-id>`                 |
+   | `CHROME_SERVICE_ACCOUNT`         | `chrome-web-store@<project-id>.iam.gserviceaccount.com`                                             |
    | `GCP_WORKLOAD_IDENTITY_PROVIDER` | `projects/<project-number>/locations/global/workloadIdentityPools/github/providers/refined-threads` |
 
 8. Check the setup. Run the `Chrome Web Store` workflow by hand with the tag of a published release and **dry-run** on. It signs in and uploads nothing.
