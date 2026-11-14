@@ -5,7 +5,7 @@ Copy each field into the [Add-on Developer Hub](https://addons.mozilla.org/devel
 ## Upload
 
 1. Choose **Submit a New Add-on**, then **On this site**.
-2. Upload `refined-threads-<version>-firefox.zip` from the GitHub release. The add-on ID `refined-threads@hanlee.co` and the data collection setting come from `wxt.config.ts`.
+2. Upload `refined-threads-<version>-firefox.zip` from the GitHub release. The add-on ID `refined-threads@hannoeru.me` and the data collection setting come from `wxt.config.ts`.
 3. When asked whether the add-on uses minified, concatenated, or machine-generated code, answer **Yes**. Upload `refined-threads-<version>-sources.zip` from the same release.
 
 ## Describe the add-on

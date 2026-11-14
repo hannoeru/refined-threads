@@ -22,7 +22,7 @@ export default defineConfig({
     ...(browser === 'firefox' && {
       browser_specific_settings: {
         gecko: {
-          id: 'refined-threads@hanlee.co',
+          id: 'refined-threads@hannoeru.me',
           strict_min_version: '128.0',
           data_collection_permissions: {
             required: ['none'],

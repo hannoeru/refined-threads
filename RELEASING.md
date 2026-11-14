@@ -94,7 +94,7 @@ PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format='value(projectN
 
 ## Firefox Add-ons setup
 
-The Firefox job signs in with an AMO API key. The add-on ID, `refined-threads@hanlee.co`, is in the workflow.
+The Firefox job signs in with an AMO API key. The add-on ID, `refined-threads@hannoeru.me`, is in the workflow.
 
 1. Create a key at [addons.mozilla.org/developers/addon/api/key](https://addons.mozilla.org/developers/addon/api/key/).
 2. On GitHub, create the `firefox-add-ons` environment. Add two environment secrets: `FIREFOX_JWT_ISSUER` (the JWT issuer) and `FIREFOX_JWT_SECRET` (the JWT secret).
