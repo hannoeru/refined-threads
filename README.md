@@ -2,9 +2,9 @@
 
 [![CI](https://github.com/hannoeru/refined-threads/actions/workflows/ci.yml/badge.svg)](https://github.com/hannoeru/refined-threads/actions/workflows/ci.yml)
 
-A browser extension that adds small features to Threads web (`threads.com`, `threads.net`). You can turn each feature on or off, and each feature has its own settings page. To contribute a feature, read [CONTRIBUTING.md](CONTRIBUTING.md).
+A collection of small, switchable features that make Threads web better, including a spam and bot filter. Inspired by [Refined GitHub](https://github.com/refined-github/refined-github). It runs on `threads.com` and `threads.net`. To contribute a feature, read [CONTRIBUTING.md](CONTRIBUTING.md).
 
-The name follows [Refined GitHub](https://github.com/refined-github/refined-github), a browser extension that makes GitHub cleaner. Refined Threads is not affiliated with Meta or with Refined GitHub. License: MIT.
+Refined Threads is not affiliated with Meta or with Refined GitHub. License: MIT.
 
 ## Features
 

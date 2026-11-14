@@ -3,7 +3,7 @@
     "message": "Refined Threads"
   },
   "extDescription": {
-    "message": "為 Threads 網頁版加入實用的小改進。每項功能都有自己的開關，只開啟你需要的。"
+    "message": "一系列可個別開關的小功能，讓 Threads 網頁版更好用，包含垃圾與機器人貼文過濾。靈感來自 Refined GitHub。"
   },
   "bar_hidden": {
     "message": "已隱藏 · $VALUE$",

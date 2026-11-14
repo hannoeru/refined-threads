@@ -3,7 +3,7 @@
     "message": "Refined Threads"
   },
   "extDescription": {
-    "message": "Small improvements for Threads on the web. Each one has its own switch, so you turn on only what you want."
+    "message": "A collection of small, switchable features that make Threads web better, including a spam and bot filter. Inspired by Refined GitHub"
   },
   "bar_hidden": {
     "message": "Hidden · $VALUE$",

@@ -34,7 +34,7 @@ Upload `refined-threads-<version>-chrome.zip` from the draft GitHub release.
 ### Description (English)
 
 ```text
-Refined Threads adds small features to Threads on the web (threads.com and threads.net). Each feature has its own switch and its own settings, so you keep only what you want.
+A collection of small, switchable features that make Threads web better, including a spam and bot filter. Inspired by Refined GitHub. It runs on threads.com and threads.net.
 
 SPAM FILTER (on by default)
 • Hides spam and bot posts, or only tags them so you can check.
@@ -66,7 +66,7 @@ Refined Threads is open source (MIT). It is not affiliated with Meta.
 ### Description (Traditional Chinese)
 
 ```text
-Refined Threads 為 Threads 網頁版（threads.com 與 threads.net）加入實用的小功能。每個功能都有自己的開關與設定，只留下你需要的。
+一系列可個別開關的小功能，讓 Threads 網頁版更好用，包含垃圾與機器人貼文過濾。靈感來自 Refined GitHub。適用於 threads.com 與 threads.net。
 
 垃圾過濾（預設開啟）
 • 隱藏垃圾與機器人貼文，或只加上標記讓你先確認。
