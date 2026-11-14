@@ -118,7 +118,7 @@ Adds "Hide posts from this account" and "Never hide this account" to the right-c
 **Permission justification: host permissions (threads.com, threads.net).**
 
 ```text
-The extension runs only on Threads. It reads the posts Threads already sends to the page to filter spam and show account details, and it changes the page to hide or tag posts and show dates. For account checks the user turns on, it sends the same "About this profile" and profile requests that Threads makes, to threads.com only, with the user's own session. It has no access to other sites.
+The extension runs only on Threads. It reads the posts Threads already sends to the page to filter spam and show account details, and it changes the page to hide or tag posts and show dates. For account checks the user turns on, it sends the same "About this profile" and profile requests that Threads makes, only to the Threads site that is open (threads.com or threads.net), with the user's own session. For the "About this profile" request, it reuses the session tokens that the page itself sends to Threads. It keeps them only in the page's memory, sends them only to that same Threads site, and never stores them. It has no access to other sites.
 ```
 
 **Remote code.** No, I am not using remote code.
