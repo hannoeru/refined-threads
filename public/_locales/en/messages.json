@@ -3,7 +3,7 @@
     "message": "Refined Threads"
   },
   "extDescription": {
-    "message": "Hides spam and bot posts on Threads. Works on install. Your settings stay in your browser."
+    "message": "Small features for Threads web that you can turn on or off: a spam filter, account info, real dates, and keyboard navigation."
   },
   "bar_hidden": {
     "message": "Hidden · $VALUE$",
