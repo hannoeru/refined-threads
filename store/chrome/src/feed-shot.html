@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Feed screenshot</title>
+    <style>
+      :root {
+        --barcelona-primary-text: #000;
+        --barcelona-secondary-icon: rgb(119, 119, 119);
+        --barcelona-elevated-background: rgb(245, 245, 245);
+        --barcelona-primary-column-outline: rgb(223, 223, 223);
+        --barcelona-hovered-background: rgb(247, 247, 247);
+        --barcelona-link-text: rgb(0, 149, 246);
+        --barcelona-columns-item-horizontal-padding: 24px;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1280px;
+        height: 800px;
+        overflow: hidden;
+      }
+      body {
+        display: grid;
+        grid-template-columns: 1fr 600px;
+        align-items: center;
+        gap: 72px;
+        padding: 0 100px 0 140px;
+        box-sizing: border-box;
+        background: #fafafa;
+        color: #000;
+        font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+      }
+      h1 {
+        margin: 0 0 16px;
+        font-size: 44px;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+      }
+      .lead {
+        margin: 0;
+        max-width: 400px;
+        font-size: 20px;
+        line-height: 1.45;
+        color: #555;
+      }
+      .note {
+        margin: 28px 0 0;
+        font-size: 13px;
+        color: #999;
+      }
+
+      .feed {
+        background: #fff;
+        border: 1px solid rgb(223, 223, 223);
+        border-radius: 24px;
+        overflow: hidden;
+      }
+      .post {
+        padding: 14px 0 12px;
+        border-bottom: 1px solid rgb(235, 235, 235);
+      }
+      .post:last-child {
+        border-bottom: 0;
+      }
+      .body {
+        display: grid;
+        grid-template-columns: 36px 1fr;
+        column-gap: 12px;
+        padding: 0 24px;
+      }
+      .avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 14px;
+      }
+      .header {
+        display: grid;
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+      }
+      .name {
+        font-weight: 600;
+        font-size: 15px;
+      }
+      .time {
+        color: rgb(153, 153, 153);
+        font-size: 15px;
+      }
+      .text {
+        margin: 4px 0 8px;
+        font-size: 15px;
+        line-height: 21px;
+      }
+      .actions {
+        display: flex;
+        gap: 20px;
+        color: rgb(119, 119, 119);
+        font-size: 13px;
+      }
+      .actions span {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .actions svg {
+        width: 18px;
+        height: 18px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.8;
+      }
+
+      /* Copied from src/features/account-info/index.ts */
+      .rt-account-info {
+        display: flex;
+        align-items: center;
+        min-width: 0;
+        overflow: hidden;
+        font-size: 11px;
+        line-height: 14px;
+        font-weight: 400;
+        color: var(--barcelona-secondary-icon, rgb(119, 119, 119));
+        white-space: nowrap;
+      }
+      .rt-account-info.rt-ai-line {
+        grid-column: 1 / -1;
+        margin: 1px 0 3px;
+      }
+      .rt-account-info > span {
+        flex: none;
+      }
+      .rt-account-info > span + span::before {
+        content: '·';
+        margin: 0 4px;
+      }
+      .rt-account-info > .rt-ai-follows-you {
+        font-weight: 600;
+      }
+
+      /* Copied from src/features/keyboard-navigation/index.ts */
+      .rt-keyboard-current {
+        box-shadow: inset 3px 0 0 var(--barcelona-link-text, rgb(0, 149, 246));
+        background: var(--barcelona-hovered-background, rgba(127, 127, 127, 0.06));
+      }
+
+      /* Copied from STYLE in src/features/spam-filter/view.ts */
+      .rt-collapse > :not(.rt-bar) {
+        display: none !important;
+      }
+      .rt-bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px 10px;
+        margin: 10px var(--barcelona-columns-item-horizontal-padding, 16px) 2px;
+        padding: 8px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--barcelona-primary-column-outline, rgba(127, 127, 127, 0.25));
+        background: var(--barcelona-elevated-background, rgba(127, 127, 127, 0.08));
+        font:
+          13px/18px system-ui,
+          -apple-system,
+          'Segoe UI',
+          Roboto,
+          sans-serif;
+        color: var(--barcelona-secondary-icon, rgb(119, 119, 119));
+        cursor: default;
+      }
+      .rt-bar::before {
+        content: '';
+        flex: none;
+        width: 14px;
+        height: 14px;
+        background: currentColor;
+        -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2 4 5v6c0 5 3.4 9.5 8 11 4.6-1.5 8-6 8-11V5l-8-3z'/%3E%3C/svg%3E")
+          center / contain no-repeat;
+        mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2 4 5v6c0 5 3.4 9.5 8 11 4.6-1.5 8-6 8-11V5l-8-3z'/%3E%3C/svg%3E")
+          center / contain no-repeat;
+      }
+      .rt-bar-text {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
+      .rt-bar button {
+        font: inherit;
+        font-weight: 600;
+        padding: 3px 12px;
+        border-radius: 10px;
+        border: 1px solid var(--barcelona-primary-column-outline, rgba(127, 127, 127, 0.25));
+        background: transparent;
+        color: var(--barcelona-primary-text, currentColor);
+        cursor: pointer;
+      }
+      .rt-chip {
+        display: inline-flex;
+        flex: 0 1 auto;
+        align-items: center;
+        gap: 5px;
+        min-width: 0;
+        max-width: 220px;
+        padding: 0 2px 0 8px;
+        border-radius: 999px;
+        border: 1px dashed var(--barcelona-primary-column-outline, rgba(127, 127, 127, 0.25));
+        font:
+          12px/18px system-ui,
+          -apple-system,
+          'Segoe UI',
+          Roboto,
+          sans-serif;
+        font-weight: 500;
+        color: var(--barcelona-secondary-icon, rgb(119, 119, 119));
+        cursor: default;
+      }
+      .rt-chip::before {
+        content: '';
+        flex: none;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--barcelona-link-text, rgb(0, 149, 246));
+      }
+      .rt-chip-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .rt-chip button {
+        flex: none;
+        width: 18px;
+        height: 18px;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: transparent;
+        color: inherit;
+        font:
+          14px/18px system-ui,
+          sans-serif;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <h1>Spam folds away. Details show up inline.</h1>
+      <p class="lead">
+        Hidden posts become one line with the reason. Your own rules can tag posts instead. Each name gets a short line
+        of account details, and every post shows its real date.
+      </p>
+      <p class="note">Example feed. The accounts and posts are made up.</p>
+    </div>
+
+    <div class="feed">
+      <div class="post rt-keyboard-current">
+        <div class="body">
+          <div class="avatar" style="background: #e07a5f">M</div>
+          <div>
+            <div class="header">
+              <div class="row">
+                <span class="name">mika.sketches</span><span class="time">Nov 13, 2026, 9:42 AM</span>
+              </div>
+              <span class="rt-account-info rt-ai-line"
+                ><span class="rt-ai-follows-you">Follows you</span><span>🇯🇵</span><span>3y</span></span
+              >
+            </div>
+            <p class="text">
+              Finished the autumn series today. Five small paintings of the same street, one for each week of October.
+            </p>
+            <div class="actions">
+              <span
+                ><svg viewBox="0 0 24 24">
+                  <path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" /></svg
+                >128</span
+              >
+              <span
+                ><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z" /></svg
+                >14</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="post rt-collapse">
+        <div class="body"><div class="avatar" style="background: #999">S</div></div>
+        <div class="rt-bar">
+          <span class="rt-bar-text">Hidden · affiliate link</span><button type="button">Show</button>
+        </div>
+      </div>
+
+      <div class="post">
+        <div class="body">
+          <div class="avatar" style="background: #3d5a80">D</div>
+          <div>
+            <div class="header">
+              <div class="row">
+                <span class="name">daily.brew.notes</span
+                ><span class="rt-chip"><span class="rt-chip-text">Giveaway</span><button type="button">×</button></span
+                ><span class="time">Nov 13, 2026, 8:15 AM</span>
+              </div>
+              <span class="rt-account-info rt-ai-line"><span>🇹🇼</span><span>8mo</span></span>
+            </div>
+            <p class="text">Giveaway! We will pick three people this Friday to win a bag of our new winter beans.</p>
+            <div class="actions">
+              <span
+                ><svg viewBox="0 0 24 24">
+                  <path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" /></svg
+                >9</span
+              >
+              <span
+                ><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z" /></svg
+                >41</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="post rt-collapse">
+        <div class="body"><div class="avatar" style="background: #999">G</div></div>
+        <div class="rt-bar">
+          <span class="rt-bar-text">Hidden · copy-paste reply</span><button type="button">Show</button>
+        </div>
+      </div>
+
+      <div class="post">
+        <div class="body">
+          <div class="avatar" style="background: #81b29a">T</div>
+          <div>
+            <div class="header">
+              <div class="row">
+                <span class="name">trail.runner.tomo</span><span class="time">Nov 12, 2026, 7:03 PM</span>
+              </div>
+              <span class="rt-account-info rt-ai-line"><span>🇺🇸</span><span>2y</span></span>
+            </div>
+            <p class="text">20 km this morning. The hills were hard, but the view at the top was worth it.</p>
+            <div class="actions">
+              <span
+                ><svg viewBox="0 0 24 24">
+                  <path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" /></svg
+                >57</span
+              >
+              <span
+                ><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z" /></svg
+                >6</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

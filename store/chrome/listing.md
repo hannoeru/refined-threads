@@ -18,11 +18,12 @@ Upload `refined-threads-<version>-chrome.zip` from the draft GitHub release.
 
 **Screenshots** (1280×800, in this order):
 
-1. `screenshots/1-features.png`. The list of features, each with its own switch.
-2. `screenshots/2-protection.png`. Spam filter levels and checks.
-3. `screenshots/3-lists.png`. Blocked words, sites, and accounts.
-4. `screenshots/4-welcome.png`. The page that opens after install.
-5. `screenshots/5-popup.png`. The toolbar popup.
+1. `screenshots/0-feed.png`. An example feed with hidden posts, a tag from a user rule, account details, real dates, and the keyboard selection. The accounts and posts are made up, and the image says so.
+2. `screenshots/1-features.png`. The list of features, each with its own switch.
+3. `screenshots/2-protection.png`. Spam filter levels and checks.
+4. `screenshots/3-lists.png`. Blocked words, sites, and accounts.
+5. `screenshots/4-welcome.png`. The page that opens after install.
+6. `screenshots/5-popup.png`. The toolbar popup.
 
 **Small promo tile.** `promo-tile-440x280.png`.
 
@@ -142,4 +143,4 @@ Then check all three certifications: no sale or transfer to third parties, no us
 
 ## Rebuild the images
 
-The screenshots come from a disposable Chrome profile, with the browser in light mode and a 1280×800 window. `5-popup.png` and the promo tile come from the HTML pages in `src/`. Open each page in a window of the right size (1280×800 for `popup-shot.html`, 440×280 for `promo-tile.html`) and take a screenshot. The "14 hidden today" numbers in the popup are example counts that were written to storage before the screenshot.
+The screenshots come from a disposable Chrome profile, with the browser in light mode and a 1280×800 window. `0-feed.png`, `5-popup.png`, and the promo tile come from the HTML pages in `src/`. `feed-shot.html` copies the extension's CSS for the hidden bar, tag chip, account line, and keyboard selection. Update it when those styles change. Open each page in a window of the right size (1280×800 for `feed-shot.html` and `popup-shot.html`, 440×280 for `promo-tile.html`) and take a screenshot. The "14 hidden today" numbers in the popup are example counts that were written to storage before the screenshot.
