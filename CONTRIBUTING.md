@@ -109,11 +109,15 @@ Add these keys to both `public/_locales/en/messages.json` and `public/_locales/z
 
 If you cannot write Traditional Chinese, copy the English text and say so in the pull request.
 
-## 6. Test
+## 6. Document it
+
+Add `docs/features/<id>.md`. Start it with the same header line as the other pages, for example `**ID** \`my-feature\` · **Off by default** · **Code** [...]`. Then say what changes on Threads, list each option with its default, and say what the feature reads or sends. Add one line for the feature to the Features list in `README.md`.
+
+## 7. Test
 
 Write tests that show what the user sees. `src/features/__tests__/features.test.ts` shows how to run a feature on a small fake Threads page with `postContainer()` from `src/testing/feature.ts`.
 
-The registry test checks every feature. It fails when the id does not match the folder, when an option default is not valid, or when a text key is missing in one language.
+The registry test checks every feature. It fails when the id does not match the folder, when an option default is not valid, or when a text key is missing in one language. The docs test fails when a feature has no page in `docs/features/`, when the page states the wrong default, or when `README.md` does not link to it.
 
 ```sh
 pnpm lint:fix

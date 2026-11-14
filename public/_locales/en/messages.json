@@ -3,7 +3,7 @@
     "message": "Refined Threads"
   },
   "extDescription": {
-    "message": "Small features for Threads web that you can turn on or off: a spam filter, account info, real dates, and keyboard navigation."
+    "message": "Small improvements for Threads on the web. Each one has its own switch, so you turn on only what you want."
   },
   "bar_hidden": {
     "message": "Hidden · $VALUE$",

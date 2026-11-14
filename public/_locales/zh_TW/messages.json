@@ -3,7 +3,7 @@
     "message": "Refined Threads"
   },
   "extDescription": {
-    "message": "為 Threads 網頁版加入可個別開關的小功能：垃圾過濾、帳號資訊、實際日期與鍵盤瀏覽。"
+    "message": "為 Threads 網頁版加入實用的小改進。每項功能都有自己的開關，只開啟你需要的。"
   },
   "bar_hidden": {
     "message": "已隱藏 · $VALUE$",
