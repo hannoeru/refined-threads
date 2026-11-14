@@ -151,7 +151,7 @@ pnpm icons          # regenerate public/icon/*.png from assets/icon/source.png
 
 To load a build by hand, open `chrome://extensions`, turn on developer mode, and load `.output/chrome-mv3`. In Firefox, open `about:debugging#/runtime/this-firefox` and load `.output/firefox-mv3/manifest.json`.
 
-CI runs `pnpm check` on every push and pull request. Pushing a `v*` tag that matches the `package.json` version creates a draft GitHub release with the Chrome and Firefox zips. Dependabot opens weekly update pull requests for packages and GitHub Actions.
+CI runs `pnpm check` on every push and pull request. Pushing a `v*` tag that matches the `package.json` version creates a draft GitHub release with the Chrome and Firefox zips. Publishing that release submits the Chrome zip to the Chrome Web Store. See [RELEASING.md](RELEASING.md). Dependabot opens weekly update pull requests for packages and GitHub Actions.
 
 Agents can drive the extension on the real site with the project skill in `.agents/skills/verify-refined-threads/`.
 
