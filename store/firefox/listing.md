@@ -30,7 +30,7 @@ A collection of small, switchable features that make Threads web better, includi
 
 **Privacy policy.** Paste the text of [`PRIVACY.md`](../../PRIVACY.md). The add-on collects no data, so the policy is optional, but it answers the questions reviewers and users ask.
 
-**Screenshots.** The images in `../chrome/screenshots/`, in the same order.
+**Screenshots.** The six screenshots in `../chrome/en/`, in the order of their numbers. Add-on pages use one set of images for every language.
 
 ## Notes to reviewer
 

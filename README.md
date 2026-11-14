@@ -20,7 +20,7 @@
   <a href="https://github.com/hannoeru/refined-threads/actions/workflows/ci.yml"><img src="https://github.com/hannoeru/refined-threads/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
 </p>
 
-![Refined Threads on a Threads feed: hidden spam posts fold into one line, a tag from a user rule, account details under each name, and real dates](store/chrome/screenshots/0-feed.png)
+![Refined Threads on a Threads feed: hidden spam posts fold into one line, a tag from a user rule, account details under each name, and real dates](store/chrome/en/0-feed.png)
 
 ## Install
 

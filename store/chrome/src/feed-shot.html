@@ -253,12 +253,9 @@
   </head>
   <body>
     <div>
-      <h1>Spam folds away. Details show up inline.</h1>
-      <p class="lead">
-        Hidden posts become one line with the reason. Your own rules can tag posts instead. Each name gets a short line
-        of account details, and every post shows its real date.
-      </p>
-      <p class="note">Example feed. The accounts and posts are made up.</p>
+      <h1 data-t="title"></h1>
+      <p class="lead" data-t="lead"></p>
+      <p class="note" data-t="note"></p>
     </div>
 
     <div class="feed">
@@ -267,16 +264,12 @@
           <div class="avatar" style="background: #e07a5f">M</div>
           <div>
             <div class="header">
-              <div class="row">
-                <span class="name">mika.sketches</span><span class="time">Nov 13, 2026, 9:42 AM</span>
-              </div>
+              <div class="row"><span class="name">mika.sketches</span><span class="time" data-t="date1"></span></div>
               <span class="rt-account-info rt-ai-line"
-                ><span class="rt-ai-follows-you">Follows you</span><span>🇯🇵</span><span>3y</span></span
-              >
+                ><span class="rt-ai-follows-you" data-t="followsYou"></span><span>🇯🇵</span><span data-t="age3y"></span
+              ></span>
             </div>
-            <p class="text">
-              Finished the autumn series today. Five small paintings of the same street, one for each week of October.
-            </p>
+            <p class="text" data-t="post1"></p>
             <div class="actions">
               <span
                 ><svg viewBox="0 0 24 24">
@@ -295,7 +288,7 @@
       <div class="post rt-collapse">
         <div class="body"><div class="avatar" style="background: #999">S</div></div>
         <div class="rt-bar">
-          <span class="rt-bar-text">Hidden · affiliate link</span><button type="button">Show</button>
+          <span class="rt-bar-text" data-t="bar1"></span><button type="button" data-t="show"></button>
         </div>
       </div>
 
@@ -306,12 +299,13 @@
             <div class="header">
               <div class="row">
                 <span class="name">daily.brew.notes</span
-                ><span class="rt-chip"><span class="rt-chip-text">Giveaway</span><button type="button">×</button></span
-                ><span class="time">Nov 13, 2026, 8:15 AM</span>
+                ><span class="rt-chip"
+                  ><span class="rt-chip-text" data-t="chip"></span><button type="button">×</button></span
+                ><span class="time" data-t="date2"></span>
               </div>
-              <span class="rt-account-info rt-ai-line"><span>🇹🇼</span><span>8mo</span></span>
+              <span class="rt-account-info rt-ai-line"><span>🇹🇼</span><span data-t="age8mo"></span></span>
             </div>
-            <p class="text">Giveaway! We will pick three people this Friday to win a bag of our new winter beans.</p>
+            <p class="text" data-t="post2"></p>
             <div class="actions">
               <span
                 ><svg viewBox="0 0 24 24">
@@ -330,7 +324,7 @@
       <div class="post rt-collapse">
         <div class="body"><div class="avatar" style="background: #999">G</div></div>
         <div class="rt-bar">
-          <span class="rt-bar-text">Hidden · copy-paste reply</span><button type="button">Show</button>
+          <span class="rt-bar-text" data-t="bar2"></span><button type="button" data-t="show"></button>
         </div>
       </div>
 
@@ -340,11 +334,11 @@
           <div>
             <div class="header">
               <div class="row">
-                <span class="name">trail.runner.tomo</span><span class="time">Nov 12, 2026, 7:03 PM</span>
+                <span class="name">trail.runner.tomo</span><span class="time" data-t="date3"></span>
               </div>
-              <span class="rt-account-info rt-ai-line"><span>🇺🇸</span><span>2y</span></span>
+              <span class="rt-account-info rt-ai-line"><span>🇺🇸</span><span data-t="age2y"></span></span>
             </div>
-            <p class="text">20 km this morning. The hills were hard, but the view at the top was worth it.</p>
+            <p class="text" data-t="post3"></p>
             <div class="actions">
               <span
                 ><svg viewBox="0 0 24 24">
@@ -360,5 +354,49 @@
         </div>
       </div>
     </div>
+
+    <script type="application/json" id="text">
+      {
+        "en": {
+          "title": "Spam folds away. Details show up inline.",
+          "lead": "Hidden posts become one line with the reason. Your own rules can tag posts instead. Each name gets a short line of account details, and every post shows its real date.",
+          "note": "Example feed. The accounts and posts are made up.",
+          "date1": "Nov 13, 2026, 9:42 AM",
+          "date2": "Nov 13, 2026, 8:15 AM",
+          "date3": "Nov 12, 2026, 7:03 PM",
+          "followsYou": "Follows you",
+          "age3y": "3y",
+          "age8mo": "8mo",
+          "age2y": "2y",
+          "post1": "Finished the autumn series today. Five small paintings of the same street, one for each week of October.",
+          "post2": "Giveaway! We will pick three people this Friday to win a bag of our new winter beans.",
+          "post3": "20 km this morning. The hills were hard, but the view at the top was worth it.",
+          "chip": "Giveaway",
+          "bar1": "Hidden · affiliate link",
+          "bar2": "Hidden · copy-paste reply",
+          "show": "Show"
+        },
+        "zh_TW": {
+          "title": "垃圾貼文收起來，帳號資訊一眼看。",
+          "lead": "被隱藏的貼文會收成一行並顯示原因，你的自訂規則也可以只加上標記。每個名稱下方都有一行帳號資訊，每則貼文都顯示實際日期。",
+          "note": "範例畫面。帳號與貼文皆為虛構。",
+          "date1": "2026年11月13日 上午9:42",
+          "date2": "2026年11月13日 上午8:15",
+          "date3": "2026年11月12日 晚上7:03",
+          "followsYou": "追蹤你",
+          "age3y": "3 年",
+          "age8mo": "8 個月",
+          "age2y": "2 年",
+          "post1": "今天完成了秋天系列。同一條街畫了五張小圖，十月的每一週各一張。",
+          "post2": "抽獎！本週五會抽出三位朋友，送出我們新的冬季咖啡豆。",
+          "post3": "今天早上跑了 20 公里。上坡很累，但山頂的風景很值得。",
+          "chip": "抽獎",
+          "bar1": "已隱藏 · 分潤連結",
+          "bar2": "已隱藏 · 複製貼上的回覆",
+          "show": "顯示"
+        }
+      }
+    </script>
+    <script src="i18n.js"></script>
   </body>
 </html>

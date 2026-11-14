@@ -16,16 +16,16 @@ Upload `refined-threads-<version>-chrome.zip` from the draft GitHub release.
 
 **Store icon.** `public/icon/128.png`.
 
-**Screenshots** (1280×800, in this order):
+**Screenshots** (1280×800, in this order). Each language has its own set: `en/` for the English listing and `zh_TW/` for the Traditional Chinese listing. Upload each set to its own language in the dashboard.
 
-1. `screenshots/0-feed.png`. An example feed with hidden posts, a tag from a user rule, account details, real dates, and the keyboard selection. The accounts and posts are made up, and the image says so.
-2. `screenshots/1-features.png`. The list of features, each with its own switch.
-3. `screenshots/2-protection.png`. Spam filter levels and checks.
-4. `screenshots/3-lists.png`. Blocked words, sites, and accounts.
-5. `screenshots/4-welcome.png`. The page that opens after install.
-6. `screenshots/5-popup.png`. The toolbar popup.
+1. `0-feed.png`. An example feed with hidden posts, a tag from a user rule, account details, real dates, and the keyboard selection. The accounts and posts are made up, and the image says so.
+2. `1-features.png`. The list of features, each with its own switch.
+3. `2-protection.png`. Spam filter levels and checks.
+4. `3-lists.png`. Blocked words, sites, and accounts.
+5. `4-welcome.png`. The page that opens after install.
+6. `5-popup.png`. The toolbar popup.
 
-**Small promo tile.** `promo-tile-440x280.png`.
+**Small promo tile.** `en/promo-tile-440x280.png` and `zh_TW/promo-tile-440x280.png`, one per language.
 
 **Homepage URL.** https://github.com/hannoeru/refined-threads
 

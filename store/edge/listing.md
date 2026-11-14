@@ -28,9 +28,9 @@ Add English and Chinese (Traditional).
 
 **Extension store logo.** `logo-300x300.png`.
 
-**Small promotional tile.** `../chrome/promo-tile-440x280.png`.
+**Small promotional tile.** `../chrome/<language>/promo-tile-440x280.png`, with `en` or `zh_TW` for each listing language.
 
-**Screenshots.** The images in `../chrome/screenshots/`, in the same order.
+**Screenshots.** The six screenshots in `../chrome/<language>/`, in the order of their numbers.
 
 **Search terms.**
 

@@ -44,12 +44,22 @@
   </head>
   <body>
     <div>
-      <h1>Every feature, one click away.</h1>
-      <p>
-        See how many spam posts were hidden today, change the protection level, and turn each feature on or off from the
-        toolbar.
-      </p>
+      <h1 data-t="title"></h1>
+      <p data-t="lead"></p>
     </div>
-    <img src="popup.png" width="340" height="528" alt="" />
+    <img data-src="popup-{lang}.png" width="340" height="528" alt="" />
+    <script type="application/json" id="text">
+      {
+        "en": {
+          "title": "Every feature, one click away.",
+          "lead": "See how many spam posts were hidden today, change the protection level, and turn each feature on or off from the toolbar."
+        },
+        "zh_TW": {
+          "title": "所有功能，一鍵就到。",
+          "lead": "從工具列查看今天隱藏了多少垃圾貼文、切換防護等級，並個別開關每項功能。"
+        }
+      }
+    </script>
+    <script src="i18n.js"></script>
   </body>
 </html>

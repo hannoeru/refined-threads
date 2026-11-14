@@ -8,8 +8,8 @@ description: Generate or update the store listings in store/ for the Chrome Web 
 `store/chrome/` holds the text and images that all three stores share, plus the Chrome-only fields:
 
 - `listing.md` has the text for each dashboard field, in English and Traditional Chinese.
-- `screenshots/` holds six images at 1280×800, numbered in upload order. `promo-tile-440x280.png` is the small promo tile.
-- `src/` holds the HTML pages behind `0-feed.png`, `5-popup.png`, and the promo tile. `feed-shot.html` is a mock feed that copies the extension's real CSS and strings.
+- `en/` and `zh_TW/` each hold six screenshots at 1280×800, numbered in upload order, and the small promo tile `promo-tile-440x280.png`. Each language folder matches a locale in `public/_locales/`.
+- `src/` holds the HTML pages behind `0-feed.png`, `5-popup.png`, and the promo tile. Each page takes `?lang=en` or `?lang=zh_TW` and reads its text from the JSON block in the page. `feed-shot.html` is a mock feed that copies the extension's real CSS, and its bars, buttons, and account details use the real locale strings.
 - `store/firefox/listing.md` and `store/edge/listing.md` hold only their store's own fields (the Firefox summary and notes to reviewer, the Edge search terms and logo). They point to `store/chrome/listing.md` for the rest.
 - `sources.json` records a hash of the source files behind each image. `bin/check.mjs` compares it with the code.
 

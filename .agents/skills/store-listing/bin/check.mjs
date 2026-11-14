@@ -9,15 +9,20 @@ const store = join(root, 'store/chrome')
 const hashFile = join(store, 'sources.json')
 const read = path => readFileSync(join(root, path))
 
+const LOCALES = ['en', 'zh_TW']
 const SPAM = ['src/features/spam-filter/Settings.vue', 'entrypoints/options/App.vue', 'src/ui/base.css', 'src/ui/components/Toggle.vue']
+const MOCK = ['store/chrome/src/i18n.js']
+const PER_LOCALE = {
+  '0-feed.png': { size: [1280, 800], sources: [...MOCK, 'store/chrome/src/feed-shot.html', 'src/features/spam-filter/view.ts', 'src/features/account-info/index.ts', 'src/features/keyboard-navigation/index.ts'] },
+  '1-features.png': { size: [1280, 800], sources: ['entrypoints/options/App.vue', 'src/ui/base.css', 'src/ui/components/Toggle.vue', 'src/features/registry.ts'] },
+  '2-protection.png': { size: [1280, 800], sources: [...SPAM, 'src/features/spam-filter/settings/Protection.vue', 'src/ui/components/LevelPicker.vue', 'src/ui/components/EffectPicker.vue'] },
+  '3-lists.png': { size: [1280, 800], sources: [...SPAM, 'src/features/spam-filter/settings/Lists.vue', 'src/ui/components/ChipInput.vue'] },
+  '4-welcome.png': { size: [1280, 800], sources: ['entrypoints/welcome/App.vue', 'src/ui/base.css', 'src/ui/components/LevelPicker.vue'] },
+  '5-popup.png': { size: [1280, 800], sources: [...MOCK, 'store/chrome/src/popup-shot.html', 'entrypoints/popup/App.vue', 'src/ui/base.css', 'src/ui/components/LevelPicker.vue', 'src/ui/components/Toggle.vue'] },
+  'promo-tile-440x280.png': { size: [440, 280], sources: [...MOCK, 'store/chrome/src/promo-tile.html', 'public/icon/128.png'] },
+}
 const IMAGES = {
-  'screenshots/0-feed.png': { size: [1280, 800], sources: ['store/chrome/src/feed-shot.html', 'src/features/spam-filter/view.ts', 'src/features/account-info/index.ts', 'src/features/keyboard-navigation/index.ts'] },
-  'screenshots/1-features.png': { size: [1280, 800], sources: ['entrypoints/options/App.vue', 'src/ui/base.css', 'src/ui/components/Toggle.vue', 'src/features/registry.ts'] },
-  'screenshots/2-protection.png': { size: [1280, 800], sources: [...SPAM, 'src/features/spam-filter/settings/Protection.vue', 'src/ui/components/LevelPicker.vue', 'src/ui/components/EffectPicker.vue'] },
-  'screenshots/3-lists.png': { size: [1280, 800], sources: [...SPAM, 'src/features/spam-filter/settings/Lists.vue', 'src/ui/components/ChipInput.vue'] },
-  'screenshots/4-welcome.png': { size: [1280, 800], sources: ['entrypoints/welcome/App.vue', 'src/ui/base.css', 'src/ui/components/LevelPicker.vue'] },
-  'screenshots/5-popup.png': { size: [1280, 800], sources: ['store/chrome/src/popup-shot.html', 'entrypoints/popup/App.vue', 'src/ui/base.css', 'src/ui/components/LevelPicker.vue', 'src/ui/components/Toggle.vue'] },
-  'promo-tile-440x280.png': { size: [440, 280], sources: ['store/chrome/src/promo-tile.html', 'public/icon/128.png'] },
+  ...Object.fromEntries(LOCALES.flatMap(code => Object.entries(PER_LOCALE).map(([name, image]) => [`${code}/${name}`, image]))),
   '../edge/logo-300x300.png': { size: [300, 300], sources: ['assets/icon/source.png'] },
 }
 
@@ -70,17 +75,29 @@ const summary = readFileSync(join(root, 'store/firefox/listing.md'), 'utf8').spl
 if (summary.length === 0 || [...summary].length > 250)
   problems.push(`store/firefox/listing.md: the summary has ${[...summary].length} characters, it needs 1 to 250`)
 
-const feed = read('store/chrome/src/feed-shot.html').toString()
-const reasons = new Set(Object.entries(en).filter(([key]) => key.startsWith('reason_')).map(([, value]) => value.message))
-const hiddenPrefix = en.bar_hidden.message.replace('$VALUE$', '')
-for (const [, text] of feed.matchAll(/class="rt-bar-text">([^<]+)</g)) {
-  if (!text.startsWith(hiddenPrefix)) {
-    problems.push(`feed-shot.html: bar "${text}" does not start with "${hiddenPrefix}"`)
+const feedText = JSON.parse(read('store/chrome/src/feed-shot.html').toString().match(/<script type="application\/json" id="text">([\s\S]*?)<\/script>/)[1])
+for (const code of LOCALES) {
+  const messages = locale(code)
+  const text = feedText[code]
+  if (!text) {
+    problems.push(`feed-shot.html: no text for ${code}`)
     continue
   }
-  for (const reason of text.slice(hiddenPrefix.length).split(', ')) {
-    if (!reasons.has(reason))
-      problems.push(`feed-shot.html: reason "${reason}" is not a reason_* text in the en locale`)
+  const reasons = new Set(Object.entries(messages).filter(([key]) => key.startsWith('reason_')).map(([, value]) => value.message))
+  const hiddenPrefix = messages.bar_hidden.message.replace('$VALUE$', '')
+  for (const key of ['bar1', 'bar2']) {
+    if (!text[key].startsWith(hiddenPrefix)) {
+      problems.push(`feed-shot.html (${code}): ${key} "${text[key]}" does not start with "${hiddenPrefix}"`)
+      continue
+    }
+    for (const reason of text[key].slice(hiddenPrefix.length).split(', ')) {
+      if (!reasons.has(reason))
+        problems.push(`feed-shot.html (${code}): reason "${reason}" is not a reason_* text in the ${code} locale`)
+    }
+  }
+  for (const [key, message] of [['show', 'bar_show'], ['followsYou', 'feature_account_info_follows_you']]) {
+    if (text[key] !== messages[message].message)
+      problems.push(`feed-shot.html (${code}): ${key} "${text[key]}" is not the ${message} text "${messages[message].message}"`)
   }
 }
 
