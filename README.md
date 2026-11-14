@@ -12,7 +12,8 @@
   <a href="#install">Install</a> ·
   <a href="#features">Features</a> ·
   <a href="#privacy">Privacy</a> ·
-  <a href="#contributing">Contributing</a>
+  <a href="#contributing">Contributing</a> ·
+  <a href="https://github.com/sponsors/hannoeru">Sponsor</a>
 </p>
 
 <p align="center">
@@ -65,6 +66,7 @@ Refined Threads has no server, no account, no analytics, and no tracking. Your s
 - **Report a bug or suggest an idea** with the [issue forms](https://github.com/hannoeru/refined-threads/issues/new/choose).
 - **Add a feature.** [CONTRIBUTING.md](CONTRIBUTING.md) walks through one, step by step.
 - **Report a security problem** privately, as [SECURITY.md](SECURITY.md) describes.
+- **Support the work** by [sponsoring the maintainer on GitHub](https://github.com/sponsors/hannoeru).
 
 This project follows the [code of conduct](CODE_OF_CONDUCT.md).
 
