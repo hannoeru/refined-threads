@@ -41,7 +41,7 @@ Build steps (the same as CI):
 3. pnpm build:firefox
 The add-on is in .output/firefox-mv3.
 
-The add-on runs only on threads.com and threads.net. The page-hook content script runs in the MAIN world to read the post data that Threads loads for itself (XHR, fetch, and the server-rendered JSON). It sends requests only to threads.com, and only for account checks the user turns on. Settings are in storage.sync. There is no server, no analytics, and no remote code. User regular expressions run with re2js (bundled), not eval.
+The add-on runs only on threads.com and threads.net. The page-hook content script runs in the MAIN world to read the post data that Threads loads for itself (XHR, fetch, and the server-rendered JSON). It sends requests only to the Threads site that is open (threads.com or threads.net), and only for account checks the user turns on. For the "About this profile" request, it reuses the session tokens that the page itself sends to Threads. It keeps them only in the page's memory, sends them only to that same Threads site, and never stores them. Settings are in storage.sync. There is no server, no analytics, and no remote code. User regular expressions run with re2js (bundled), not eval.
 
 To test: open https://www.threads.com. The spam filter, account info, and keyboard navigation are on by default. Press j and k to move between posts. The toolbar popup and the settings page list every feature.
 ```
