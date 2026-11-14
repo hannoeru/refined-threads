@@ -1,3 +1,4 @@
+import type { StoredFeatures } from './features/state'
 import type { Rule, Settings } from './model'
 import * as v from 'valibot'
 import { BAIT_PHRASES, RuleFileSchema, SettingsSchema } from './model'
@@ -8,18 +9,34 @@ const SharedFileSchema = v.strictObject({
   format: v.literal(SHARE_FORMAT),
   name: v.optional(v.pipe(v.string(), v.maxLength(80)), ''),
   description: v.optional(v.pipe(v.string(), v.maxLength(500)), ''),
+  features: v.optional(v.record(v.string(), v.strictObject({
+    enabled: v.optional(v.boolean()),
+    options: v.optional(v.record(v.string(), v.unknown())),
+  }))),
   settings: v.optional(v.partial(SettingsSchema), {}),
 })
 export type SharedFile = v.InferOutput<typeof SharedFileSchema>
 
-export function exportSettings(settings: Settings, name = '', description = ''): string {
+export function exportSettings(config: { settings: Settings, features: StoredFeatures }, name = ''): string {
   const file: SharedFile = {
     format: SHARE_FORMAT,
     name,
-    description,
-    settings,
+    description: '',
+    features: config.features,
+    settings: config.settings,
   }
   return `${JSON.stringify(file, null, 2)}\n`
+}
+
+export function importFeatures(current: StoredFeatures, file: SharedFile, mode: 'replace' | 'merge'): StoredFeatures {
+  if (!file.features)
+    return current
+  return mode === 'replace'
+    ? file.features
+    : {
+        ...current,
+        ...file.features,
+      }
 }
 
 export type ImportResult = { ok: true, file: SharedFile } | { ok: false, errors: string[] }

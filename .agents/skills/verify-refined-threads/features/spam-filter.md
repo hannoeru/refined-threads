@@ -14,7 +14,7 @@ The spam filter hides or tags posts that match the user's rules. A hidden post b
 ## How to get to it (user POV)
 
 - It is on by default. Open threads.com.
-- Settings page: `options.html#feature/spam-filter`, with the tabs Protection, Words and accounts, Account filters, My rules, How it looks, Share and presets.
+- Settings page: `options.html#feature/spam-filter`, with the tabs Protection, Words and accounts, Account filters, My rules, How it looks, Presets. Import, export, and the advanced editor are on the global page `options.html#backup`.
 - Popup: the spam card with today's count and the level picker.
 - Right-click an author link and choose "Hide posts from this account" or "Never hide this account".
 

@@ -1,12 +1,13 @@
 <script setup vapor lang="ts">
-import type { SharedFile } from '../../../share'
-import type { SectionProps } from '../../../ui/props'
+import type { SharedFile } from '../../src/share'
 import { computed, ref, shallowRef } from 'vue'
-import { exportSettings, mergeInto, PRESET_FILES, readSharedFile, replaceWith } from '../../../share'
-import Toggle from '../../../ui/components/Toggle.vue'
-import { t } from '../../../ui/i18n'
+import { featuresItem } from '../../src/features/state'
+import { exportSettings, importFeatures, mergeInto, readSharedFile, replaceWith } from '../../src/share'
+import Toggle from '../../src/ui/components/Toggle.vue'
+import { t } from '../../src/ui/i18n'
+import { useSettings } from '../../src/ui/useSettings'
 
-const props = defineProps<SectionProps>()
+const { settings, error, update } = useSettings()
 
 const status = ref('')
 const exportName = ref('')
@@ -15,10 +16,20 @@ const errors = ref<string[]>([])
 const advanced = ref(false)
 const draft = ref('')
 
-function download(): void {
-  const blob = new Blob([
-    exportSettings(props.settings, exportName.value.trim()),
-  ], { type: 'application/json' })
+function messages(result: ReturnType<typeof readSharedFile>) {
+  return result.ok
+    ? []
+    : result.errors.map(item => (item === 'not-json'
+        ? t('import_not_json')
+        : item))
+}
+
+async function currentFile(name = ''): Promise<string> {
+  return exportSettings({ settings: settings.value!, features: await featuresItem.getValue() }, name)
+}
+
+async function download(): Promise<void> {
+  const blob = new Blob([await currentFile(exportName.value.trim())], { type: 'application/json' })
   const link = document.createElement('a')
   link.href = URL.createObjectURL(blob)
   link.download = 'refined-threads-settings.json'
@@ -32,79 +43,57 @@ async function load(event: Event): Promise<void> {
   input.value = ''
   if (!file)
     return
-  open(await file.text())
-}
-
-function open(text: string): void {
-  const result = readSharedFile(text)
+  const result = readSharedFile(await file.text())
   pending.value = result.ok ? result.file : null
-  errors.value = result.ok
-    ? []
-    : result.errors.map(error => (error === 'not-json'
-        ? t('import_not_json')
-        : error))
+  errors.value = messages(result)
 }
 
 async function apply(mode: 'replace' | 'merge', file: SharedFile | null = pending.value): Promise<void> {
   if (!file)
     return
-  await props.update(current => (mode === 'replace'
+  await update(current => (mode === 'replace'
     ? replaceWith(file)
     : mergeInto(current, file)))
+  if (error.value)
+    return
+  await featuresItem.setValue(importFeatures(await featuresItem.getValue(), file, mode))
   pending.value = null
   status.value = t(mode === 'replace'
     ? 'import_replaced'
     : 'import_merged')
 }
 
-const presetText = (key: string) => t(key)
+const editorErrors = computed(() => (advanced.value && draft.value !== ''
+  ? messages(readSharedFile(draft.value))
+  : []))
 
-const editorErrors = computed(() => {
-  if (!advanced.value || draft.value === '')
-    return []
-  const result = readSharedFile(draft.value)
-  return result.ok
-    ? []
-    : result.errors.map(error => (error === 'not-json'
-        ? t('import_not_json')
-        : error))
-})
-function showEditor(value: boolean) {
+async function showEditor(value: boolean): Promise<void> {
   advanced.value = value
   if (value)
-    draft.value = exportSettings(props.settings)
+    draft.value = await currentFile()
 }
+
 async function saveEditor(): Promise<void> {
   const result = readSharedFile(draft.value)
   if (!result.ok)
     return
   await apply('replace', result.file)
-  draft.value = exportSettings(props.settings)
+  draft.value = await currentFile()
 }
 </script>
 
 <template>
-  <section class="section">
-    <h2>{{ t('section_share') }}</h2>
+  <section v-if="settings" class="section">
+    <h2>{{ t('backup_title') }}</h2>
+    <p class="muted">
+      {{ t('backup_intro') }}
+    </p>
     <p v-if="status" class="status" role="status">
       {{ status }}
     </p>
-
-    <h3>{{ t('presets_title') }}</h3>
-    <p class="muted">
-      {{ t('presets_intro') }}
+    <p v-if="error" class="save-error" role="alert">
+      {{ t(error) }}
     </p>
-    <ul class="presets">
-      <li v-for="preset in PRESET_FILES" :key="preset.id" class="card preset">
-        <strong>{{ presetText(preset.name) }}</strong>
-        <p class="muted small">
-          {{ presetText(preset.description) }}
-        </p>
-        <button type="button" class="button" @click="apply('merge', preset)">
-          {{ t('preset_apply') }}
-        </button>
-      </li>
-    </ul>
 
     <div class="card">
       <h3>{{ t('export_title') }}</h3>
@@ -136,6 +125,9 @@ async function saveEditor(): Promise<void> {
         <p class="small">
           {{ t('import_rule_count', [String(pending.settings.ruleFile?.rules.length ?? 0)]) }}
         </p>
+        <p v-if="pending.features" class="small">
+          {{ t('import_has_features') }}
+        </p>
         <div class="inline">
           <button type="button" class="button primary" @click="apply('merge')">
             {{ t('import_merge') }}
@@ -149,8 +141,8 @@ async function saveEditor(): Promise<void> {
         </div>
       </div>
       <ul v-if="errors.length" class="errors" role="alert">
-        <li v-for="error in errors" :key="error">
-          {{ error }}
+        <li v-for="item in errors" :key="item">
+          {{ item }}
         </li>
       </ul>
     </div>
@@ -160,8 +152,8 @@ async function saveEditor(): Promise<void> {
       <template v-if="advanced">
         <textarea v-model="draft" class="field editor" spellcheck="false" :aria-label="t('advanced_title')" />
         <ul v-if="editorErrors.length" class="errors" role="alert">
-          <li v-for="error in editorErrors" :key="error">
-            {{ error }}
+          <li v-for="item in editorErrors" :key="item">
+            {{ item }}
           </li>
         </ul>
         <div class="inline end">

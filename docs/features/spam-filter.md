@@ -2,7 +2,7 @@
 
 **ID** `spam-filter` · **On by default** · **Code** [`src/features/spam-filter/`](../../src/features/spam-filter/)
 
-Hides or tags spam and bot posts on Threads. The settings page has six tabs: Protection, Words and accounts, Account filters, My rules, How it looks, and Share and presets.
+Hides or tags spam and bot posts on Threads. The settings page has six tabs: Protection, Words and accounts, Account filters, My rules, How it looks, and Presets.
 
 ## On the page
 
@@ -69,13 +69,16 @@ Presets add a ready-made set of rules and keep your other rules: Affiliate spam,
 
 ## Settings file
 
-The Share and presets tab exports this format. Import and the advanced editor accept it.
+The **Import and export** page of the settings exports this format. Its import and its advanced editor accept it, and presets use it too. A full export also has a `features` field with each feature's switch and options, in the same shape as the `features` key in `storage.sync`. Presets have no `features` field, so they never change feature switches.
 
 ```json
 {
   "format": "refined-threads-settings",
   "name": "My spam filter",
   "description": "Optional text for the people you share it with.",
+  "features": {
+    "absolute-timestamps": { "enabled": true, "options": { "style": "iso" } }
+  },
   "settings": {
     "level": "balanced",
     "tagOnly": false,

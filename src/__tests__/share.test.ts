@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { defaultSettings } from '../model'
 import { addAccount, findRule, readList } from '../rules/edit'
-import { exportSettings, mergeInto, PRESET_FILES, readSharedFile, replaceWith } from '../share'
+import { exportSettings, importFeatures, mergeInto, PRESET_FILES, readSharedFile, replaceWith } from '../share'
 
 describe('sharing settings', () => {
   it('exports settings that import back to the same settings', () => {
@@ -11,12 +11,45 @@ describe('sharing settings', () => {
       tagOnly: true,
     }
     settings.ruleFile = addAccount(settings.ruleFile, 'hidden-accounts', 'spammer')
-    const result = readSharedFile(exportSettings(settings, 'My setup'))
+    const features = {
+      'absolute-timestamps': {
+        enabled: true,
+        options: { style: 'iso' },
+      },
+      'account-info': { enabled: false },
+    }
+    const result = readSharedFile(exportSettings({ settings, features }, 'My setup'))
     expect(result.ok).toBe(true)
     if (!result.ok)
       return
     expect(result.file.name).toBe('My setup')
     expect(replaceWith(result.file)).toEqual(settings)
+    expect(importFeatures({
+      'keyboard-navigation': { enabled: false },
+    }, result.file, 'replace')).toEqual(features)
+  })
+
+  it('merges feature settings from a file, and leaves them alone when the file has none', () => {
+    const mine = {
+      'keyboard-navigation': { enabled: false },
+      'account-info': { enabled: true },
+    }
+    const file = readSharedFile(JSON.stringify({
+      format: 'refined-threads-settings',
+      features: {
+        'account-info': { enabled: false },
+      },
+    }))
+    if (!file.ok)
+      throw new Error('valid file')
+    expect(importFeatures(mine, file.file, 'merge')).toEqual({
+      'keyboard-navigation': { enabled: false },
+      'account-info': { enabled: false },
+    })
+    for (const preset of PRESET_FILES) {
+      expect(importFeatures(mine, preset, 'replace')).toBe(mine)
+      expect(importFeatures(mine, preset, 'merge')).toBe(mine)
+    }
   })
 
   it('reports plain errors for files that are not settings', () => {

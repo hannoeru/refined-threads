@@ -4,10 +4,10 @@ import { t } from '../../ui/i18n'
 import { useSettings } from '../../ui/useSettings'
 import Lists from './settings/Lists.vue'
 import Look from './settings/Look.vue'
+import Presets from './settings/Presets.vue'
 import Profile from './settings/Profile.vue'
 import Protection from './settings/Protection.vue'
 import Rules from './settings/Rules.vue'
-import Share from './settings/Share.vue'
 
 const TABS = [
   'protection',
@@ -15,7 +15,7 @@ const TABS = [
   'profile',
   'rules',
   'look',
-  'share',
+  'presets',
 ] as const
 const tab = ref<(typeof TABS)[number]>('protection')
 const { settings, error, update } = useSettings()
@@ -44,7 +44,7 @@ const { settings, error, update } = useSettings()
     <Profile v-else-if="tab === 'profile'" :settings="settings" :update="update" />
     <Rules v-else-if="tab === 'rules'" :settings="settings" :update="update" />
     <Look v-else-if="tab === 'look'" :settings="settings" :update="update" />
-    <Share v-else :settings="settings" :update="update" />
+    <Presets v-else :settings="settings" :update="update" />
   </template>
 </template>
 

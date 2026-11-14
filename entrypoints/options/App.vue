@@ -7,6 +7,7 @@ import OptionsForm from '../../src/ui/components/OptionsForm.vue'
 import Toggle from '../../src/ui/components/Toggle.vue'
 import { t } from '../../src/ui/i18n'
 import { useFeatures } from '../../src/ui/useFeatures'
+import Backup from './Backup.vue'
 
 const route = ref(location.hash.slice(1))
 window.addEventListener('hashchange', () => (route.value = location.hash.slice(1)))
@@ -17,6 +18,8 @@ const current = computed(() => {
     ? featureById(match[1])
     : undefined
 })
+
+const backup = computed(() => route.value === 'backup')
 
 const query = ref('')
 const { states, setEnabled, setOption } = useFeatures()
@@ -41,7 +44,7 @@ const page = computed(() => (current.value
         <img src="/icon/48.png" alt="" width="32" height="32">
         <span>{{ t('extName') }}</span>
       </a>
-      <a class="nav-item" href="#features" :aria-current="!current ? 'page' : undefined">{{ t('features_title') }}</a>
+      <a class="nav-item" href="#features" :aria-current="!current && !backup ? 'page' : undefined">{{ t('features_title') }}</a>
       <a
         v-for="feature in FEATURES"
         :key="feature.id"
@@ -52,10 +55,13 @@ const page = computed(() => (current.value
         <span class="dot" :class="{ on: states?.[feature.id]?.enabled }" aria-hidden="true" />
         {{ name(feature.id) }}
       </a>
+      <a class="nav-item nav-section" href="#backup" :aria-current="backup ? 'page' : undefined">{{ t('backup_title') }}</a>
     </nav>
 
     <main v-if="states" class="options-main">
-      <section v-if="!current" class="section">
+      <Backup v-if="backup" />
+
+      <section v-else-if="!current" class="section">
         <h2>{{ t('features_title') }}</h2>
         <p class="muted">
           {{ t('features_intro') }}
@@ -69,7 +75,20 @@ const page = computed(() => (current.value
               :description="description(feature.id)"
               @update:model-value="(value: boolean) => setEnabled(feature.id, value)"
             />
-            <a v-if="hasSettings(feature.id)" class="button" :href="`#feature/${feature.id}`">{{ t('feature_settings') }}</a>
+            <a
+              v-if="hasSettings(feature.id)"
+              class="icon-button"
+              :href="`#feature/${feature.id}`"
+              :aria-label="t('feature_settings_for', [name(feature.id)])"
+              :title="t('feature_settings_for', [name(feature.id)])"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="7.5" stroke-width="3.5" stroke-dasharray="2.95 2.95" />
+                <circle cx="12" cy="12" r="6" stroke-width="2" />
+                <circle cx="12" cy="12" r="2.25" stroke-width="2" />
+              </svg>
+            </a>
+            <span v-else class="icon-button-space" aria-hidden="true" />
           </li>
         </ul>
         <p v-if="visible.length === 0" class="muted">
@@ -152,6 +171,9 @@ const page = computed(() => (current.value
 .nav-feature {
   font-size: 14px;
 }
+.nav-section {
+  margin-top: 12px;
+}
 .dot {
   width: 6px;
   height: 6px;
@@ -212,8 +234,27 @@ const page = computed(() => (current.value
 .feature-row .toggle {
   flex: 1;
 }
-.feature-row .button {
-  white-space: nowrap;
+.icon-button,
+.icon-button-space {
+  flex: none;
+  width: 36px;
+  height: 36px;
+}
+.icon-button {
+  display: inline-grid;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+}
+.icon-button:hover {
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+.icon-button svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
 }
 .shortcuts {
   list-style: none;

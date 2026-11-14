@@ -51,9 +51,6 @@
   "section_look": {
     "message": "顯示方式"
   },
-  "section_share": {
-    "message": "分享與預設組合"
-  },
   "settings_title": {
     "message": "設定"
   },
@@ -496,7 +493,7 @@
     "message": "結果"
   },
   "rule_json_only": {
-    "message": "這條規則有巢狀條件，請在「分享與預設組合」的進階編輯器中修改。"
+    "message": "這條規則有巢狀條件，請在「匯入與匯出」頁面的進階編輯器中修改。"
   },
   "rule_invalid": {
     "message": "請填寫每個值。數字欄位要填數字，樣式必須正確。"
@@ -512,9 +509,6 @@
   },
   "no": {
     "message": "否"
-  },
-  "presets_title": {
-    "message": "預設組合"
   },
   "presets_intro": {
     "message": "把現成的規則加到你的設定裡，其他規則保持不變。"
@@ -562,7 +556,7 @@
     "message": "給別人看的名稱"
   },
   "export_name_placeholder": {
-    "message": "例如：我的垃圾過濾器"
+    "message": "例如：我的 Threads 設定"
   },
   "export_button": {
     "message": "下載檔案"
@@ -577,7 +571,7 @@
     "message": "未命名的設定"
   },
   "import_rule_count": {
-    "message": "$VALUE$ 條規則",
+    "message": "垃圾過濾規則：$VALUE$",
     "placeholders": {
       "value": {
         "content": "$1"
@@ -600,7 +594,7 @@
     "message": "已取代你的設定。"
   },
   "import_merged": {
-    "message": "規則已加入你的設定。"
+    "message": "規則與功能設定已加入你的設定。"
   },
   "advanced_title": {
     "message": "進階編輯器"
@@ -619,9 +613,6 @@
   },
   "features_search": {
     "message": "搜尋功能"
-  },
-  "feature_settings": {
-    "message": "設定"
   },
   "features_none": {
     "message": "沒有符合搜尋的功能。"
@@ -838,5 +829,28 @@
   },
   "import_choose": {
     "message": "選擇檔案"
+  },
+  "section_presets": {
+    "message": "預設組合"
+  },
+  "backup_title": {
+    "message": "匯入與匯出"
+  },
+  "backup_intro": {
+    "message": "備份你的設定，或搬到另一個瀏覽器。設定檔包含開啟了哪些功能、各功能的選項，以及垃圾過濾的設定與規則。"
+  },
+  "import_has_features": {
+    "message": "也包含功能開關與選項。"
+  },
+  "preset_added": {
+    "message": "預設組合的規則已加入你的設定。"
+  },
+  "feature_settings_for": {
+    "message": "$VALUE$ 設定",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
   }
 }

@@ -63,7 +63,7 @@ function usedKeys(): Set<string> {
       'profile',
       'rules',
       'look',
-      'share',
+      'presets',
     ].map(section => `section_${section}`),
     ...PRESET_FILES.flatMap(preset => [preset.name, preset.description]),
     ...FEATURES.flatMap(feature => [

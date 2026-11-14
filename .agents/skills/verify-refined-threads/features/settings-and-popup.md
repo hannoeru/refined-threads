@@ -4,10 +4,11 @@ The settings page lists every feature with a switch, a search box, and a page pe
 
 ## Sub-features
 
-- `settings-list` shows every feature, its description, a switch, and a Settings button when it has options.
+- `settings-list` shows every feature, its description, a switch, and a gear link (named "<feature> settings") when it has a settings page. Every switch lines up, with or without a gear.
 - `settings-search` filters the list by name or description.
 - `settings-feature-page` shows the feature switch, the generated option form, any custom page, and shortcuts.
 - `settings-hash-route` opens `#feature/<id>` directly and follows hash changes.
+- `settings-backup` (`#backup`, "Import and export" in the sidebar) exports and imports one settings file with the feature switches and options and the spam filter settings, and has the advanced JSON editor.
 - `popup-switches` turns features on and off and stays in sync with the settings page.
 - `popup-spam-card` shows today's count, the top reasons, and the level picker (Light, Balanced, Strict).
 - `theme` renders light and dark with Threads tokens.
@@ -28,6 +29,7 @@ Preconditions:
 - **Search.** Fill the searchbox "Search features" with `date`. Only "Real dates" remains.
 - **Feature page.** Open `#feature/account-info`. Switches exist for "Country flag", "Country name", "How long on Threads", "Follower count", "Post count", "Follows you", and "You follow them".
 - **Option persists.** Choose the "Follower count" switch with `find role switch click`. Eval `chrome.storage.sync.get('features')`: `account-info.options.followers` is true.
+- **Import.** Open `#backup`, then `upload input[type=file] <file>` with a settings file that has a `features` field. The preview says "Also has feature switches and options." Choose "Replace my settings", then eval `chrome.storage.sync.get(null)`: `features` equals the file's `features`, and the joined `settings_<n>` parts hold its rules.
 - **Popup sync.** Open `popup.html`. The "Account info" switch matches the settings page. Change the level to Strict, then eval storage: `settings.level` is `strict`.
 - **Theme.** Launch with `--color-scheme light` and then `dark`, and screenshot `#feature/spam-filter` in each. The six sub-tabs fit on one line.
 - **Proof.** Save the snapshots and screenshots, plus the storage JSON after each change.

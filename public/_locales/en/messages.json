@@ -51,9 +51,6 @@
   "section_look": {
     "message": "How it looks"
   },
-  "section_share": {
-    "message": "Share and presets"
-  },
   "settings_title": {
     "message": "Settings"
   },
@@ -496,7 +493,7 @@
     "message": "Then"
   },
   "rule_json_only": {
-    "message": "This rule uses nested conditions. Edit it in the advanced editor under Share and presets."
+    "message": "This rule uses nested conditions. Edit it in the advanced editor on the Import and export page."
   },
   "rule_invalid": {
     "message": "Fill in every value. Numbers must be numbers, and patterns must be valid."
@@ -512,9 +509,6 @@
   },
   "no": {
     "message": "No"
-  },
-  "presets_title": {
-    "message": "Presets"
   },
   "presets_intro": {
     "message": "Add a ready-made set of rules to your settings. Your other rules stay as they are."
@@ -562,7 +556,7 @@
     "message": "File name shown to others"
   },
   "export_name_placeholder": {
-    "message": "For example: My spam filter"
+    "message": "For example: My Threads setup"
   },
   "export_button": {
     "message": "Download file"
@@ -577,7 +571,7 @@
     "message": "Unnamed settings"
   },
   "import_rule_count": {
-    "message": "$VALUE$ rules",
+    "message": "Spam filter rules: $VALUE$",
     "placeholders": {
       "value": {
         "content": "$1"
@@ -600,7 +594,7 @@
     "message": "Your settings were replaced."
   },
   "import_merged": {
-    "message": "The rules were added to your settings."
+    "message": "The rules and feature settings were added to your settings."
   },
   "advanced_title": {
     "message": "Advanced editor"
@@ -619,9 +613,6 @@
   },
   "features_search": {
     "message": "Search features"
-  },
-  "feature_settings": {
-    "message": "Settings"
   },
   "features_none": {
     "message": "No feature matches your search."
@@ -838,5 +829,28 @@
   },
   "import_choose": {
     "message": "Choose a file"
+  },
+  "section_presets": {
+    "message": "Presets"
+  },
+  "backup_title": {
+    "message": "Import and export"
+  },
+  "backup_intro": {
+    "message": "Back up your settings, or move them to another browser. A settings file holds which features are on, their options, and your spam filter settings and rules."
+  },
+  "import_has_features": {
+    "message": "Also has feature switches and options."
+  },
+  "preset_added": {
+    "message": "The preset's rules were added to your settings."
+  },
+  "feature_settings_for": {
+    "message": "$VALUE$ settings",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
   }
 }
