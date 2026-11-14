@@ -16,6 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          fetch-depth: 0
           persist-credentials: false
 
       - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
@@ -35,7 +36,7 @@ jobs:
       - name: Package for Chrome, Edge, and Firefox
         run: pnpm zip && pnpm zip:firefox
 
-      - name: Create a draft release
+      - name: Create a draft release with notes from the commits
         env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" .output/*.zip --draft --generate-notes --title "$GITHUB_REF_NAME"
+          GITHUB_TOKEN: ${{ github.token }}
+        run: pnpm exec changelogithub --draft --assets '.output/*.zip'

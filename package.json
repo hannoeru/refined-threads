@@ -37,6 +37,7 @@
     "@antfu/eslint-config": "10.0.0",
     "@vitejs/plugin-vue": "6.0.11",
     "@wxt-dev/module-vue": "1.0.3",
+    "changelogithub": "15.0.5",
     "eslint": "10.14.0",
     "eslint-plugin-format": "2.0.1",
     "eslint-plugin-slop": "0.1.3",

@@ -6,7 +6,7 @@ This guide is for maintainers. It covers the Chrome Web Store, Firefox Add-ons, 
 
 1. Set `version` in `package.json` to the new version, and commit.
 2. Push a tag with the same version: `git tag v0.2.0 && git push origin v0.2.0`.
-3. The `Release` workflow runs `pnpm check`, builds the zips, and creates a draft GitHub release.
+3. The `Release` workflow runs `pnpm check`, builds the zips, and creates a draft GitHub release. [changelogithub](https://github.com/antfu/changelogithub) writes the notes from the Conventional Commits since the last tag: `feat` under Features, `fix` under Bug Fixes, and `perf` under Performance. Other commit types do not appear. If the workflow runs twice for one tag, delete the extra draft.
 4. Read the draft release notes, then choose **Publish release** on GitHub.
 5. The `Stores` workflow (`.github/workflows/stores.yml`) uploads the zips from that release to each store that is set up, and submits them for review. Each store publishes the version after its review.
 
