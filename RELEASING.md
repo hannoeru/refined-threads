@@ -12,6 +12,8 @@ This guide is for maintainers. It covers the Chrome Web Store.
 
 Nothing goes to the store until a person publishes the GitHub release. The Chrome Web Store rejects a version that is not higher than the current one.
 
+Before a store release, run `node .agents/skills/store-listing/bin/check.mjs`. If it reports a problem, update the listing with the `store-listing` skill.
+
 ## First release
 
 The store API can only update an item that already exists. Do the first release by hand.

@@ -141,6 +141,6 @@ Then check all three certifications: no sale or transfer to third parties, no us
 
 **Visibility.** Public. **Regions.** All regions.
 
-## Rebuild the images
+## Update this listing
 
-The screenshots come from a disposable Chrome profile, with the browser in light mode and a 1280×800 window. `0-feed.png`, `5-popup.png`, and the promo tile come from the HTML pages in `src/`. `feed-shot.html` copies the extension's CSS for the hidden bar, tag chip, account line, and keyboard selection. Update it when those styles change. Open each page in a window of the right size (1280×800 for `feed-shot.html` and `popup-shot.html`, 440×280 for `promo-tile.html`) and take a screenshot. The "14 hidden today" numbers in the popup are example counts that were written to storage before the screenshot.
+Use the `store-listing` skill in `.agents/skills/store-listing/`. Its check script finds stale images and text, and `capture.md` has the recipe for each image. The "14 hidden today" numbers in the popup are example counts.
