@@ -16,17 +16,20 @@ const names = new CountryNames([language])
 const regionNames = new Intl.DisplayNames([language], { type: 'region' })
 const flag = (code: string) => String.fromCodePoint(...[...code].map(letter => 0x1f1a5 + letter.charCodeAt(0)))
 const showCountry = (code: string) => `${flag(code)} ${regionNames.of(code) ?? code}`
-const suggestions = computed(() =>
-  [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'].flatMap(a => [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'].map(b => a + b)).map(code => ({
-    code,
-    name: regionNames.of(code),
-  })).filter((entry): entry is { code: string, name: string } => !!entry.name && entry.name !== entry.code).map(({ code, name }) => ({ value: code, label: name })),
-)
+const REGIONS = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'].flatMap(a => [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'].map(b => a + b)).filter(code => code !== 'ZZ' && regionNames.of(code) !== code)
+const known = new Set(REGIONS)
+const suggestions = REGIONS.map(code => ({ value: code, label: `${flag(code)} ${regionNames.of(code)}` }))
 function country(input: string) {
-  const trimmed = input.trim()
-  if (/^[a-z]{2}$/i.test(trimmed) && regionNames.of(trimmed.toUpperCase()) !== trimmed.toUpperCase())
+  const flagged = input.match(/[\u{1F1E6}-\u{1F1FF}]{2}/u)?.[0]
+  const trimmed = flagged
+    ? [...flagged].map(letter => String.fromCharCode(letter.codePointAt(0)! - 0x1F1A5)).join('')
+    : input.trim()
+  if (known.has(trimmed.toUpperCase()))
     return trimmed.toUpperCase()
-  return names.code(trimmed)
+  const code = names.code(trimmed)
+  return code && known.has(code)
+    ? code
+    : null
 }
 
 const THRESHOLD_RULES = ['new-accounts', 'few-followers', 'few-posts'] as const
