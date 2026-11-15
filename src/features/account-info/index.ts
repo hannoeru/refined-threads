@@ -24,6 +24,8 @@ const flag = (code: string) => String.fromCodePoint(...[...code].map(letter => 0
 
 interface Item { kind: string, text: string, title: string }
 
+const RELATION_KINDS = new Set(['follows-you', 'you-follow'])
+
 export default defineFeature({
   id: 'account-info',
   enabledByDefault: true,
@@ -136,7 +138,8 @@ export default defineFeature({
 
     const refresh = (pk: string) => {
       const list = items(pk)
-      if (lookups.loading(pk)) {
+      const looked = list.some(item => !RELATION_KINDS.has(item.kind))
+      if (lookups.loading(pk) && !looked) {
         list.push({
           kind: 'loading',
           text: '',

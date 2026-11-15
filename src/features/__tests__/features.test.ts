@@ -243,6 +243,22 @@ describe('account-info', () => {
     expect([...badge.children].map(item => item.className)).toEqual(['rt-ai-follows-you', 'rt-ai-loading'])
   })
 
+  it('keeps showing cached details without a loading bar while they refresh', () => {
+    document.body.innerHTML = postContainer('C1')
+    const lookups = fakeLookups({ country: 'JP', ageMonths: 40 })
+    run('account-info', {
+      'account-info': { enabled: true },
+    }, catalogWith([
+      makePost({
+        code: 'C1',
+        author: { pk: 'p4', username: 'amy' },
+      }),
+    ]), lookups)
+    expect(lookups.lookups.loading('p4')).toBe(true)
+    const badge = document.querySelector('.rt-account-info') as HTMLElement
+    expect([...badge.children].map(item => item.className)).toEqual(['rt-ai-flag', 'rt-ai-age'])
+  })
+
   it('shows each detail only when its switch is on', () => {
     const { lookups, items } = setup({ flag: false, countryName: true, age: false })
     lookups.resolve('p1', {

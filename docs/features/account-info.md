@@ -18,7 +18,7 @@ Each detail has its own switch.
 | Follower count      | 1.2K followers | Off     | A profile lookup, or a count Threads already loaded |
 | Post count          | 340 posts      | Off     | A profile lookup                                    |
 
-An account that hides its location shows 🏴, or "🏴 Location hidden" when the country name is on. While a lookup runs, the line shows a small loading bar.
+An account that hides its location shows 🏴, or "🏴 Location hidden" when the country name is on. While the first lookup for an account runs, the line shows a small loading bar. When cached details have expired, the line keeps showing them while the new lookup runs, with no loading bar.
 
 Threads does not publish how many accounts someone follows, so there is no following count.
 
