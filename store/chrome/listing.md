@@ -35,7 +35,7 @@ Do not upload `5-popup.png` (the toolbar popup) to the Chrome Web Store. It is a
 ### Description (English)
 
 ```text
-A collection of small, switchable features that make Threads web better, including a spam and bot filter. Inspired by Refined GitHub. It runs on threads.com and threads.net.
+Refined Threads runs on threads.com and threads.net.
 
 SPAM FILTER (on by default)
 • Hides spam and bot posts, or only tags them so you can check.
@@ -67,7 +67,7 @@ Refined Threads is open source (MIT). It is not affiliated with Meta.
 ### Description (Traditional Chinese)
 
 ```text
-一系列可個別開關的小功能，讓 Threads 網頁版更好用，包含垃圾與機器人貼文過濾。靈感來自 Refined GitHub。適用於 threads.com 與 threads.net。
+Refined Threads 適用於 threads.com 與 threads.net。
 
 垃圾過濾（預設開啟）
 • 隱藏垃圾與機器人貼文，或只加上標記讓你先確認。
