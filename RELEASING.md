@@ -4,8 +4,8 @@ This guide is for maintainers. It covers the Chrome Web Store, Firefox Add-ons, 
 
 ## How a release works
 
-1. Set `version` in `package.json` to the new version, and commit.
-2. Push a tag with the same version: `git tag v0.2.0 && git push origin v0.2.0`.
+1. On an up-to-date `main`, run `pnpm release` and choose the new version. Choose a minor version if there is a `feat` commit since the last tag, and a patch version if there are only fixes.
+2. [bumpp](https://github.com/antfu-collective/bumpp) sets `version` in `package.json`, commits `chore: release v<version>`, tags `v<version>`, and pushes the commit and the tag.
 3. The `Release` workflow runs `pnpm check`, builds the zips, and creates a draft GitHub release. [changelogithub](https://github.com/antfu/changelogithub) writes the notes from the Conventional Commits since the last tag: `feat` under Features, `fix` under Bug Fixes, and `perf` under Performance. Other commit types do not appear. If the workflow runs twice for one tag, delete the extra draft.
 4. Read the draft release notes, then choose **Publish release** on GitHub.
 5. The `Stores` workflow (`.github/workflows/stores.yml`) uploads the zips from that release to each store that is set up, and submits them for review. Each store publishes the version after its review.
@@ -14,18 +14,19 @@ Nothing goes to a store until a person publishes the GitHub release. Each store 
 
 Before a store release, run `node .agents/skills/store-listing/bin/check.mjs`. If it reports a problem, update the listing with the `store-listing` skill.
 
-## First release
+## Turn on a store
 
-A store API can only update an item that already exists. Do the first release in each store by hand. The listing text and images for each store are in `store/<store>/listing.md`.
+A store API can only update an item that already exists, so the first release in each store is done by hand.
 
-1. Push the tag, as in steps 1 to 3 above.
-2. Download the zips from the draft release. Chrome and Edge use `refined-threads-<version>-chrome.zip`. Firefox uses `refined-threads-<version>-firefox.zip` and `refined-threads-<version>-sources.zip`.
-3. Create the item in each store, fill in the listing, and submit it for review:
-   - [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole), with [`store/chrome/listing.md`](store/chrome/listing.md).
-   - [Firefox Add-on Developer Hub](https://addons.mozilla.org/developers/), with [`store/firefox/listing.md`](store/firefox/listing.md).
-   - [Microsoft Partner Center](https://partner.microsoft.com/dashboard/microsoftedge/overview), with [`store/edge/listing.md`](store/edge/listing.md).
-4. Publish the GitHub release. The `Stores` workflow skips every store that is not set up yet, so it does not upload the same version again.
-5. Do the one-time setup below for each store.
+| Store            | Item                                                          | Status                                                  |
+| ---------------- | ------------------------------------------------------------- | ------------------------------------------------------- |
+| Chrome Web Store | `eafpgdohgehofcogmadaoodifnjnaigk`                            | v0.2.0 submitted by hand. Do the setup below.           |
+| Firefox Add-ons  | `refined-threads@hannoeru.me`, slug `refined-threads`, listed | v0.2.0 submitted by hand. Do the setup below.           |
+| Edge Add-ons     | Not created yet                                               | Create the item by hand first, then do the setup below. |
+
+To create an item by hand, download the zips from the GitHub release, create the item in the store's dashboard, and fill in the listing from `store/<store>/listing.md`. Chrome and Edge use `refined-threads-<version>-chrome.zip`. Firefox uses `refined-threads-<version>-firefox.zip` and `refined-threads-<version>-sources.zip`. Do the one-time setup below after the item exists.
+
+Chrome and Firefox already have v0.2.0. After their setup is done, they get the next version that you release automatically. The Edge job skips itself until the Edge item exists and its variables are set.
 
 Store variables must be **repository** variables, not environment variables, because the workflow reads them to decide whether to run a job. Store secrets go in the store's **environment**.
 
@@ -81,7 +82,7 @@ PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format='value(projectN
 
    | Variable                         | Value                                                                                               |
    | -------------------------------- | --------------------------------------------------------------------------------------------------- |
-   | `CHROME_EXTENSION_ID`            | The 32-letter item ID from the Developer Dashboard                                                  |
+   | `CHROME_EXTENSION_ID`            | `eafpgdohgehofcogmadaoodifnjnaigk`                                                                  |
    | `CHROME_PUBLISHER_ID`            | The ID in the dashboard URL, `chrome.google.com/webstore/devconsole/<publisher-id>`                 |
    | `CHROME_SERVICE_ACCOUNT`         | `chrome-web-store@<project-id>.iam.gserviceaccount.com`                                             |
    | `GCP_WORKLOAD_IDENTITY_PROVIDER` | `projects/<project-number>/locations/global/workloadIdentityPools/github/providers/refined-threads` |
@@ -89,7 +90,7 @@ PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format='value(projectN
 8. Check the setup. Run the workflow by hand with the tag of a published release and **dry-run** on. It signs in and uploads nothing.
 
    ```sh
-   gh workflow run stores.yml -f tag=v0.1.0 -f store=chrome -f dry-run=true
+   gh workflow run stores.yml -f tag=v0.2.0 -f store=chrome -f dry-run=true
    ```
 
 ## Firefox Add-ons setup
@@ -102,7 +103,7 @@ The Firefox job signs in with an AMO API key. The add-on ID, `refined-threads@ha
 4. Check the setup. A dry run signs in and uploads nothing.
 
    ```sh
-   gh workflow run stores.yml -f tag=v0.1.0 -f store=firefox -f dry-run=true
+   gh workflow run stores.yml -f tag=v0.2.0 -f store=firefox -f dry-run=true
    ```
 
 Each upload also sends the sources zip, because the add-on is built with a bundler. Mozilla's reviewers rebuild it with the steps in the notes to reviewer.
@@ -118,7 +119,7 @@ The Edge job signs in with a Partner Center API key.
 5. Run a dry run. For Edge, a dry run only checks that the zip exists. It does not sign in, so the first real upload is the first test of the key.
 
    ```sh
-   gh workflow run stores.yml -f tag=v0.1.0 -f store=edge -f dry-run=true
+   gh workflow run stores.yml -f tag=v0.2.0 -f store=edge -f dry-run=true
    ```
 
 ## Submit again
