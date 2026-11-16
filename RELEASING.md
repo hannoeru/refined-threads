@@ -41,7 +41,10 @@ PROJECT_ID=your-project-id
 REPO=hannoeru/refined-threads
 SA=chrome-web-store
 PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)')
+SUBJECT=$(gh api "repos/$REPO/actions/oidc/customization/sub" -q .sub_claim_prefix)
 ```
+
+`SUBJECT` is the start of the `sub` claim in the repository's GitHub tokens. With immutable subjects, it holds the owner and repository IDs, as in `repo:hannoeru@16288797/refined-threads@1455521259`.
 
 1. Turn on the APIs:
 
@@ -71,7 +74,7 @@ PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format='value(projectN
    ```sh
    gcloud iam service-accounts add-iam-policy-binding "$SA@$PROJECT_ID.iam.gserviceaccount.com" \
      --project "$PROJECT_ID" --role roles/iam.workloadIdentityUser \
-     --member "principal://iam.googleapis.com/projects/$PROJECT_NUMBER/locations/global/workloadIdentityPools/github/subject/repo:$REPO:environment:chrome-web-store"
+     --member "principal://iam.googleapis.com/projects/$PROJECT_NUMBER/locations/global/workloadIdentityPools/github/subject/$SUBJECT:environment:chrome-web-store"
    ```
 
 5. In the Developer Dashboard, open **Account** and add `$SA@$PROJECT_ID.iam.gserviceaccount.com` as the service account. A publisher can have one service account.
