@@ -1,7 +1,7 @@
-import { loadSettings, saveSettings, today, watchSettings } from '../../settings'
+import { loadSettings, rankingItem, saveSettings, statsItem, today, watchSettings } from '../../settings'
 import { defineFeature } from '../api'
 import { SpamFilter } from './controller'
-import { createStatsRecorder } from './stats'
+import { createRecorder } from './recorder'
 
 export default defineFeature({
   id: 'spam-filter',
@@ -21,7 +21,8 @@ export default defineFeature({
       translate: ctx.t,
       addStyle: ctx.addStyle,
       saveSettings,
-      recordStats: createStatsRecorder(),
+      recordStats: createRecorder(statsItem),
+      recordRanking: createRecorder(rankingItem),
       today,
     })
     const unwatch = watchSettings(next => filter.setSettings(next))

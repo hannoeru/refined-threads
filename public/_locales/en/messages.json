@@ -852,5 +852,41 @@
         "content": "$1"
       }
     }
+  },
+  "section_ranking": {
+    "message": "Ranking"
+  },
+  "ranking_intro": {
+    "message": "The accounts whose posts the spam filter hid or tagged most. Each post counts once. The list keeps up to 500 accounts and stays on this device."
+  },
+  "ranking_empty": {
+    "message": "No hidden or tagged posts yet."
+  },
+  "ranking_account": {
+    "message": "Account"
+  },
+  "ranking_hidden": {
+    "message": "Hidden"
+  },
+  "ranking_tagged": {
+    "message": "Tagged"
+  },
+  "ranking_reason": {
+    "message": "Top reason"
+  },
+  "ranking_last_seen": {
+    "message": "Last seen"
+  },
+  "ranking_hide": {
+    "message": "Hide account"
+  },
+  "ranking_is_hidden": {
+    "message": "Hidden"
+  },
+  "ranking_clear": {
+    "message": "Clear ranking"
+  },
+  "ranking_clear_confirm": {
+    "message": "Clear the ranking? This cannot be undone."
   }
 }

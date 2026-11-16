@@ -1,4 +1,4 @@
-import type { Settings, Stats } from './model'
+import type { Ranking, Settings, Stats } from './model'
 import * as v from 'valibot'
 import { browser, storage } from '#imports'
 import { defaultSettings, SettingsSchema } from './model'
@@ -66,4 +66,8 @@ export const statsItem = storage.defineItem<Stats>('local:stats', {
     tagged: 0,
     byRule: {},
   },
+})
+
+export const rankingItem = storage.defineItem<Ranking>('local:ranking', {
+  fallback: {},
 })

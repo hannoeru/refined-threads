@@ -45,6 +45,7 @@ SPAM FILTER (on by default)
 • Optional account checks: country, account age, follower count, and post count.
 • Your own rules with points, plus ready-made presets. Export your settings as a file and share them.
 • A hidden post folds into one line with the reason and a Show button. "Not spam" allows the author with one click.
+• A ranking of the accounts the filter hid or tagged most, with a button to hide each one for good.
 
 ACCOUNT INFO (on by default)
 A small line under each author name: whether they follow you, the country flag, and how long the account has been on Threads. You can also show whether you follow them, the country name, and follower and post counts.
@@ -77,6 +78,7 @@ Refined Threads 適用於 threads.com 與 threads.net。
 • 可選的帳號檢查：國家、帳號年齡、粉絲數與貼文數。
 • 用分數自訂規則，也可套用現成的預設組合。設定可以匯出成檔案並分享。
 • 被隱藏的貼文會收合成一行，顯示原因與「顯示」按鈕。按「不是垃圾」即可一鍵放行該作者。
+• 排行榜列出被隱藏或標記最多的帳號，可一鍵永久隱藏。
 
 帳號資訊（預設開啟）
 在每個作者名稱下方顯示一行小字：對方是否追蹤你、國旗，以及帳號加入 Threads 多久。也可以顯示你是否追蹤對方、國家名稱、粉絲數與貼文數。
@@ -107,7 +109,7 @@ Refined Threads improves the Threads website (threads.com and threads.net) with 
 **Permission justification: storage.**
 
 ```text
-Saves the user's settings and rules, the daily count of hidden posts shown in the popup, and a local cache of account details so the same account is not looked up again.
+Saves the user's settings and rules, the daily count of hidden posts shown in the popup, a local ranking of the accounts the spam filter hid or tagged most, and a local cache of account details so the same account is not looked up again.
 ```
 
 **Permission justification: contextMenus.**

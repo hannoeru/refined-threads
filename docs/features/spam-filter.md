@@ -2,7 +2,7 @@
 
 **ID** `spam-filter` · **On by default** · **Code** [`src/features/spam-filter/`](../../src/features/spam-filter/)
 
-Hides or tags spam and bot posts on Threads. The settings page has six tabs: Protection, Words and accounts, Account filters, My rules, How it looks, and Presets.
+Hides or tags spam and bot posts on Threads. The settings page has seven tabs: Protection, Words and accounts, Account filters, My rules, How it looks, Presets, and Ranking.
 
 ## On the page
 
@@ -66,6 +66,15 @@ Country and join date need a logged-in Threads session. Follower counts that Thr
 A rule has a name, a target (all posts, posts, or replies), a condition, and an effect: **Hide**, **Tag**, **Add points**, or **Never hide**. Never hide wins over every other rule.
 
 Presets add a ready-made set of rules and keep your other rules: Affiliate spam, Engagement bait, New and empty accounts, Reply guard, and Test mode.
+
+## Ranking
+
+The Ranking tab lists the 50 accounts whose posts the filter hid or tagged most. Each row shows the account, its hidden and tagged counts, its most common reason, and the day it was last seen. The list is sorted by hidden plus tagged posts, then by the newest day.
+
+- Each post counts once, also after a reload. The extension keeps the newest 30 post codes of each account to check this.
+- The list keeps up to 500 accounts in `storage.local`. When it is full, the accounts seen longest ago go first, then the accounts with the lowest counts.
+- **Hide account** adds the account to your hidden accounts list. It changes only your settings, never your Threads account.
+- **Clear ranking** deletes the list.
 
 ## Settings file
 

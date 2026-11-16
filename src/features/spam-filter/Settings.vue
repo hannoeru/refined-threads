@@ -7,6 +7,7 @@ import Look from './settings/Look.vue'
 import Presets from './settings/Presets.vue'
 import Profile from './settings/Profile.vue'
 import Protection from './settings/Protection.vue'
+import Ranking from './settings/Ranking.vue'
 import Rules from './settings/Rules.vue'
 
 const TABS = [
@@ -16,6 +17,7 @@ const TABS = [
   'rules',
   'look',
   'presets',
+  'ranking',
 ] as const
 const tab = ref<(typeof TABS)[number]>('protection')
 const { settings, error, update } = useSettings()
@@ -44,7 +46,8 @@ const { settings, error, update } = useSettings()
     <Profile v-else-if="tab === 'profile'" :settings="settings" :update="update" />
     <Rules v-else-if="tab === 'rules'" :settings="settings" :update="update" />
     <Look v-else-if="tab === 'look'" :settings="settings" :update="update" />
-    <Presets v-else :settings="settings" :update="update" />
+    <Presets v-else-if="tab === 'presets'" :settings="settings" :update="update" />
+    <Ranking v-else :settings="settings" :update="update" />
   </template>
 </template>
 

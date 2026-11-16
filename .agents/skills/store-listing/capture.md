@@ -30,7 +30,7 @@ Do one pass per language, each in its own fresh session. `<language>` is `en` or
 
 ## Recipes
 
-Save each image into `store/chrome/<language>/`. Find tabs and inputs by position, because their names change with the language: the spam filter tabs are `.subtab:nth-child(1)` to `(6)`, and the list inputs are `.chips:nth-of-type(1)` to `(4)` with `.chips-add input`.
+Save each image into `store/chrome/<language>/`. Find tabs and inputs by position, because their names change with the language: the spam filter tabs are `.subtab:nth-child(1)` to `(7)`, and the list inputs are `.chips:nth-of-type(1)` to `(4)` with `.chips-add input`.
 
 | Image | Page and setup |
 | --- | --- |

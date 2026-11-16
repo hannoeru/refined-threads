@@ -1,4 +1,4 @@
-import type { Post, Settings, Stats } from '../../model'
+import type { Post, Ranking, Settings, Stats } from '../../model'
 import type { CompiledRules } from '../../rules/engine'
 import type { AccountLookups, PostStream } from '../api'
 import type { WhenVisible } from '../services/visible'
@@ -6,6 +6,7 @@ import type { ViewText } from './view'
 import { addAccount, isBuiltIn, ruleLabel } from '../../rules/edit'
 import { compileRules, CopyTracker, evaluate, isAllowed, normalizeCopyText } from '../../rules/engine'
 import { nameSlotOf } from '../../threads/dom'
+import { addSighting } from './ranking'
 import { clearView, CONTAINER, postCode, renderView, STYLE } from './view'
 
 export interface SpamFilterDeps {
@@ -20,6 +21,7 @@ export interface SpamFilterDeps {
   addStyle: (css: string) => void
   saveSettings: (settings: Settings) => Promise<void>
   recordStats: (update: (stats: Stats) => Stats) => void
+  recordRanking: (update: (ranking: Ranking) => Ranking) => void
   today: () => string
 }
 
@@ -225,7 +227,7 @@ export class SpamFilter {
       clearView(container)
       return
     }
-    this.#count(post.code, verdict.action, verdict.reasons.map(reason => reason.id))
+    this.#count(post, verdict.action, verdict.reasons.map(reason => reason.id))
     const t = this.deps.translate
     const labels = verdict.reasons.map(reason =>
       reason.id === 'countries' && post.author.country
@@ -274,11 +276,19 @@ export class SpamFilter {
     await this.deps.saveSettings(settings)
   }
 
-  #count(code: string, action: 'hide' | 'tag', ruleIds: string[]): void {
-    if (this.#counted.has(code))
+  #count(post: Post, action: 'hide' | 'tag', ruleIds: string[]): void {
+    if (this.#counted.has(post.code))
       return
-    this.#counted.add(code)
+    this.#counted.add(post.code)
     const day = this.deps.today()
+    this.deps.recordRanking(ranking => addSighting(ranking, {
+      pk: post.author.pk,
+      username: post.author.username,
+      code: post.code,
+      action,
+      ruleIds,
+      day,
+    }))
     this.deps.recordStats((stats) => {
       const current = stats.day === day
         ? stats

@@ -1,4 +1,4 @@
-import type { Settings, Stats } from '../../../model'
+import type { Ranking, Settings, Stats } from '../../../model'
 import type { ProfileData } from '../../../profile/lookups'
 // @vitest-environment happy-dom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -13,7 +13,7 @@ import { postCode } from '../view'
 
 type Post = ReturnType<typeof makePost>
 
-function setup(posts: Post[], settings: Settings = defaultSettings(), profile: Partial<ProfileData> = {}) {
+function setup(posts: Post[], settings: Settings = defaultSettings(), profile: Partial<ProfileData> = {}, stored: Ranking = {}) {
   const saved: Settings[] = []
   const controller = new AbortController()
   const catalog = catalogWith(posts)
@@ -24,6 +24,7 @@ function setup(posts: Post[], settings: Settings = defaultSettings(), profile: P
     tagged: 0,
     byRule: {},
   }
+  let ranking = stored
   const filter = new SpamFilter({
     document,
     signal: controller.signal,
@@ -36,6 +37,7 @@ function setup(posts: Post[], settings: Settings = defaultSettings(), profile: P
     addStyle: () => undefined,
     saveSettings: async next => void saved.push(next),
     recordStats: update => void (stats = update(stats)),
+    recordRanking: update => void (ranking = update(ranking)),
     today: () => '2026-11-12',
   })
   filter.start()
@@ -47,6 +49,7 @@ function setup(posts: Post[], settings: Settings = defaultSettings(), profile: P
     wanted,
     resolve,
     stats: () => stats,
+    ranking: () => ranking,
   }
 }
 
@@ -343,6 +346,61 @@ describe('spamFilter', () => {
       hidden: 1,
       tagged: 0,
       byRule: { 'affiliate-links': 1 },
+    })
+  })
+
+  it('adds hidden and tagged posts to the ranking of their author', () => {
+    document.body.innerHTML = postContainer('H1') + postContainer('H2')
+    const { ranking } = setup([
+      affiliate('H1'),
+      makePost({
+        code: 'H2',
+        links: ['https://shopee.tw/y'],
+        author: { username: 'amy_new', pk: 'p-amy' },
+      }),
+    ])
+    document.body.innerHTML = postContainer('T9')
+    const tagged = setup([
+      makePost({
+        code: 'T9',
+        links: ['https://shopee.tw/x'],
+        author: { username: 'bob', pk: 'p-bob' },
+      }),
+    ], {
+      ...defaultSettings(),
+      tagOnly: true,
+    })
+    expect(ranking()).toEqual({
+      'p-amy': {
+        username: 'amy_new',
+        hidden: 2,
+        tagged: 0,
+        byRule: { 'affiliate-links': 2 },
+        lastSeen: '2026-11-12',
+        codes: ['H1', 'H2'],
+      },
+    })
+    expect(tagged.ranking()['p-bob']).toMatchObject({
+      hidden: 0,
+      tagged: 1,
+      codes: ['T9'],
+    })
+  })
+
+  it('does not count a post again in a new session with the same stored ranking', () => {
+    document.body.innerHTML = postContainer('D1')
+    const first = setup([
+      affiliate('D1'),
+    ])
+    first.filter.scan()
+    first.controller.abort()
+    document.body.innerHTML = postContainer('D1')
+    const second = setup([
+      affiliate('D1'),
+    ], defaultSettings(), {}, first.ranking())
+    expect(second.ranking()['p-amy']).toMatchObject({
+      hidden: 1,
+      codes: ['D1'],
     })
   })
 })

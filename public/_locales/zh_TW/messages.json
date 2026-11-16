@@ -852,5 +852,41 @@
         "content": "$1"
       }
     }
+  },
+  "section_ranking": {
+    "message": "排行榜"
+  },
+  "ranking_intro": {
+    "message": "垃圾過濾隱藏或標記最多貼文的帳號。每則貼文只計算一次。清單最多保留 500 個帳號，只存在這台裝置上。"
+  },
+  "ranking_empty": {
+    "message": "目前還沒有被隱藏或標記的貼文。"
+  },
+  "ranking_account": {
+    "message": "帳號"
+  },
+  "ranking_hidden": {
+    "message": "隱藏"
+  },
+  "ranking_tagged": {
+    "message": "標記"
+  },
+  "ranking_reason": {
+    "message": "主要原因"
+  },
+  "ranking_last_seen": {
+    "message": "最後出現"
+  },
+  "ranking_hide": {
+    "message": "隱藏帳號"
+  },
+  "ranking_is_hidden": {
+    "message": "已隱藏"
+  },
+  "ranking_clear": {
+    "message": "清除排行榜"
+  },
+  "ranking_clear_confirm": {
+    "message": "要清除排行榜嗎？此動作無法復原。"
   }
 }

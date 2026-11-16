@@ -37,6 +37,7 @@ function start(initialPosts: typeof posts) {
     addStyle: () => undefined,
     saveSettings: async () => undefined,
     recordStats: () => undefined,
+    recordRanking: () => undefined,
     today: () => '2026-11-13',
   })
   let scans = 0

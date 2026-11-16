@@ -363,3 +363,7 @@ export interface Reason { id: string, name: string, effect: Effect }
 export interface Verdict { action: 'none' | 'tag' | 'hide', score: number, reasons: Reason[] }
 
 export interface Stats { day: string, hidden: number, tagged: number, byRule: Record<string, number> }
+
+export interface RankedAccount { username: string, hidden: number, tagged: number, byRule: Record<string, number>, lastSeen: string, codes: string[] }
+
+export type Ranking = Record<string, RankedAccount>

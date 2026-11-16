@@ -16,6 +16,7 @@ Refined Threads runs only in your browser. It has no server, no account, no anal
 | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
 | Your settings and rules                                                                        | `storage.sync` in your browser. If browser sync is on, your browser syncs it to your other devices. | Until you change or remove them                      |
 | Daily counts of hidden and tagged posts                                                        | `storage.local`                                                                                     | Replaced every day                                   |
+| Accounts whose posts the spam filter hid or tagged, with their counts, up to 500 accounts      | `storage.local`                                                                                     | Until you clear the ranking                          |
 | Looked-up account details (country, join date, follower and post counts), up to 5,000 accounts | `storage.local`                                                                                     | 30 days for country and join date, 7 days for counts |
 
 Removing the extension deletes all of this data.
@@ -26,7 +27,7 @@ Nothing. The only network requests are the account lookups to `threads.com` desc
 
 ## Permissions
 
-- `storage` saves your settings, the daily counts, and the lookup cache.
+- `storage` saves your settings, the daily counts, the ranking, and the lookup cache.
 - `contextMenus` adds "Hide posts from this account" and "Never hide this account" to links to Threads profiles.
 - Access to `threads.com` and `threads.net` lets the extension run on Threads. It has no access to other sites.
 
