@@ -1,8 +1,6 @@
 name: Stores
 
 on:
-  release:
-    types: [published]
   workflow_dispatch:
     inputs:
       tag:
@@ -22,12 +20,12 @@ permissions:
   contents: read
 
 env:
-  TAG: ${{ github.event.release.tag_name || inputs.tag }}
-  DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry-run }}
+  TAG: ${{ inputs.tag }}
+  DRY_RUN: ${{ inputs.dry-run }}
 
 jobs:
   chrome:
-    if: vars.CHROME_EXTENSION_ID != '' && (github.event_name == 'release' || inputs.store == 'all' || inputs.store == 'chrome')
+    if: vars.CHROME_EXTENSION_ID != '' && (inputs.store == 'all' || inputs.store == 'chrome')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: chrome-web-store
@@ -68,7 +66,7 @@ jobs:
         run: pnpm exec wxt submit --chrome-zip release/*-chrome.zip --dry-run "$DRY_RUN"
 
   firefox:
-    if: vars.FIREFOX_LISTED == 'true' && (github.event_name == 'release' || inputs.store == 'all' || inputs.store == 'firefox')
+    if: vars.FIREFOX_LISTED == 'true' && (inputs.store == 'all' || inputs.store == 'firefox')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: firefox-add-ons
@@ -97,7 +95,7 @@ jobs:
         run: pnpm exec wxt submit --firefox-zip release/*-firefox.zip --firefox-sources-zip release/*-sources.zip --dry-run "$DRY_RUN"
 
   edge:
-    if: vars.EDGE_PRODUCT_ID != '' && (github.event_name == 'release' || inputs.store == 'all' || inputs.store == 'edge')
+    if: vars.EDGE_PRODUCT_ID != '' && (inputs.store == 'all' || inputs.store == 'edge')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: edge-add-ons

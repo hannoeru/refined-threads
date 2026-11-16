@@ -10,7 +10,7 @@ export default defineConfig({
     }),
   ],
   test: {
-    exclude: [...configDefaults.exclude, '**/*.perf.test.ts'],
+    exclude: [...configDefaults.exclude, '**/*.perf.test.ts', 'e2e/**'],
   },
   resolve: {
     alias: [

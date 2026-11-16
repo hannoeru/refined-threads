@@ -126,4 +126,12 @@ pnpm check
 
 `pnpm check` runs lint, the typecheck, the tests, and both builds, the same as CI.
 
+CI also loads the built extension in headless Chrome and Firefox, opens a small fake Threads page, and checks that the spam filter folds a spam post (`e2e/extension.e2e.test.ts`). To run it on your computer after `pnpm check`:
+
+```sh
+pnpm exec puppeteer browsers install chrome firefox
+pnpm test:e2e
+E2E_BROWSER=firefox pnpm test:e2e
+```
+
 Then load the extension (`pnpm dev`), turn the feature on in the settings page, and try it on threads.com. Turn it off and check that the page looks as before. In the pull request, add a screenshot and the Threads URLs you tested.
