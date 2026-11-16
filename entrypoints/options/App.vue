@@ -349,6 +349,16 @@ kbd {
   font-weight: 700;
   padding: 0 4px;
 }
+.part-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 0;
+  padding: 0;
+}
+.part-picker legend {
+  padding: 0 0 4px;
+}
 .choice {
   display: flex;
   gap: 10px;

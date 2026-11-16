@@ -550,7 +550,7 @@
     "message": "Export"
   },
   "export_intro": {
-    "message": "Save your settings as a file to back them up or share them with friends."
+    "message": "Save your settings as a file or as a link, to back them up or to share them with friends. A link opens on threads.com and shows the import here. The settings are in the part of the link after #, so the browser does not send them to Threads."
   },
   "export_name": {
     "message": "File name shown to others"
@@ -565,18 +565,10 @@
     "message": "Import"
   },
   "import_intro": {
-    "message": "Open a settings file from a friend or from your backup."
+    "message": "Open a settings file from a friend or from your backup. To import a settings link, open it in this browser. Nothing changes until you choose a button."
   },
   "import_unnamed": {
     "message": "Unnamed settings"
-  },
-  "import_rule_count": {
-    "message": "Spam filter rules: $VALUE$",
-    "placeholders": {
-      "value": {
-        "content": "$1"
-      }
-    }
   },
   "import_merge": {
     "message": "Add to my settings"
@@ -591,10 +583,10 @@
     "message": "This file is not a settings file."
   },
   "import_replaced": {
-    "message": "Your settings were replaced."
+    "message": "The chosen parts of your settings were replaced."
   },
   "import_merged": {
-    "message": "The rules and feature settings were added to your settings."
+    "message": "The chosen parts were added to your settings."
   },
   "advanced_title": {
     "message": "Advanced editor"
@@ -837,10 +829,7 @@
     "message": "Import and export"
   },
   "backup_intro": {
-    "message": "Back up your settings, or move them to another browser. A settings file holds which features are on, their options, and your spam filter settings and rules."
-  },
-  "import_has_features": {
-    "message": "Also has feature switches and options."
+    "message": "Back up your settings, move them to another browser, or share them. You can include all of your settings or only some parts: feature switches, protection, words and accounts, and rules."
   },
   "preset_added": {
     "message": "The preset's rules were added to your settings."
@@ -888,5 +877,49 @@
   },
   "ranking_clear_confirm": {
     "message": "Clear the ranking? This cannot be undone."
+  },
+  "share_part_features": {
+    "message": "Feature switches"
+  },
+  "share_part_features_description": {
+    "message": "Which features are on, and their options."
+  },
+  "share_part_protection": {
+    "message": "Protection"
+  },
+  "share_part_protection_description": {
+    "message": "Protection level, test mode, and how hidden posts look."
+  },
+  "share_part_lists": {
+    "message": "Words and accounts"
+  },
+  "share_part_lists_description": {
+    "message": "Blocked words and sites, hidden and allowed accounts, and countries."
+  },
+  "share_part_rules": {
+    "message": "Rules and points"
+  },
+  "share_part_rules_description": {
+    "message": "Account filters, the built-in rules, your own rules, and the points that tag or hide a post."
+  },
+  "export_parts": {
+    "message": "Parts to include"
+  },
+  "export_link_button": {
+    "message": "Copy link"
+  },
+  "export_link_copied": {
+    "message": "Link copied. It has $VALUE$ characters.",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "import_parts": {
+    "message": "Parts to apply"
+  },
+  "import_not_link": {
+    "message": "This link is not a settings link, or it is damaged."
   }
 }

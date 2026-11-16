@@ -2,7 +2,7 @@
 import type { SharedFile } from '../../../share'
 import type { SectionProps } from '../../../ui/props'
 import { ref } from 'vue'
-import { mergeInto, PRESET_FILES } from '../../../share'
+import { applyShared, PRESET_FILES } from '../../../share'
 import { t } from '../../../ui/i18n'
 
 const props = defineProps<SectionProps>()
@@ -10,7 +10,7 @@ const props = defineProps<SectionProps>()
 const status = ref('')
 
 async function apply(preset: SharedFile): Promise<void> {
-  await props.update(current => mergeInto(current, preset))
+  await props.update(current => applyShared({ settings: current, features: {} }, preset, ['protection', 'lists', 'rules'], 'merge').settings)
   status.value = t('preset_added')
 }
 </script>

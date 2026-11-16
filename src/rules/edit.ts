@@ -12,6 +12,8 @@ const LIST_KEY: Record<ListRuleId, 'in' | 'contains_any' | 'host_in'> = {
   'countries': 'in',
 }
 
+export const isListRule = (id: string): id is ListRuleId => id in LIST_KEY
+
 function leaves(condition: Condition): Condition[] {
   return 'all' in condition
     ? condition.all.flatMap(leaves)

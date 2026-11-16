@@ -8,6 +8,7 @@ import { PostCatalog } from '../../src/features/services/posts'
 import { createWhenVisible } from '../../src/features/services/visible'
 import { featuresItem } from '../../src/features/state'
 import { ProfileLookups } from '../../src/profile/lookups'
+import { linkPayload, OPEN_SHARED_MESSAGE } from '../../src/share'
 
 const profileCache = storage.defineItem<Cache>('local:profiles', { fallback: {} })
 
@@ -15,6 +16,16 @@ export default defineContentScript({
   matches: THREADS_MATCHES,
   runAt: 'document_start',
   async main(ctx) {
+    const openSharedLink = () => {
+      const payload = linkPayload(location.hash)
+      if (!payload)
+        return
+      history.replaceState(history.state, '', location.pathname + location.search)
+      void browser.runtime.sendMessage({ type: OPEN_SHARED_MESSAGE, payload })
+    }
+    openSharedLink()
+    ctx.addEventListener(window, 'hashchange', openSharedLink)
+
     const posts = new PostCatalog(window)
     const listeners = new Set<(pk: string) => void>()
     const profiles = new ProfileLookups(

@@ -80,6 +80,25 @@ The Ranking tab lists the 50 accounts whose posts the filter hid or tagged most.
 
 The **Import and export** page of the settings exports this format. Its import and its advanced editor accept it, and presets use it too. A full export also has a `features` field with each feature's switch and options, in the same shape as the `features` key in `storage.sync`. Presets have no `features` field, so they never change feature switches.
 
+A file has up to four parts. Export and import let you choose them, and all are chosen by default:
+
+| Part               | What it holds                                                                                             |
+| ------------------ | --------------------------------------------------------------------------------------------------------- |
+| Feature switches   | The `features` field.                                                                                     |
+| Protection         | `level`, `tagOnly`, and `display`.                                                                        |
+| Words and accounts | The list rules: `allowed-accounts`, `hidden-accounts`, `blocked-words`, `blocked-sites`, and `countries`. |
+| Rules and points   | All other rules, and `scoring`.                                                                           |
+
+A partial file leaves out the parts that you did not choose. Import shows only the parts that the file has, each with a checkbox, and changes nothing until you choose **Add to my settings** or **Replace my settings**. A part that you do not check, or that the file does not have, stays as it is.
+
+- **Replace my settings** replaces each checked part. For example, replacing Words and accounts replaces your five lists and keeps your other rules.
+- **Add to my settings** adds each checked part. It adds the entries of each list to your list, keeps your own rules and adds or updates rules by `id`, and keeps your thresholds.
+- When you import Protection without Rules and points, the imported level turns its checks on or off, the same as choosing the level yourself.
+
+### Settings links
+
+**Copy link** on the export side copies a link like `https://www.threads.com/#refined-threads=<data>`, and shows how long it is. The data is the settings file, compressed with deflate and written as base64url. It is after the `#`, so the browser does not send it to Threads. When you open the link in a browser with Refined Threads, the extension removes the data from the address bar and opens the import on this page. Without the extension, the link opens the Threads home page.
+
 ```json
 {
   "format": "refined-threads-settings",

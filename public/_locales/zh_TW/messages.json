@@ -550,7 +550,7 @@
     "message": "匯出"
   },
   "export_intro": {
-    "message": "把設定存成檔案，用來備份或分享給朋友。"
+    "message": "把設定存成檔案或連結，用來備份或分享給朋友。連結會在 threads.com 開啟，並在這裡顯示匯入內容。設定放在連結 # 後面的部分，所以瀏覽器不會把它傳給 Threads。"
   },
   "export_name": {
     "message": "給別人看的名稱"
@@ -565,18 +565,10 @@
     "message": "匯入"
   },
   "import_intro": {
-    "message": "開啟朋友分享或你備份的設定檔。"
+    "message": "開啟朋友分享或你備份的設定檔。要匯入設定連結，請在這個瀏覽器開啟連結。在你按下按鈕之前，什麼都不會改變。"
   },
   "import_unnamed": {
     "message": "未命名的設定"
-  },
-  "import_rule_count": {
-    "message": "垃圾過濾規則：$VALUE$",
-    "placeholders": {
-      "value": {
-        "content": "$1"
-      }
-    }
   },
   "import_merge": {
     "message": "加到我的設定"
@@ -591,10 +583,10 @@
     "message": "這不是設定檔。"
   },
   "import_replaced": {
-    "message": "已取代你的設定。"
+    "message": "已取代你設定中選擇的部分。"
   },
   "import_merged": {
-    "message": "規則與功能設定已加入你的設定。"
+    "message": "選擇的部分已加入你的設定。"
   },
   "advanced_title": {
     "message": "進階編輯器"
@@ -837,10 +829,7 @@
     "message": "匯入與匯出"
   },
   "backup_intro": {
-    "message": "備份你的設定，或搬到另一個瀏覽器。設定檔包含開啟了哪些功能、各功能的選項，以及垃圾過濾的設定與規則。"
-  },
-  "import_has_features": {
-    "message": "也包含功能開關與選項。"
+    "message": "備份你的設定、搬到另一個瀏覽器，或分享出去。你可以包含全部設定，或只包含部分：功能開關、保護、字詞與帳號，以及規則。"
   },
   "preset_added": {
     "message": "預設組合的規則已加入你的設定。"
@@ -888,5 +877,49 @@
   },
   "ranking_clear_confirm": {
     "message": "要清除排行榜嗎？此動作無法復原。"
+  },
+  "share_part_features": {
+    "message": "功能開關"
+  },
+  "share_part_features_description": {
+    "message": "開啟了哪些功能，以及各功能的選項。"
+  },
+  "share_part_protection": {
+    "message": "保護"
+  },
+  "share_part_protection_description": {
+    "message": "保護等級、測試模式，以及隱藏貼文的顯示方式。"
+  },
+  "share_part_lists": {
+    "message": "字詞與帳號"
+  },
+  "share_part_lists_description": {
+    "message": "封鎖的字詞與網站、隱藏與允許的帳號，以及國家或地區。"
+  },
+  "share_part_rules": {
+    "message": "規則與分數"
+  },
+  "share_part_rules_description": {
+    "message": "帳號篩選、內建規則、你自己的規則，以及標記或隱藏貼文所需的分數。"
+  },
+  "export_parts": {
+    "message": "要包含的部分"
+  },
+  "export_link_button": {
+    "message": "複製連結"
+  },
+  "export_link_copied": {
+    "message": "已複製連結，長度 $VALUE$ 個字元。",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "import_parts": {
+    "message": "要套用的部分"
+  },
+  "import_not_link": {
+    "message": "這不是設定連結，或連結已損壞。"
   }
 }

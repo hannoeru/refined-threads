@@ -25,6 +25,10 @@ Removing the extension deletes all of this data.
 
 Nothing. The only network requests are the account lookups to `threads.com` described above. "Report a problem" opens the GitHub issues page in a new tab.
 
+## Settings files and links
+
+You can export your settings, or only the parts you choose, as a file or as a link. A settings link holds those settings in the part of the address after `#`. Browsers do not send that part to the server, so opening the link does not send your settings to Threads. When the extension sees a settings link on `threads.com`, it removes the settings from the address bar and opens the import in its settings page. The extension does not send files or links anywhere. You decide where to share them, and anyone with a link can read the settings in it.
+
 ## Permissions
 
 - `storage` saves your settings, the daily counts, the ranking, and the lookup cache.

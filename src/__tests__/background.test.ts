@@ -34,4 +34,13 @@ describe('background', () => {
     await clicked?.({ menuItemId: 'hide-account', linkUrl: 'https://www.threads.com/@Spam.Bot/post/ABC' })
     expect(readList((await loadSettings()).ruleFile, 'hidden-accounts')).toEqual(['spam.bot'])
   })
+
+  it('opens the import page for a settings link from a Threads tab, and ignores other messages', async () => {
+    const options = fakeBrowser.runtime.getURL('/options.html')
+    await fakeBrowser.runtime.sendMessage({ type: 'something-else', payload: 'abc' })
+    await fakeBrowser.runtime.sendMessage({ type: 'refined-threads:open-shared', payload: 'not a payload' })
+    expect((await fakeBrowser.tabs.query({})).filter(tab => tab.url?.startsWith(options))).toHaveLength(0)
+    await fakeBrowser.runtime.sendMessage({ type: 'refined-threads:open-shared', payload: 'abc_-1' })
+    expect((await fakeBrowser.tabs.query({})).map(tab => tab.url)).toContain(`${options}?share=abc_-1#backup`)
+  })
 })

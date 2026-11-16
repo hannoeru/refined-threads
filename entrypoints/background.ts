@@ -1,5 +1,7 @@
+import * as v from 'valibot'
 import { addAccount } from '../src/rules/edit'
 import { loadSettings, saveSettings } from '../src/settings'
+import { OpenSharedSchema } from '../src/share'
 import { handleFromUrl } from '../src/threads/handle'
 
 const PROFILE_LINKS = [
@@ -32,6 +34,12 @@ export default defineBackground(() => {
         url: browser.runtime.getURL('/welcome.html'),
       })
     }
+  })
+
+  browser.runtime.onMessage.addListener((message: unknown) => {
+    const result = v.safeParse(OpenSharedSchema, message)
+    if (result.success)
+      void browser.tabs.create({ url: `${browser.runtime.getURL('/options.html')}?share=${result.output.payload}#backup` })
   })
 
   browser.contextMenus.onClicked.addListener(async (info) => {
