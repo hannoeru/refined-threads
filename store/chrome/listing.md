@@ -43,7 +43,7 @@ SPAM FILTER (on by default)
 • Checks for affiliate links, engagement bait ("comment +1", "link in bio"), copy-paste replies, AI labels, auto-made usernames, and strangers who drop links in replies.
 • Your own lists of blocked words, blocked sites, hidden accounts, and accounts that are never hidden.
 • Optional account checks: country, account age, follower count, and post count.
-• Your own rules with points, plus ready-made presets. Export your settings as a file and share them.
+• Your own rules with points, plus ready-made presets. Share all of your settings, or only some parts, as a file or a link.
 • A hidden post folds into one line with the reason and a Show button. "Not spam" allows the author with one click.
 • A ranking of the accounts the filter hid or tagged most, with a button to hide each one for good.
 
@@ -76,7 +76,7 @@ Refined Threads 適用於 threads.com 與 threads.net。
 • 偵測聯盟行銷連結、互動誘餌（「留言 +1」、「連結在簡介」）、複製貼上的回覆、AI 標籤、自動產生的帳號名稱，以及在回覆中貼連結的陌生人。
 • 自訂封鎖字詞、封鎖網站、隱藏帳號，以及永不隱藏的帳號。
 • 可選的帳號檢查：國家、帳號年齡、粉絲數與貼文數。
-• 用分數自訂規則，也可套用現成的預設組合。設定可以匯出成檔案並分享。
+• 用分數自訂規則，也可套用現成的預設組合。可以把全部或部分設定匯出成檔案或連結來分享。
 • 被隱藏的貼文會收合成一行，顯示原因與「顯示」按鈕。按「不是垃圾」即可一鍵放行該作者。
 • 排行榜列出被隱藏或標記最多的帳號，可一鍵永久隱藏。
 
