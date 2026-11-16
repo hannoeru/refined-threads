@@ -24,7 +24,9 @@
 
 ## Install
 
-Install Refined Threads from the [Chrome Web Store](https://chromewebstore.google.com/detail/eafpgdohgehofcogmadaoodifnjnaigk) in Chrome, Brave, or Arc.
+Install Refined Threads from the Chrome Web Store in Chrome, Brave, or Arc.
+
+<a href="https://chromewebstore.google.com/detail/eafpgdohgehofcogmadaoodifnjnaigk"><img src="https://developer.chrome.com/static/docs/webstore/branding/image/iNEddTyWiMfLSwFD6qGq.png" alt="Available in the Chrome Web Store" height="58"></a>
 
 The Firefox Add-ons listing is in review, and the Edge Add-ons listing is on the way. Until then, install the latest release by hand in Firefox or Edge. It takes about a minute.
 
