@@ -8,15 +8,15 @@ Shows a small gray line of details under each author name. The line sits inside 
 
 Each detail has its own switch.
 
-| Detail              | Example        | Default | Needs                                               |
-| ------------------- | -------------- | ------- | --------------------------------------------------- |
-| Follows you         | Follows you    | On      | Nothing extra                                       |
-| You follow them     | Following      | Off     | Nothing extra                                       |
-| Country flag        | 🇯🇵             | On      | An About lookup and a logged-in session             |
-| Country name        | Japan          | Off     | An About lookup and a logged-in session             |
-| How long on Threads | 3y, or 8mo     | On      | An About lookup and a logged-in session             |
-| Follower count      | 1.2K followers | Off     | A profile lookup, or a count Threads already loaded |
-| Post count          | 340 posts      | Off     | A profile lookup                                    |
+| Detail              | Example                          | Default | Needs                                               |
+| ------------------- | -------------------------------- | ------- | --------------------------------------------------- |
+| Follows you         | Follows you                      | On      | Nothing extra                                       |
+| You follow them     | Following                        | Off     | Nothing extra                                       |
+| Country flag        | 🇯🇵                               | On      | An About lookup and a logged-in session             |
+| Country name        | Japan                            | Off     | An About lookup and a logged-in session             |
+| How long on Threads | joined 3y ago, or joined 8mo ago | On      | An About lookup and a logged-in session             |
+| Follower count      | 1.2K followers                   | Off     | A profile lookup, or a count Threads already loaded |
+| Post count          | 340 posts                        | Off     | A profile lookup                                    |
 
 An account that hides its location shows 🏴, or "🏴 Location hidden" when the country name is on. While the first lookup for an account runs, the line shows a small loading bar. When cached details have expired, the line keeps showing them while the new lookup runs, with no loading bar.
 

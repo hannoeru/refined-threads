@@ -655,7 +655,7 @@
     "message": "粉絲數"
   },
   "feature_account_info_age_years": {
-    "message": "$VALUE$ 年",
+    "message": "加入 $VALUE$ 年",
     "placeholders": {
       "value": {
         "content": "$1"
@@ -663,7 +663,7 @@
     }
   },
   "feature_account_info_age_months": {
-    "message": "$VALUE$ 個月",
+    "message": "加入 $VALUE$ 個月",
     "placeholders": {
       "value": {
         "content": "$1"

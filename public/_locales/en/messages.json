@@ -655,7 +655,7 @@
     "message": "Follower count"
   },
   "feature_account_info_age_years": {
-    "message": "$VALUE$y",
+    "message": "joined $VALUE$y ago",
     "placeholders": {
       "value": {
         "content": "$1"
@@ -663,7 +663,7 @@
     }
   },
   "feature_account_info_age_months": {
-    "message": "$VALUE$mo",
+    "message": "joined $VALUE$mo ago",
     "placeholders": {
       "value": {
         "content": "$1"
