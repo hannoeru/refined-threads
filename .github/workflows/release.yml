@@ -13,6 +13,7 @@ jobs:
     timeout-minutes: 15
     permissions:
       contents: write
+      actions: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -48,3 +49,9 @@ jobs:
         run: |
           test "$(gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --json assets -q '.assets | length')" = 3
           gh release edit "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --draft=false --latest
+
+      # A release published with GITHUB_TOKEN starts no `release` workflows, so dispatch the store run.
+      - name: Submit the release to the stores
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run stores.yml --repo "$GITHUB_REPOSITORY" -f tag="$GITHUB_REF_NAME" -f store=all -f dry-run=false

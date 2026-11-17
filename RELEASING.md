@@ -7,15 +7,15 @@ This guide is for maintainers. It covers the Chrome Web Store, Firefox Add-ons, 
 1. On an up-to-date `main`, run `pnpm release` and choose the new version. Choose a minor version if there is a `feat` commit since the last tag, and a patch version if there are only fixes.
 2. [bumpp](https://github.com/antfu-collective/bumpp) sets `version` in `package.json`, commits `chore: release v<version>`, tags `v<version>`, and pushes the commit and the tag.
 3. The `Release` workflow runs `pnpm check`, builds the zips, and publishes the GitHub release with the zips attached. [changelogithub](https://github.com/antfu/changelogithub) writes the notes from the Conventional Commits since the last tag: `feat` under Features, `fix` under Bug Fixes, and `perf` under Performance. Other commit types do not appear. The release is first created as a draft, because the repository uses immutable releases and a published release cannot get new files.
-4. When you want the version in the stores, run the `Stores` workflow (`.github/workflows/stores.yml`) by hand with the tag, the store, and **dry-run** off:
+4. The `Release` workflow then starts the `Stores` workflow (`.github/workflows/stores.yml`) for the new tag. Approve each store job on the run page with **Review deployments**. The job uploads the zips from the release and submits them for review. Each store publishes the version after its review.
 
-   ```sh
-   gh workflow run stores.yml -f tag=v<version> -f store=all -f dry-run=false
-   ```
+To submit a release again, for example after a failed store job, run the `Stores` workflow by hand with the tag, the store, and **dry-run** off:
 
-   Approve each store job on the run page with **Review deployments**. The job uploads the zips from the release and submits them for review. Each store publishes the version after its review.
+```sh
+gh workflow run stores.yml -f tag=v<version> -f store=chrome -f dry-run=false
+```
 
-Nothing goes to a store until a person runs the `Stores` workflow and approves its jobs. Each store rejects a version that is not higher than its current one. A store's job skips itself until that store is set up, so you can add the stores one at a time.
+Nothing goes to a store until a person approves its job. Each store rejects a version that is not higher than its current one. A store's job skips itself until that store is set up, so you can add the stores one at a time.
 
 Before a store release, run `node .agents/skills/store-listing/bin/check.mjs`. If it reports a problem, update the listing with the `store-listing` skill.
 
@@ -31,7 +31,7 @@ A store API can only update an item that already exists, so the first release in
 
 To create an item by hand, download the zips from the GitHub release, create the item in the store's dashboard, and fill in the listing from `store/<store>/listing.md`. Chrome and Edge use `refined-threads-<version>-chrome.zip`. Firefox uses `refined-threads-<version>-firefox.zip` and `refined-threads-<version>-sources.zip`. Do the one-time setup below after the item exists.
 
-Chrome and Firefox already have v0.2.0. After their setup is done, run the `Stores` workflow for each new version. The Edge job skips itself until the Edge item exists and its variables are set.
+Chrome and Firefox already have v0.2.0. After their setup is done, they get each new version that you release. The Edge job skips itself until the Edge item exists and its variables are set.
 
 Store variables must be **repository** variables, not environment variables, because the workflow reads them to decide whether to run a job. Store secrets go in the store's **environment**.
 
