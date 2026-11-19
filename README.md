@@ -24,11 +24,11 @@
 
 ## Install
 
-Install Refined Threads from the Chrome Web Store in Chrome, Brave, or Arc.
+Install Refined Threads from the Chrome Web Store in Chrome, Brave, or Arc, or from Firefox Add-ons in Firefox or Zen.
 
-<a href="https://chromewebstore.google.com/detail/eafpgdohgehofcogmadaoodifnjnaigk"><img src="https://developer.chrome.com/static/docs/webstore/branding/image/iNEddTyWiMfLSwFD6qGq.png" alt="Available in the Chrome Web Store" height="58"></a>
+<a href="https://chromewebstore.google.com/detail/eafpgdohgehofcogmadaoodifnjnaigk"><img src="https://developer.chrome.com/static/docs/webstore/branding/image/iNEddTyWiMfLSwFD6qGq.png" alt="Available in the Chrome Web Store" height="58"></a> <a href="https://addons.mozilla.org/en-US/firefox/addon/refined-threads/"><img src="https://extensionworkshop.com/assets/img/documentation/publish/get-the-addon-178x60px.dad84b42.png" alt="Get the add-on for Firefox" height="58"></a>
 
-The Firefox Add-ons listing is in review, and the Edge Add-ons listing is on the way. Until then, install the latest release by hand in Firefox or Edge. It takes about a minute.
+The Edge Add-ons listing is on the way. Until then, install the latest release by hand in Edge. It takes about a minute.
 
 ### Chrome, Edge, Brave, and Arc
 
@@ -42,11 +42,15 @@ The browser keeps the extension after a restart. To update, unzip the new releas
 
 ### Firefox and Zen
 
+Install Refined Threads from [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/refined-threads/). Firefox updates it for you.
+
+To try a release build without the listing, load it as a temporary add-on:
+
 1. Download `refined-threads-<version>-firefox.zip` from the [latest release](https://github.com/hannoeru/refined-threads/releases/latest).
 2. Open `about:debugging#/runtime/this-firefox`.
 3. Choose **Load Temporary Add-on**, and select the zip file.
 
-Firefox removes a temporary add-on when it restarts. A permanent install will come with the Firefox Add-ons listing.
+Firefox removes a temporary add-on when it restarts.
 
 ## Features
 
